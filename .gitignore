@@ -1,0 +1,10 @@
+/bin/
+.gradle/
+/build/
+/.settings/
+/generated/
+/run/
+
+# Class files
+**/*.class
+

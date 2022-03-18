@@ -1,0 +1,58 @@
+plugins {
+	// For runnable JARs
+	id 'application'
+ 	id 'distribution'
+}
+
+// Java project
+apply plugin: 'java'
+
+// Repositories providers
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+	implementation "junit:junit:4.11"     
+	implementation group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '5.11.1.202105131744-r'
+    
+}
+
+task javacc21(type:Exec) {
+
+	delete "./generated/"
+	workingDir './javacc/'
+
+	commandLine 'java', '-jar', '../libs/javacc-full.jar', 'JmmGrammar.jj', '-d', '../generated/'
+}
+compileJava.dependsOn javacc21
+
+// Project sources
+sourceSets {
+   main {
+      java {
+         srcDir 'src'
+         srcDir 'src-lib'
+         srcDir 'src-testing'         
+         srcDir 'src-private'
+         srcDir 'generated'
+         srcDir 'test_project'                  
+      }
+   }
+	
+   test {
+      java {
+         srcDir 'test'
+      }
+	  
+	  resources {
+		srcDir 'test'
+	  }
+   }
+}
+
+mainClassName = 'pt.up.fe.comp.Launcher'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+}

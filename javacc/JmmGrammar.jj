@@ -1,0 +1,39 @@
+PARSER_PACKAGE=pt.up.fe.comp;
+PARSER_CLASS=JmmGrammarParser;
+SMART_NODE_CREATION=false;
+
+SKIP : " " | "\t" | "\r" | "\n";
+
+TOKEN :
+	< PLUS : "+" > |
+	< MINUS : "-" > |
+	< TIMES : "*" > |
+	< DIVIDE : "/" > |
+	< OPEN_PAREN : "(" > |
+	< CLOSE_PAREN : ")" > |
+	< INTEGER : (["0" - "9"])+ >
+;
+
+Start : AdditiveExpression <EOF> ;
+
+AdditiveExpression :
+	MultiplicativeExpression
+	(
+		(< PLUS > | < MINUS >)
+		MultiplicativeExpression
+	)?
+;
+
+MultiplicativeExpression :
+	Factor
+	(
+		(< TIMES > | < DIVIDE >)
+		Factor
+	)?
+;
+
+Factor :
+	< INTEGER > |
+	< MINUS> Factor |
+	< OPEN_PAREN > AdditiveExpression < CLOSE_PAREN >
+;
