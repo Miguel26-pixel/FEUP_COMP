@@ -7,4 +7,4 @@
 
 # Class files
 **/*.class
-
+!libs-jmm/**/*.class
