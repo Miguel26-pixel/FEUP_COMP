@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.ReportsProvider;
 import pt.up.fe.specs.util.SpecsCollections;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsSystem;
@@ -26,7 +27,7 @@ import pt.up.fe.specs.util.utilities.StringLines;
 /**
  * A semantic analysis returns the analysed tree and the generated symbol table.
  */
-public class JasminResult {
+public class JasminResult implements ReportsProvider {
 
     private static Long HUMAN_DELAY_MS = 250l;
     private static Long TIMEOUT_NS = 5_000_000_000l;

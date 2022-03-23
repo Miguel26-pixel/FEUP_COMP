@@ -7,12 +7,13 @@ import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.ReportsProvider;
 import pt.up.fe.specs.util.SpecsCollections;
 
 /**
  * A semantic analysis returns the analysed tree and the generated symbol table.
  */
-public class JmmSemanticsResult {
+public class JmmSemanticsResult implements ReportsProvider {
 
     private final JmmNode rootNode;
     private final SymbolTable symbolTable;

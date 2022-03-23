@@ -11,8 +11,9 @@ import com.google.gson.GsonBuilder;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.ast.JmmSerializer;
 import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.ReportsProvider;
 
-public class JmmParserResult {
+public class JmmParserResult implements ReportsProvider {
 
     private final JmmNode rootNode;
     private final List<Report> reports;

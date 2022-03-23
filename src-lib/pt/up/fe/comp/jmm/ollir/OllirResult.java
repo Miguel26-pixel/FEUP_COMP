@@ -9,12 +9,13 @@ import org.specs.comp.ollir.ClassUnit;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.ReportsProvider;
 import pt.up.fe.specs.util.SpecsCollections;
 
 /**
  * An OLLIR result returns the parsed OLLIR code and the corresponding symbol table.
  */
-public class OllirResult {
+public class OllirResult implements ReportsProvider {
 
     private final String ollirCode;
     private final ClassUnit ollirClass;

@@ -19,6 +19,7 @@ import pt.up.fe.comp.jmm.parser.JmmParser;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
+import pt.up.fe.comp.jmm.report.ReportsProvider;
 import pt.up.fe.specs.util.SpecsCheck;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsSystem;
@@ -213,6 +214,15 @@ public class TestUtils {
     }
 
     /**
+     * Overload that accepts a ReportsProvider.
+     * 
+     * @param provider
+     */
+    public static void noErrors(ReportsProvider provider) {
+        noErrors(provider.getReports());
+    }
+
+    /**
      * Checks if there are Error reports. Throws exception is there are no reports of type Error.
      */
     public static void mustFail(List<Report> reports) {
@@ -224,6 +234,15 @@ public class TestUtils {
         if (noReports) {
             throw new RuntimeException("Could not find any Error report");
         }
+    }
+
+    /**
+     * Overload that accepts a ReportsProvider.
+     * 
+     * @param provider
+     */
+    public static void mustFail(ReportsProvider provider) {
+        mustFail(provider.getReports());
     }
 
     public static long getNumReports(List<Report> reports, ReportType type) {
