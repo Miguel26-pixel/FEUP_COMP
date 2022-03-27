@@ -9,11 +9,107 @@ TOKEN :
 	< MINUS : "-" > |
 	< TIMES : "*" > |
 	< DIVIDE : "/" > |
-	< OPEN_PAREN : "(" > |
-	< CLOSE_PAREN : ")" > |
-	< INTEGER : (["0" - "9"])+ >
+    < EQUAL : "=" > |
+	< AND: "&&" > |
+	< LESS_THAN: "<" > |
+	< NOT: "!" > |
+	< OPEN_PARENTHESES : "(" > |
+	< CLOSE_PARENTHESES : ")" > |
+	< OPEN_CURLY_BRACKETS : "{" > |
+    < CLOSE_CURLY_BRACKETS : "}" > |
+	< OPEN_SQUARE_BRACKETS : "[" > |
+    < CLOSE_SQUARE_BRACKETS : "]" > |
+	< INTEGER : (["0" - "9"])+ > |
+	< SEMICOLON : ";" > |
+	< DOT : "." > |
+	< COMMA : "," > |
+	< IMPORT : "import" > |
+	< ID : ["A"-"Z","a"-"z"](["A"-"Z","a"-"z","0"-"9"])* > | //not fully correct
+    < CLASS : "class" > |
+    < EXTENDS : "extends" > |
+    < PUBLIC : "public" > |
+    < STATIC : "static" > |
+    < VOID : "void" > |
+    < MAIN : "main" > |
+    < THIS : "this" > |
+    < NEW : "new" > |
+    < STRING : "String" > |
+    < BOOLEAN : "boolean" > |
+    < TRUE : "true" > |
+    < FALSE : "false" > |
+    < INT : "int" > |
+    < IF : "if" > |
+    < ELSE : "else" > |
+    < WHILE : "while" > |
+    < LENGTH : "lenght" > |
+    < RETURN : "return" >
 ;
 
+// from teacher's project infos
+Program:
+    ImportDeclaration |
+    ClassDeclaration |
+    <EOF>
+;
+
+ImportDeclaration:
+    < IMPORT > < ID >  ( < DOT > < ID > )* < SEMICOLON >
+;
+
+ClassDeclaration:
+    < CLASS > < ID > (< EXTENDS > < ID >)* < OPEN_CURLY_BRACKETS > (VarDeclaration | MethodDeclaration)* < CLOSE_CURLY_BRACKETS >
+;
+
+VarDeclaration:
+    Type < ID > < SEMICOLON >
+;
+
+MethodDeclaration:
+    < PUBLIC > Type < ID > < OPEN_PARENTHESES > Type < ID > (< COMMA > Type < ID >)* < CLOSE_PARENTHESES >
+    < OPEN_CURLY_BRACKETS>
+        ( VarDeclaration /*| Statement*/ )*
+        < RETURN > Expression < SEMICOLON >
+    < CLOSE_CURLY_BRACKETS >
+    |
+    < PUBLIC > < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
+    < OPEN_CURLY_BRACKETS>
+        ( VarDeclaration | Statement)*
+    < CLOSE_CURLY_BRACKETS >
+;
+
+Type:
+    < INT > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS >
+    | < INT >
+    | < BOOLEAN >
+    | < ID >
+;
+
+Statement:
+    < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS >
+    | < IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement < ELSE > Statement
+    | < WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement
+    | Expression < SEMICOLON >
+    | < ID > < EQUAL > Expression < SEMICOLON >
+    | < ID > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > < EQUAL > Expression < SEMICOLON >
+;
+
+Expression: //without the comments gives an exception (infinite loop)
+    /*Expression*/ ( < AND > | < LESS_THAN > | < PLUS > | < MINUS > | < TIMES > | < DIVIDE >) Expression
+    | /*Expression*/ < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
+    | /*Expression*/ < DOT > < LENGTH >
+    | /*Expression*/ < DOT > < ID > < OPEN_PARENTHESES > Expression ( < COMMA > Expression )* < CLOSE_PARENTHESES >
+    | < INTEGER > //IntegerLiteral
+    | < TRUE >
+    | < FALSE >
+    | < ID >
+    | < THIS >
+    | < NEW > < INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
+    | < NEW > < ID > < OPEN_PARENTHESES > < CLOSE_PARENTHESES >
+    | < NOT > Expression
+    | < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
+;
+
+// simple expression
 Start : AdditiveExpression <EOF> ;
 
 AdditiveExpression :
@@ -35,5 +131,5 @@ MultiplicativeExpression :
 Factor :
 	< INTEGER > |
 	< MINUS> Factor |
-	< OPEN_PAREN > AdditiveExpression < CLOSE_PAREN >
+	< OPEN_PARENTHESES > AdditiveExpression < CLOSE_PARENTHESES >
 ;
