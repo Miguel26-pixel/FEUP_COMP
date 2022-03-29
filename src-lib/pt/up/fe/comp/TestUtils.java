@@ -43,6 +43,16 @@ public class TestUtils {
         }
     }
 
+    public static JmmParserResult parse(String code, String startingRule) {
+        return parse(code, startingRule, Collections.emptyMap());
+    }
+
+    public static JmmParserResult parse(String code, String startingRule, Map<String, String> config) {
+        JmmParser parser = getJmmParser();
+
+        return parser.parse(code, startingRule, config);
+    }
+
     public static JmmParserResult parse(String code) {
         return parse(code, Collections.emptyMap());
     }
