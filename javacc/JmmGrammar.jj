@@ -41,7 +41,7 @@ TOKEN :
     < IF : "if" > |
     < ELSE : "else" > |
     < WHILE : "while" > |
-    < LENGTH : "lenght" > |
+    < LENGTH : "length" > |
     < RETURN : "return" >
 ;
 
@@ -98,7 +98,7 @@ Expression: //without the comments gives an exception (infinite loop)
     | /*Expression*/ < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
     | /*Expression*/ < DOT > < LENGTH >
     | /*Expression*/ < DOT > < ID > < OPEN_PARENTHESES > Expression ( < COMMA > Expression )* < CLOSE_PARENTHESES >
-    | < INTEGER > //IntegerLiteral
+    | < INTEGER >
     | < TRUE >
     | < FALSE >
     | < ID >
