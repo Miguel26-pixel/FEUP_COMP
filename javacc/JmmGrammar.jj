@@ -96,11 +96,11 @@ Expressions:
         Expression BinaryOP Expression |
         Expression < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > |
         Expression < DOT > < LENGTH > |
-        Expression < DOT > < ID > < OPEN_PARENTHESES > Expression ( < COMMA > Expression )* < CLOSE_PARENTHESES >
+        Expression < DOT > < ID > < OPEN_PARENTHESES > (Expression ( < COMMA > Expression )*)? < CLOSE_PARENTHESES >
     ) (Expressions)*
 ;
 
-Expression: //without the comments gives an exception (infinite loop)
+Expression:
     < INTEGER >
     | < TRUE >
     | < FALSE >
