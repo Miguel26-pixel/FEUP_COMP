@@ -46,7 +46,7 @@ TOKEN :
 ;
 
 // from teacher's project infos
-Program:
+Start:
     ImportDeclaration |
     ClassDeclaration |
     <EOF>
@@ -68,7 +68,7 @@ MethodDeclaration:
     < PUBLIC > Type < ID > < OPEN_PARENTHESES > Type < ID > (< COMMA > Type < ID >)* < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS>
         ( VarDeclaration /*| Statement*/ )*
-        < RETURN > Expression < SEMICOLON >
+        < RETURN > Expressions < SEMICOLON >
     < CLOSE_CURLY_BRACKETS >
     |
     < PUBLIC > < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
@@ -86,19 +86,24 @@ Type:
 
 Statement:
     < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS >
-    | < IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement < ELSE > Statement
-    | < WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement
-    | Expression < SEMICOLON >
-    | < ID > < EQUAL > Expression < SEMICOLON >
-    | < ID > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > < EQUAL > Expression < SEMICOLON >
+    | < IF > < OPEN_PARENTHESES > Expressions < CLOSE_PARENTHESES > Statement < ELSE > Statement
+    | < WHILE > <OPEN_PARENTHESES > Expressions < CLOSE_PARENTHESES > Statement
+    | Expressions < SEMICOLON >
+    | < ID > < EQUAL > Expressions < SEMICOLON >
+    | < ID > < OPEN_SQUARE_BRACKETS > Expressions < CLOSE_SQUARE_BRACKETS > < EQUAL > Expressions < SEMICOLON >
+;
+
+Expressions:
+    (
+        Expression BinaryOP Expression |
+        Expression < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > |
+        Expression < DOT > < LENGTH > |
+        Expression < DOT > < ID > < OPEN_PARENTHESES > Expression ( < COMMA > Expression )* < CLOSE_PARENTHESES >
+    ) (Expressions)*
 ;
 
 Expression: //without the comments gives an exception (infinite loop)
-    /*Expression*/ ( < AND > | < LESS_THAN > | < PLUS > | < MINUS > | < TIMES > | < DIVIDE >) Expression
-    | /*Expression*/ < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
-    | /*Expression*/ < DOT > < LENGTH >
-    | /*Expression*/ < DOT > < ID > < OPEN_PARENTHESES > Expression ( < COMMA > Expression )* < CLOSE_PARENTHESES >
-    | < INTEGER >
+    < INTEGER >
     | < TRUE >
     | < FALSE >
     | < ID >
@@ -109,9 +114,11 @@ Expression: //without the comments gives an exception (infinite loop)
     | < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
 ;
 
-// simple expression
-Start : AdditiveExpression <EOF> ;
+BinaryOP:
+    < AND > | < LESS_THAN > | < PLUS > | < MINUS > | < TIMES > | < DIVIDE >
+;
 
+// simple expression
 AdditiveExpression :
 	MultiplicativeExpression
 	(
