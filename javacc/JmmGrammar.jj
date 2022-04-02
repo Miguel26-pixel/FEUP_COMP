@@ -55,7 +55,7 @@ ImportDeclaration:
 ;
 
 ClassDeclaration:
-    < CLASS > < ID > (< EXTENDS > < ID >)* < OPEN_CURLY_BRACKETS > (VarDeclaration | MethodDeclaration)* < CLOSE_CURLY_BRACKETS >
+    < CLASS > < ID > (< EXTENDS > < ID >)? < OPEN_CURLY_BRACKETS > (VarDeclaration | MethodDeclaration)* < CLOSE_CURLY_BRACKETS >
 ;
 
 VarDeclaration:
