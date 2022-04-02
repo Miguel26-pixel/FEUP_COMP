@@ -24,7 +24,7 @@ TOKEN :
 	< DOT : "." > |
 	< COMMA : "," > |
 	< IMPORT : "import" > |
-	< ID : ["A"-"Z","a"-"z"](["A"-"Z","a"-"z","0"-"9"])* > | //not fully correct
+	< ID : ["A"-"Z","a"-"z"](["A"-"Z","a"-"z","0"-"9"])* > |
     < CLASS : "class" > |
     < EXTENDS : "extends" > |
     < PUBLIC : "public" > |
