@@ -59,13 +59,13 @@ ClassDeclaration:
 ;
 
 VarDeclaration:
-    Type < ID > < SEMICOLON >
+    Type < ID > (< EQUAL > Expression)? < SEMICOLON >
 ;
 
 MethodDeclaration:
-    < PUBLIC > Type < ID > < OPEN_PARENTHESES > Type < ID > (< COMMA > Type < ID >)* < CLOSE_PARENTHESES >
+    < PUBLIC > Type < ID > < OPEN_PARENTHESES > (Type < ID > (< COMMA > Type < ID >)*)? < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS>
-        ( VarDeclaration /*| Statement*/ )*
+        ( VarDeclaration | Statement )*
         < RETURN > Expressions < SEMICOLON >
     < CLOSE_CURLY_BRACKETS >
     |
