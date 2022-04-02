@@ -66,7 +66,7 @@ MethodDeclaration:
     < PUBLIC > Type < ID > < OPEN_PARENTHESES > (Type < ID > (< COMMA > Type < ID >)*)? < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS>
         ( VarDeclaration | Statement )*
-        < RETURN > Expressions < SEMICOLON >
+        < RETURN > Expression < SEMICOLON >
     < CLOSE_CURLY_BRACKETS >
     |
     < PUBLIC > < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
@@ -84,32 +84,42 @@ Type:
 
 Statement:
     < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS >
-    | < IF > < OPEN_PARENTHESES > Expressions < CLOSE_PARENTHESES > Statement < ELSE > Statement
-    | < WHILE > <OPEN_PARENTHESES > Expressions < CLOSE_PARENTHESES > Statement
-    | Expressions < SEMICOLON >
-    | < ID > < EQUAL > Expressions < SEMICOLON >
-    | < ID > < OPEN_SQUARE_BRACKETS > Expressions < CLOSE_SQUARE_BRACKETS > < EQUAL > Expressions < SEMICOLON >
-;
-
-Expressions:
-    (
-        Expression BinaryOP Expression |
-        Expression < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > |
-        Expression < DOT > < LENGTH > |
-        Expression < DOT > < ID > < OPEN_PARENTHESES > (Expression ( < COMMA > Expression )*)? < CLOSE_PARENTHESES >
-    ) (Expressions)*
+    | < IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement < ELSE > Statement
+    | < WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement
+    | Expression < SEMICOLON >
+    | < ID > < EQUAL > Expression < SEMICOLON >
+    | < ID > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > < EQUAL > Expression < SEMICOLON >
 ;
 
 Expression:
+    (SCAN 2 Bloat | Expression BinaryOP Bloat)
+    | Bloat
+    | < NEW > < INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
+    | < NEW > < ID > < OPEN_PARENTHESES > < CLOSE_PARENTHESES >
+    | < NOT > Expression
+    | < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
+;
+
+Bloat:
+    Bloat < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
+    | Expression < DOT > (< LENGTH > | < ID > < OPEN_PARENTHESES > (Arguments)? < CLOSE_PARENTHESES >)
+    | Fodasse
+;
+
+Arguments:
+    Expression (MoreArguments)?
+;
+
+MoreArguments:
+    < COMMA > Expression (MoreArguments)?
+;
+
+Fodasse:
     < INTEGER >
     | < TRUE >
     | < FALSE >
     | < ID >
     | < THIS >
-    | < NEW > < INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
-    | < NEW > < ID > < OPEN_PARENTHESES > < CLOSE_PARENTHESES >
-    | < NOT > Expression
-    | < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
 ;
 
 BinaryOP:
