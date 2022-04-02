@@ -47,9 +47,7 @@ TOKEN :
 
 // from teacher's project infos
 Start:
-    ImportDeclaration |
-    ClassDeclaration |
-    <EOF>
+    (ImportDeclaration)* ClassDeclaration <EOF>
 ;
 
 ImportDeclaration:
