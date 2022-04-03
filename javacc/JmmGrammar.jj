@@ -42,7 +42,7 @@ TOKEN :
     | < WHILE : "while" >
     | < LENGTH : "length" >
     | < RETURN : "return" >
-    | < ID : ["A"-"Z","a"-"z"](["A"-"Z","a"-"z","0"-"9"])* >
+    | < ID : ["A"-"Z","a"-"z","$","_"](["A"-"Z","a"-"z","0"-"9","$","_"])* >
     | < INTEGER : (["0" - "9"])+ >
 ;
 
@@ -69,7 +69,7 @@ MethodDeclaration:
 RegularMethod:
     Type < ID > < OPEN_PARENTHESES > (Type < ID > (< COMMA > Type < ID >)*)? < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS>
-        ( VarDeclaration | Statement )*
+        ( SCAN 2 VarDeclaration | Statement )*
         < RETURN > Expression < SEMICOLON >
     < CLOSE_CURLY_BRACKETS >
 ;
@@ -77,31 +77,37 @@ RegularMethod:
 MainMethod:
     < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS>
-        ( VarDeclaration | Statement)*
+        ( SCAN 2 VarDeclaration | Statement)*
     < CLOSE_CURLY_BRACKETS >
 ;
 
 Type:
-    < INT > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS >
-    | < INT >
+    < INT > (< OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS >)?
     | < BOOLEAN >
+    | < ID >
 ;
 
 Statement:
-    Expression < SEMICOLON >
-    | < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS >
-    | < IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement < ELSE > Statement
+    < IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement < ELSE > Statement
     | < WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement
-    | < ID > < EQUAL > Expression < SEMICOLON >
-    | < ID > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > < EQUAL > Expression < SEMICOLON >
+    | (SCAN 2
+        < ID > (
+                < EQUAL > Expression < SEMICOLON >
+                | < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > < EQUAL > Expression < SEMICOLON >
+               )
+        | Expression < SEMICOLON >
+       )
+    | < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS >
 ;
 
 Expression:
-    < NEW > < INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
-    | < NEW > < ID > < OPEN_PARENTHESES > < CLOSE_PARENTHESES >
+    < NEW > (
+                < INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
+                | < ID > < OPEN_PARENTHESES > < CLOSE_PARENTHESES >
+            )
     | < NOT > Expression
     | < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
-    | Terminal (ExpressionCompound)?
+    | Terminal (ExpressionCompound)*
 ;
 
 ExpressionCompound:
