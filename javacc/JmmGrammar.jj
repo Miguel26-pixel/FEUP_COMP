@@ -5,47 +5,47 @@ SMART_NODE_CREATION=false;
 SKIP : " " | "\t" | "\r" | "\n";
 
 TOKEN :
-	< PLUS : "+" > |
-	< MINUS : "-" > |
-	< TIMES : "*" > |
-	< DIVIDE : "/" > |
-    < EQUAL : "=" > |
-	< AND: "&&" > |
-	< LESS_THAN: "<" > |
-	< NOT: "!" > |
-	< OPEN_PARENTHESES : "(" > |
-	< CLOSE_PARENTHESES : ")" > |
-	< OPEN_CURLY_BRACKETS : "{" > |
-    < CLOSE_CURLY_BRACKETS : "}" > |
-	< OPEN_SQUARE_BRACKETS : "[" > |
-    < CLOSE_SQUARE_BRACKETS : "]" > |
-	< INTEGER : (["0" - "9"])+ > |
-	< SEMICOLON : ";" > |
-	< DOT : "." > |
-	< COMMA : "," > |
-	< IMPORT : "import" > |
-	< ID : ["A"-"Z","a"-"z"](["A"-"Z","a"-"z","0"-"9"])* > |
-    < CLASS : "class" > |
-    < EXTENDS : "extends" > |
-    < PUBLIC : "public" > |
-    < STATIC : "static" > |
-    < VOID : "void" > |
-    < MAIN : "main" > |
-    < THIS : "this" > |
-    < NEW : "new" > |
-    < STRING : "String" > |
-    < BOOLEAN : "boolean" > |
-    < TRUE : "true" > |
-    < FALSE : "false" > |
-    < INT : "int" > |
-    < IF : "if" > |
-    < ELSE : "else" > |
-    < WHILE : "while" > |
-    < LENGTH : "length" > |
-    < RETURN : "return" >
+	< PLUS : "+" >
+	| < MINUS : "-" >
+	| < TIMES : "*" >
+	| < DIVIDE : "/" >
+    | < EQUAL : "=" >
+	| < AND: "&&" >
+	| < OR: "||" >
+	| < LESS_THAN: "<" >
+	| < NOT: "!" >
+	| < OPEN_PARENTHESES : "(" >
+	| < CLOSE_PARENTHESES : ")" >
+	| < OPEN_CURLY_BRACKETS : "{" >
+    | < CLOSE_CURLY_BRACKETS : "}" >
+	| < OPEN_SQUARE_BRACKETS : "[" >
+    | < CLOSE_SQUARE_BRACKETS : "]" >
+	| < SEMICOLON : ";" >
+	| < DOT : "." >
+	| < COMMA : "," >
+	| < IMPORT : "import" >
+    | < CLASS : "class" >
+    | < EXTENDS : "extends" >
+    | < PUBLIC : "public" >
+    | < STATIC : "static" >
+    | < VOID : "void" >
+    | < MAIN : "main" >
+    | < THIS : "this" >
+    | < NEW : "new" >
+    | < STRING : "String" >
+    | < BOOLEAN : "boolean" >
+    | < TRUE : "true" >
+    | < FALSE : "false" >
+    | < INT : "int" >
+    | < IF : "if" >
+    | < ELSE : "else" >
+    | < WHILE : "while" >
+    | < LENGTH : "length" >
+    | < RETURN : "return" >
+    | < ID : ["A"-"Z","a"-"z"](["A"-"Z","a"-"z","0"-"9"])* >
+    | < INTEGER : (["0" - "9"])+ >
 ;
 
-// from teacher's project infos
 Start:
     (ImportDeclaration)* ClassDeclaration <EOF>
 ;
@@ -63,13 +63,19 @@ VarDeclaration:
 ;
 
 MethodDeclaration:
-    < PUBLIC > Type < ID > < OPEN_PARENTHESES > (Type < ID > (< COMMA > Type < ID >)*)? < CLOSE_PARENTHESES >
+    <PUBLIC> (MainMethod | RegularMethod)
+;
+
+RegularMethod:
+    Type < ID > < OPEN_PARENTHESES > (Type < ID > (< COMMA > Type < ID >)*)? < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS>
         ( VarDeclaration | Statement )*
         < RETURN > Expression < SEMICOLON >
     < CLOSE_CURLY_BRACKETS >
-    |
-    < PUBLIC > < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
+;
+
+MainMethod:
+    < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS>
         ( VarDeclaration | Statement)*
     < CLOSE_CURLY_BRACKETS >
@@ -79,42 +85,32 @@ Type:
     < INT > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS >
     | < INT >
     | < BOOLEAN >
-    | < ID >
 ;
 
 Statement:
-    < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS >
+    Expression < SEMICOLON >
+    | < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS >
     | < IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement < ELSE > Statement
     | < WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement
-    | Expression < SEMICOLON >
     | < ID > < EQUAL > Expression < SEMICOLON >
     | < ID > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > < EQUAL > Expression < SEMICOLON >
 ;
 
 Expression:
-    (SCAN 2 Bloat | Expression BinaryOP Bloat)
-    | Bloat
-    | < NEW > < INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
+    < NEW > < INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
     | < NEW > < ID > < OPEN_PARENTHESES > < CLOSE_PARENTHESES >
     | < NOT > Expression
     | < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
+    | Terminal (ExpressionCompound)?
 ;
 
-Bloat:
-    Bloat < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
-    | Expression < DOT > (< LENGTH > | < ID > < OPEN_PARENTHESES > (Arguments)? < CLOSE_PARENTHESES >)
-    | Fodasse
+ExpressionCompound:
+    BinaryOperator Expression
+    | < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
+    | < DOT > (< LENGTH > | < ID > < OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? < CLOSE_PARENTHESES >)
 ;
 
-Arguments:
-    Expression (MoreArguments)?
-;
-
-MoreArguments:
-    < COMMA > Expression (MoreArguments)?
-;
-
-Fodasse:
+Terminal:
     < INTEGER >
     | < TRUE >
     | < FALSE >
@@ -122,7 +118,7 @@ Fodasse:
     | < THIS >
 ;
 
-BinaryOP:
+BinaryOperator:
     < AND > | < LESS_THAN > | < PLUS > | < MINUS > | < TIMES > | < DIVIDE >
 ;
 
