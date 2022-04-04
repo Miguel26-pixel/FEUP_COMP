@@ -36,10 +36,8 @@ public class SimpleParser implements JmmParser {
     public JmmParserResult parse(String jmmCode, String startingRule, Map<String, String> config) {
         try {
             JmmGrammarParser parser = new JmmGrammarParser(SpecsIo.toInputStream(jmmCode));
-            Node root = (Node) SpecsSystem.invoke(parser, startingRule);
-            if (root == null){
-                root = parser.rootNode();
-            }
+            SpecsSystem.invoke(parser, startingRule);
+            Node root = parser.rootNode();
             root.dump("");
             if (!(root instanceof JmmNode)) {
                 return JmmParserResult.newError(new Report(ReportType.WARNING, Stage.SYNTATIC, -1,

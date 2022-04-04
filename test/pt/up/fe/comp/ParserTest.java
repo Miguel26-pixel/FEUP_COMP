@@ -105,4 +105,5 @@ public class ParserTest {
     public void nestedLoop() {
         mustFail(SpecsIo.getResource("fixtures/public/fail/syntactical/NestedLoop.jmm"));
     }
+
 }

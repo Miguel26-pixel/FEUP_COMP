@@ -19,8 +19,7 @@ public class GrammarTest {
 
     private static final String IMPORT = "ImportDeclaration";
     private static final String CLASS = "ClassDeclaration";
-    private static final String MAIN_METHOD = "MainMethod";
-    private static final String INSTANCE_METHOD = "RegularMethod";
+    private static final String METHOD = "MethodDeclaration";
     private static final String STATEMENT = "Statement";
     private static final String EXPRESSION = "Expression";
     private static final String VAR_DECLARATION = "VarDeclaration";
@@ -69,13 +68,13 @@ public class GrammarTest {
 
     @Test
     public void testMainMethodEmpty() {
-        noErrors("public static void main(String[] args) {}", MAIN_METHOD);
+        noErrors("public static void main(String[] args) {}", METHOD);
     }
 
     @Test
     public void testInstanceMethodEmpty() {
         noErrors("public int foo(int anInt, int[] anArray, boolean aBool, String aString) {return a;}",
-                INSTANCE_METHOD);
+                METHOD);
     }
 
     @Test
@@ -257,5 +256,4 @@ public class GrammarTest {
     public void testExprChain() {
         noErrors("1 && 2 < 3 + 4 - 5 * 6 / 7", EXPRESSION);
     }
-
 }

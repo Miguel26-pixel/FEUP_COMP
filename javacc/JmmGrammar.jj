@@ -70,14 +70,11 @@ VarDeclaration:
 ;
 
 MethodDeclaration:
-    (SCAN 2
-        MainMethod
-        | RegularMethod
-    )
+    <PUBLIC> (MainMethod | RegularMethod )
 ;
 
 RegularMethod:
-    <PUBLIC> Type < ID > < OPEN_PARENTHESES > (Type < ID > (< COMMA > Type < ID >)*)? < CLOSE_PARENTHESES >
+    Type < ID > < OPEN_PARENTHESES > (Type < ID > (< COMMA > Type < ID >)*)? < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS>
         ( SCAN 2 VarDeclaration | Statement )*
         < RETURN > Expression < SEMICOLON >
@@ -85,7 +82,7 @@ RegularMethod:
 ;
 
 MainMethod:
-    <PUBLIC> < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
+    < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS>
         ( SCAN 2 VarDeclaration | Statement)*
     < CLOSE_CURLY_BRACKETS >
@@ -129,16 +126,16 @@ ExpressionCompound:
     | < DOT > (< LENGTH > | < ID > < OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? < CLOSE_PARENTHESES >)
 ;
 
-Terminal:
+BinaryOperator:
+     < AND > | < LESS_THAN > | < PLUS > | < MINUS > | < TIMES > | < DIVIDE >
+;
+
+Terminal #void:
     < INTEGER >
     | < TRUE >
     | < FALSE >
     | < ID >
     | < THIS >
-;
-
-BinaryOperator:
-    < AND > | < LESS_THAN > | < PLUS > | < MINUS > | < TIMES > | < DIVIDE >
 ;
 
 // simple expression
