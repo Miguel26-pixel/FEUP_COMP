@@ -2,7 +2,14 @@ PARSER_PACKAGE=pt.up.fe.comp;
 PARSER_CLASS=JmmGrammarParser;
 SMART_NODE_CREATION=false;
 
-SKIP : " " | "\t" | "\r" | "\n";
+SKIP :
+    < SPACE : " " >
+    | < TAB : "\t" >
+    | < CARRIAGE_RETURN: "\r" >
+    | < LINE_FEED: "\n" >
+    | < SINGLE_LINE_COMMENT: "//" (~["\r", "\n"])* >
+    | < MULTI_LINE_COMMENT: "/*" (~["*"])* "*" (~["*","/"] (~["*"])* "*" | "*")* "/" >
+;
 
 TOKEN :
 	< PLUS : "+" >
@@ -88,26 +95,28 @@ Type:
 ;
 
 Statement:
-    < IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement < ELSE > Statement
-    | < WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement
-    | (SCAN 2
+    (SCAN 2
         < ID > (
                 < EQUAL > Expression < SEMICOLON >
                 | < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > < EQUAL > Expression < SEMICOLON >
                )
         | Expression < SEMICOLON >
-       )
+    )
+    | < IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement < ELSE > Statement
+    | < WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement
     | < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS >
 ;
 
 Expression:
-    < NEW > (
-                < INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
-                | < ID > < OPEN_PARENTHESES > < CLOSE_PARENTHESES >
-            )
-    | < NOT > Expression
-    | < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
-    | Terminal (ExpressionCompound)*
+    (
+        < NEW > (
+                    < INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
+                    | < ID > < OPEN_PARENTHESES > < CLOSE_PARENTHESES >
+                )
+        | < NOT > Expression
+        | < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
+        | Terminal
+    ) (ExpressionCompound)*
 ;
 
 ExpressionCompound:

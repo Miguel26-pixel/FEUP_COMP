@@ -44,8 +44,8 @@ public class ParserTest {
     }
 
     @Test
-    public void lazysort() {
-        noErrors(SpecsIo.getResource("fixtures/public/Lazysort.jmm"));
+    public void lazySort() {
+        noErrors(SpecsIo.getResource("fixtures/public/LazySort.jmm"));
     }
 
     @Test
