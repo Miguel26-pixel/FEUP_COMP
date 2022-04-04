@@ -19,10 +19,11 @@ public class GrammarTest {
 
     private static final String IMPORT = "ImportDeclaration";
     private static final String CLASS = "ClassDeclaration";
-    private static final String MAIN_METHOD = "";
-    private static final String INSTANCE_METHOD = "";
-    private static final String STATEMENT = "";
-    private static final String EXPRESSION = "";
+    private static final String MAIN_METHOD = "MainMethod";
+    private static final String INSTANCE_METHOD = "RegularMethod";
+    private static final String STATEMENT = "Statement";
+    private static final String EXPRESSION = "Expression";
+    private static final String VAR_DECLARATION = "VarDeclaration";
 
     private static void noErrors(String code, String grammarRule) {
         if (grammarRule.isEmpty()) {
@@ -34,9 +35,6 @@ public class GrammarTest {
 
         var result = TestUtils.parse(code, grammarRule);
         TestUtils.noErrors(result.getReports());
-
-        System.out.println("Code: " + code + "\n");
-        System.out.println("AST:\n\n" + result.getRootNode().toTree());
         System.out.println("\n---------\n");
     }
 
@@ -61,12 +59,12 @@ public class GrammarTest {
 
     @Test
     public void testVarDecls() {
-        noErrors("class Foo {int a; int[] b; int c; boolean d; Bar e;}");
+        noErrors("class Foo {int a; int[] b; int c; boolean d; Bar e;}", CLASS);
     }
 
     @Test
     public void testVarDeclString() {
-        noErrors("String aString;", "VarDecl");
+        noErrors("String aString;", VAR_DECLARATION);
     }
 
     @Test

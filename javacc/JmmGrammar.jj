@@ -70,11 +70,14 @@ VarDeclaration:
 ;
 
 MethodDeclaration:
-    <PUBLIC> (MainMethod | RegularMethod)
+    (SCAN 2
+        MainMethod
+        | RegularMethod
+    )
 ;
 
 RegularMethod:
-    Type < ID > < OPEN_PARENTHESES > (Type < ID > (< COMMA > Type < ID >)*)? < CLOSE_PARENTHESES >
+    <PUBLIC> Type < ID > < OPEN_PARENTHESES > (Type < ID > (< COMMA > Type < ID >)*)? < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS>
         ( SCAN 2 VarDeclaration | Statement )*
         < RETURN > Expression < SEMICOLON >
@@ -82,7 +85,7 @@ RegularMethod:
 ;
 
 MainMethod:
-    < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
+    <PUBLIC> < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS>
         ( SCAN 2 VarDeclaration | Statement)*
     < CLOSE_CURLY_BRACKETS >
@@ -91,6 +94,7 @@ MainMethod:
 Type:
     < INT > (< OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS >)?
     | < BOOLEAN >
+    | < STRING >
     | < ID >
 ;
 
