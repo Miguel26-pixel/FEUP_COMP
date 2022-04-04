@@ -256,4 +256,7 @@ public class GrammarTest {
     public void testExprChain() {
         noErrors("1 && 2 < 3 + 4 - 5 * 6 / 7", EXPRESSION);
     }
+
+    @Test
+    public void testComplexExprChain() {noErrors("a.max()[2] + 3", EXPRESSION);}
 }

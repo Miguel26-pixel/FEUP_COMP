@@ -58,7 +58,7 @@ Start:
 ;
 
 ImportDeclaration:
-    < IMPORT > < ID >  ( < DOT > < ID > )* < SEMICOLON >
+    < IMPORT > < ID >  (< DOT > < ID >)* < SEMICOLON >
 ;
 
 ClassDeclaration:
@@ -70,7 +70,7 @@ VarDeclaration:
 ;
 
 MethodDeclaration:
-    <PUBLIC> (MainMethod | RegularMethod )
+    <PUBLIC> (MainMethod | RegularMethod)
 ;
 
 RegularMethod:
@@ -84,50 +84,69 @@ RegularMethod:
 MainMethod:
     < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS>
-        ( SCAN 2 VarDeclaration | Statement)*
+        ( SCAN 2 VarDeclaration | Statement )*
     < CLOSE_CURLY_BRACKETS >
 ;
 
-Type:
+Type #void:
     < INT > (< OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS >)?
     | < BOOLEAN >
     | < STRING >
     | < ID >
 ;
 
-Statement:
+Statement #void:
     (SCAN 2
         < ID > (
-                < EQUAL > Expression < SEMICOLON >
-                | < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > < EQUAL > Expression < SEMICOLON >
+                < EQUAL > Expression < SEMICOLON > #VariableAssignment
+                | < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > < EQUAL > Expression < SEMICOLON > #ArrayAssignment
                )
         | Expression < SEMICOLON >
     )
-    | < IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement < ELSE > Statement
-    | < WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement
+    | < IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement < ELSE > Statement #If
+    | < WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement #While
     | < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS >
 ;
 
-Expression:
+Expression #void:
+    OrExpression
+;
+
+OrExpression #void:
+    AndExpression (<OR> AndExpression #Or)*
+;
+
+AndExpression #void:
+    RelationalExpression (<AND> RelationalExpression #And)*
+;
+
+RelationalExpression #void:
+    AddExpression (<LESS_THAN> AddExpression #LessThan)?
+;
+
+AddExpression #void:
+    MultExpression ((<PLUS> | <MINUS>) MultExpression #And)*
+;
+
+MultExpression #void:
+    TerminalExpression ((<TIMES> | <DIVIDE>) TerminalExpression #Mult)*
+;
+
+TerminalExpression #void:
     (
         < NEW > (
-                    < INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
-                    | < ID > < OPEN_PARENTHESES > < CLOSE_PARENTHESES >
+                    < INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > #NewArray
+                    | < ID > < OPEN_PARENTHESES > < CLOSE_PARENTHESES > #NewObject
                 )
         | < NOT > Expression
         | < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
         | Terminal
-    ) (ExpressionCompound)*
+    ) (TerminalExpressionCompound)*
 ;
 
-ExpressionCompound:
-    BinaryOperator Expression
-    | < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
-    | < DOT > (< LENGTH > | < ID > < OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? < CLOSE_PARENTHESES >)
-;
-
-BinaryOperator:
-     < AND > | < LESS_THAN > | < PLUS > | < MINUS > | < TIMES > | < DIVIDE >
+TerminalExpressionCompound #void:
+    < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > #Indexation
+    | < DOT > (< LENGTH > | < ID > < OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? < CLOSE_PARENTHESES >) #MethodCall
 ;
 
 Terminal #void:
@@ -136,27 +155,4 @@ Terminal #void:
     | < FALSE >
     | < ID >
     | < THIS >
-;
-
-// simple expression
-AdditiveExpression :
-	MultiplicativeExpression
-	(
-		(< PLUS > | < MINUS >)
-		MultiplicativeExpression
-	)?
-;
-
-MultiplicativeExpression :
-	Factor
-	(
-		(< TIMES > | < DIVIDE >)
-		Factor
-	)?
-;
-
-Factor :
-	< INTEGER > |
-	< MINUS> Factor |
-	< OPEN_PARENTHESES > AdditiveExpression < CLOSE_PARENTHESES >
 ;
