@@ -17,7 +17,8 @@ import org.junit.Test;
 
 public class GrammarTest {
 
-    private static final String IMPORT = "";
+    private static final String IMPORT = "ImportDeclaration";
+    private static final String CLASS = "ClassDeclaration";
     private static final String MAIN_METHOD = "";
     private static final String INSTANCE_METHOD = "";
     private static final String STATEMENT = "";
@@ -40,7 +41,7 @@ public class GrammarTest {
     }
 
     private static void noErrors(String code) {
-        noErrors(code, "Program");
+        noErrors(code, "Start");
     }
 
     @Test
@@ -55,7 +56,7 @@ public class GrammarTest {
 
     @Test
     public void testClass() {
-        noErrors("class Foo extends Bar {}");
+        noErrors("class Foo extends Bar {}", CLASS);
     }
 
     @Test

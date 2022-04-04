@@ -32,7 +32,6 @@ public class ParserTest {
     /* 
      * Code that must be successfully parsed 
      */
-
     @Test
     public void helloWorld() {
         noErrors(SpecsIo.getResource("fixtures/public/HelloWorld.jmm"));
