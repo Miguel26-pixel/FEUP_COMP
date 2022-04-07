@@ -320,4 +320,27 @@ public class TestUtils {
         return toConfig(Arrays.asList(args));
     }
 
+    /**
+     * Finds an exception of the given class inside the chain of causes of the given exception. If the given exception
+     * is an instance of the given class, returns the exception itself. Returns null if no exception of the given class
+     * is found.
+     * 
+     * @param <T>
+     * @param e
+     * @param expectedClass
+     * @return
+     */
+    public static <T extends Throwable> T getException(Throwable e, Class<T> expectedClass) {
+        Throwable currentException = e;
+
+        while (currentException != null) {
+            if (expectedClass.isInstance(currentException)) {
+                return expectedClass.cast(currentException);
+            }
+
+            currentException = currentException.getCause();
+        }
+
+        return null;
+    }
 }
