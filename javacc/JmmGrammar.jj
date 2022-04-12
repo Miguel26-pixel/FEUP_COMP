@@ -1,6 +1,7 @@
 PARSER_PACKAGE=pt.up.fe.comp;
 PARSER_CLASS=JmmGrammarParser;
 SMART_NODE_CREATION=false;
+TOKENS_ARE_NODES=false;
 
 SKIP :
     < SPACE : " " >
@@ -39,7 +40,6 @@ TOKEN :
     | < MAIN : "main" >
     | < THIS : "this" >
     | < NEW : "new" >
-    | < STRING : "String" >
     | < BOOLEAN : "boolean" >
     | < TRUE : "true" >
     | < FALSE : "false" >
@@ -82,8 +82,8 @@ RegularMethod:
 ;
 
 MainMethod:
-    < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
-    < OPEN_CURLY_BRACKETS>
+    < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < ID > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
+    < OPEN_CURLY_BRACKETS >
         ( SCAN 2 VarDeclaration | Statement )*
     < CLOSE_CURLY_BRACKETS >
 ;
@@ -112,23 +112,29 @@ Expression #void:
 ;
 
 OrExpression #void:
-    AndExpression (<OR> AndExpression #Or)*
+    AndExpression ((<OR> AndExpression { jjtThis.put("op", "or"); }) #BinOp(2))*
 ;
 
 AndExpression #void:
-    RelationalExpression (<AND> RelationalExpression #And)*
+    RelationalExpression ((<AND> RelationalExpression { jjtThis.put("op", "and"); }) #BinOp(2))*
 ;
 
 RelationalExpression #void:
-    AddExpression (<LESS_THAN> AddExpression #LessThan)?
+    AddExpression ((<LESS_THAN> AddExpression { jjtThis.put("op", "lt"); }) #BinOp(2))?
 ;
 
 AddExpression #void:
-    MultExpression ((<PLUS> | <MINUS>) MultExpression #And)*
+    MultExpression (
+            (<PLUS> MultExpression { jjtThis.put("op", "add"); }) #BinOp(2)
+            | (<MINUS> MultExpression { jjtThis.put("op", "sub"); }) #BinOp(2)
+        )*
 ;
 
 MultExpression #void:
-    NewExpression ((<TIMES> | <DIVIDE>) NewExpression #Mult)*
+    NewExpression (
+            (<TIMES> NewExpression { jjtThis.put("op", "mul"); }) #BinOp(2)
+            | (<DIVIDE> NewExpression { jjtThis.put("op", "div"); }) #BinOp(2)
+        )*
 ;
 
 NewExpression #void:
@@ -140,7 +146,8 @@ NewExpression #void:
 ;
 
 NotExpression #void:
-    (< NOT >)? TerminalExpression
+    (< NOT > TerminalExpression { jjtThis.put("op", "not"); }) #UnaryOp(1)
+    | TerminalExpression
 ;
 
 TerminalExpression #void:
@@ -162,3 +169,24 @@ Terminal #void:
     | < ID >
     | < THIS >
 ;
+
+INJECT BaseNode:
+		import pt.up.fe.comp.jmm.ast.JmmNode;
+		import pt.up.fe.comp.jmm.ast.AJmmNode;
+		import pt.up.fe.specs.util.SpecsCollections;
+		extends AJmmNode
+{
+    @Override
+    public List<JmmNode> getChildren() {
+        return SpecsCollections.cast(children(), JmmNode.class);
+    }
+
+    @Override
+    public void add(JmmNode child, int index) {
+        if (child instanceof Node) {
+            addChild(index, (Node) child);
+        } else {
+            throw new RuntimeException("Node " + child + " is not a Node.");
+        }
+    }
+}
