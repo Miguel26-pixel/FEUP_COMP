@@ -163,11 +163,11 @@ TerminalExpressionCompound #void:
 ;
 
 Terminal #void:
-    < INTEGER >
-    | < TRUE >
-    | < FALSE >
-    | < ID >
-    | < THIS >
+    (< INTEGER > { jjtThis.put("value", lastConsumedToken.getImage()); }) #IntLiteral
+    | < TRUE > #True
+    | < FALSE > #False
+    | < ID > #Id
+    | < THIS > #This
 ;
 
 INJECT BaseNode:
