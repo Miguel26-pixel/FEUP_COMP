@@ -74,7 +74,7 @@ MethodDeclaration:
 ;
 
 RegularMethod:
-    Type < ID > < OPEN_PARENTHESES > (Type < ID > (< COMMA > Type < ID >)* #Arguments)? < CLOSE_PARENTHESES >
+    Type < ID > { jjtThis.put("name", lastConsumedToken.getImage()); } < OPEN_PARENTHESES > (Type < ID > { jjtThis.put("name", lastConsumedToken.getImage()); } (< COMMA > Type < ID > { jjtThis.put("name", lastConsumedToken.getImage()); })*)? < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS >
         ( SCAN 2 VarDeclaration | Statement )*
         < RETURN > Expression < SEMICOLON >
@@ -150,7 +150,7 @@ NotExpression #void:
     | TerminalExpression
 ;
 
-TerminalExpression #void:
+TerminalExpression:
     (
         < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
         | Terminal
@@ -158,16 +158,16 @@ TerminalExpression #void:
 ;
 
 TerminalExpressionCompound #void:
-    < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > #Indexation
-    | < DOT > (< LENGTH > | < ID > < OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? < CLOSE_PARENTHESES >) #MethodCall
+    (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >) #Indexation
+    | (< DOT > (< LENGTH > | < ID > { jjtThis.put("name", lastConsumedToken.getImage()); } < OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? < CLOSE_PARENTHESES >)) #MethodCall
 ;
 
 Terminal #void:
-    (< INTEGER > { jjtThis.put("value", lastConsumedToken.getImage()); }) #IntLiteral
-    | < TRUE > #True
+    < TRUE > #True
     | < FALSE > #False
-    | < ID > #Id
     | < THIS > #This
+    | (< ID > { jjtThis.put("name", lastConsumedToken.getImage()); }) #Id
+    | (< INTEGER > { jjtThis.put("value", lastConsumedToken.getImage()); }) #IntLiteral
 ;
 
 INJECT BaseNode:
