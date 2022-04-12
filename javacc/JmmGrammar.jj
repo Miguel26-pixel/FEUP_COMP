@@ -112,29 +112,29 @@ Expression #void:
 ;
 
 OrExpression #void:
-    AndExpression (<OR> ({ jjtThis.put("op", "or"); }) #BinOp(2) AndExpression)*
+    AndExpression ((<OR> AndExpression { jjtThis.put("op", "or"); }) #BinOp(2))*
 ;
 
 AndExpression #void:
-    RelationalExpression (<AND> ({ jjtThis.put("op", "and"); }) #BinOp(2) RelationalExpression)*
+    RelationalExpression ((<AND> RelationalExpression { jjtThis.put("op", "and"); }) #BinOp(2) )*
 ;
 
 RelationalExpression #void:
-    AddExpression (<LESS_THAN> ({ jjtThis.put("op", "lt"); }) #BinOp(2) AddExpression)?
+    AddExpression ((<LESS_THAN> AddExpression { jjtThis.put("op", "lt"); }) #BinOp(2))?
 ;
 
 AddExpression #void:
     MultExpression ((
-            <PLUS> ({ jjtThis.put("op", "add"); }) #BinOp(2)
-            | <MINUS> ({ jjtThis.put("op", "sub"); }) #BinOp(2)
-        ) MultExpression)*
+            (<PLUS> MultExpression { jjtThis.put("op", "add"); }) #BinOp(2)
+            | (<MINUS> MultExpression { jjtThis.put("op", "sub"); }) #BinOp(2)
+        ))*
 ;
 
 MultExpression #void:
     NewExpression ((
-            <TIMES> ({ jjtThis.put("op", "mul"); }) #BinOp(2)
-            | <DIVIDE> ({ jjtThis.put("op", "div"); }) #BinOp(2)
-        ) NewExpression)*
+            (<TIMES> NewExpression { jjtThis.put("op", "mul"); }) #BinOp(2)
+            | (<DIVIDE> NewExpression { jjtThis.put("op", "div"); }) #BinOp(2)
+        ))*
 ;
 
 NewExpression #void:
