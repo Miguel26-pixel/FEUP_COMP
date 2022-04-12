@@ -74,8 +74,8 @@ MethodDeclaration:
 ;
 
 RegularMethod:
-    Type < ID > < OPEN_PARENTHESES > (Type < ID > (< COMMA > Type < ID >)*)? < CLOSE_PARENTHESES >
-    < OPEN_CURLY_BRACKETS>
+    Type < ID > < OPEN_PARENTHESES > (Type < ID > (< COMMA > Type < ID >)* #Arguments)? < CLOSE_PARENTHESES >
+    < OPEN_CURLY_BRACKETS >
         ( SCAN 2 VarDeclaration | Statement )*
         < RETURN > Expression < SEMICOLON >
     < CLOSE_CURLY_BRACKETS >
@@ -88,10 +88,9 @@ MainMethod:
     < CLOSE_CURLY_BRACKETS >
 ;
 
-Type #void:
+Type:
     < INT > (< OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS >)?
     | < BOOLEAN >
-    | < STRING >
     | < ID >
 ;
 
@@ -129,17 +128,24 @@ AddExpression #void:
 ;
 
 MultExpression #void:
-    TerminalExpression ((<TIMES> | <DIVIDE>) TerminalExpression #Mult)*
+    NewExpression ((<TIMES> | <DIVIDE>) NewExpression #Mult)*
+;
+
+NewExpression #void:
+    < NEW > (
+                < INT > < OPEN_SQUARE_BRACKETS > NotExpression < CLOSE_SQUARE_BRACKETS > #NewArray
+                | < ID > < OPEN_PARENTHESES > < CLOSE_PARENTHESES > #NewObject
+            )
+    | NotExpression
+;
+
+NotExpression #void:
+    (< NOT >)? TerminalExpression
 ;
 
 TerminalExpression #void:
     (
-        < NEW > (
-                    < INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > #NewArray
-                    | < ID > < OPEN_PARENTHESES > < CLOSE_PARENTHESES > #NewObject
-                )
-        | < NOT > Expression
-        | < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
+        < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
         | Terminal
     ) (TerminalExpressionCompound)*
 ;
