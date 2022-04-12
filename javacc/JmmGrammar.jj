@@ -124,17 +124,17 @@ RelationalExpression #void:
 ;
 
 AddExpression #void:
-    MultExpression ((
+    MultExpression (
             (<PLUS> MultExpression { jjtThis.put("op", "add"); }) #BinOp(2)
             | (<MINUS> MultExpression { jjtThis.put("op", "sub"); }) #BinOp(2)
-        ))*
+        )*
 ;
 
 MultExpression #void:
-    NewExpression ((
+    NewExpression (
             (<TIMES> NewExpression { jjtThis.put("op", "mul"); }) #BinOp(2)
             | (<DIVIDE> NewExpression { jjtThis.put("op", "div"); }) #BinOp(2)
-        ))*
+        )*
 ;
 
 NewExpression #void:
