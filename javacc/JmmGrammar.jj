@@ -146,7 +146,8 @@ NewExpression #void:
 ;
 
 NotExpression #void:
-    (< NOT >)? TerminalExpression
+    (< NOT > TerminalExpression { jjtThis.put("op", "not"); }) #UnaryOp(1)
+    | TerminalExpression
 ;
 
 TerminalExpression #void:
