@@ -49,6 +49,7 @@ TOKEN :
     | < WHILE : "while" >
     | < LENGTH : "length" >
     | < RETURN : "return" >
+    | < STRING : "String" >
     | < ID : ["A"-"Z","a"-"z","$","_"](["A"-"Z","a"-"z","0"-"9","$","_"])* >
     | < INTEGER : (["0" - "9"])+ >
 ;
@@ -58,52 +59,57 @@ Start:
 ;
 
 ImportDeclaration:
-    < IMPORT > < ID >  (< DOT > < ID >)* < SEMICOLON >
+    < IMPORT > TerminalId  (< DOT > TerminalId)* < SEMICOLON >
 ;
 
 ClassDeclaration:
-    < CLASS > < ID > (< EXTENDS > < ID >)? < OPEN_CURLY_BRACKETS > (VarDeclaration | MethodDeclaration)* < CLOSE_CURLY_BRACKETS >
+    < CLASS > TerminalId (< EXTENDS > TerminalId)? < OPEN_CURLY_BRACKETS > (VarDeclaration | MethodDeclaration)* < CLOSE_CURLY_BRACKETS >
 ;
 
 VarDeclaration:
-    Type < ID > (< EQUAL > Expression)? < SEMICOLON >
+    Type TerminalId (< EQUAL > Expression)? < SEMICOLON >
 ;
 
-MethodDeclaration:
+MethodDeclaration #void:
     <PUBLIC> (MainMethod | RegularMethod)
 ;
 
 RegularMethod:
-    Type < ID > { jjtThis.put("name", lastConsumedToken.getImage()); } < OPEN_PARENTHESES > (Type < ID > { jjtThis.put("name", lastConsumedToken.getImage()); } (< COMMA > Type < ID > { jjtThis.put("name", lastConsumedToken.getImage()); })*)? < CLOSE_PARENTHESES >
+    Type TerminalId < OPEN_PARENTHESES > (Parameter (< COMMA > Parameter)*)? < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS >
         ( SCAN 2 VarDeclaration | Statement )*
-        < RETURN > Expression < SEMICOLON >
+        (< RETURN > Expression < SEMICOLON >) #Return
     < CLOSE_CURLY_BRACKETS >
 ;
 
 MainMethod:
-    < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < ID > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
+    < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > (< STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > TerminalId) #Parameter < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS >
-        ( SCAN 2 VarDeclaration | Statement )*
+        (( SCAN 2 VarDeclaration | Statement )*) #MethodBody
     < CLOSE_CURLY_BRACKETS >
 ;
 
+Parameter:
+    Type TerminalId
+;
+
 Type:
-    < INT > (< OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS >)?
-    | < BOOLEAN >
-    | < ID >
+    < INT > { jjtThis.put("name", "int"); } (< OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > { jjtThis.put("name", "intArray"); })?
+    | < BOOLEAN > { jjtThis.put("name", "bool"); }
+    | < STRING > { jjtThis.put("name", "string"); } // this is here so that we can force string at main
+    | < ID > { jjtThis.put("name", lastConsumedToken.getImage()); }
 ;
 
 Statement #void:
     (SCAN 2
-        < ID > (
-                < EQUAL > Expression < SEMICOLON > #VariableAssignment
-                | < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > < EQUAL > Expression < SEMICOLON > #ArrayAssignment
+        TerminalId (
+                (< EQUAL > Expression < SEMICOLON >) #VariableAssignment
+                | (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > < EQUAL > Expression < SEMICOLON >) #ArrayAssignment
                )
         | Expression < SEMICOLON >
     )
-    | < IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement < ELSE > Statement #If
-    | < WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement #While
+    | (< IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > (Statement #Then) < ELSE > (Statement) #Else) #If
+    | (< WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > (Statement) #Do) #While
     | < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS >
 ;
 
@@ -166,8 +172,12 @@ Terminal #void:
     < TRUE > #True
     | < FALSE > #False
     | < THIS > #This
-    | (< ID > { jjtThis.put("name", lastConsumedToken.getImage()); }) #Id
     | (< INTEGER > { jjtThis.put("value", lastConsumedToken.getImage()); }) #IntLiteral
+    | TerminalId
+;
+
+TerminalId #void:
+    (< ID > { jjtThis.put("name", lastConsumedToken.getImage()); }) #Id
 ;
 
 // Injections for the implementation of JmmNode
