@@ -40,7 +40,6 @@ TOKEN :
     | < MAIN : "main" >
     | < THIS : "this" >
     | < NEW : "new" >
-    | < STRING : "String" >
     | < BOOLEAN : "boolean" >
     | < TRUE : "true" >
     | < FALSE : "false" >
@@ -75,7 +74,7 @@ MethodDeclaration:
 ;
 
 RegularMethod:
-    Type < ID > < OPEN_PARENTHESES > (Type < ID > (< COMMA > Type < ID >)* #Arguments)? < CLOSE_PARENTHESES >
+    Type < ID > { jjtThis.put("name", lastConsumedToken.getImage()); } < OPEN_PARENTHESES > (Type < ID > { jjtThis.put("name", lastConsumedToken.getImage()); } (< COMMA > Type < ID > { jjtThis.put("name", lastConsumedToken.getImage()); })*)? < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS >
         ( SCAN 2 VarDeclaration | Statement )*
         < RETURN > Expression < SEMICOLON >
@@ -83,8 +82,8 @@ RegularMethod:
 ;
 
 MainMethod:
-    < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
-    < OPEN_CURLY_BRACKETS>
+    < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < ID > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
+    < OPEN_CURLY_BRACKETS >
         ( SCAN 2 VarDeclaration | Statement )*
     < CLOSE_CURLY_BRACKETS >
 ;
@@ -152,28 +151,28 @@ NotExpression #void:
 ;
 
 TerminalExpression #void:
-    (
+    ((
         < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
         | Terminal
-    ) (TerminalExpressionCompound)*
+    ) (TerminalExpressionCompound)*) #CompoundExpression(>=2)
 ;
 
 TerminalExpressionCompound #void:
-    < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > #Indexation
-    | < DOT > (< LENGTH > | < ID > < OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? < CLOSE_PARENTHESES >) #MethodCall
+    (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >) #Indexation
+    | (< DOT > (< LENGTH > | < ID > { jjtThis.put("name", lastConsumedToken.getImage()); } < OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? < CLOSE_PARENTHESES >)) #MethodCall
 ;
 
 Terminal #void:
-    < INTEGER >
-    | < TRUE >
-    | < FALSE >
-    | < ID >
-    | < THIS >
+    < TRUE > #True
+    | < FALSE > #False
+    | < THIS > #This
+    | (< ID > { jjtThis.put("name", lastConsumedToken.getImage()); }) #Id
+    | (< INTEGER > { jjtThis.put("value", lastConsumedToken.getImage()); }) #IntLiteral
 ;
 
 // Injections for the implementation of JmmNode
 // Since this is injected into BaseNode, it affects only non-terminals
-INJECT BaseNode :
+INJECT BaseNode:
 		import pt.up.fe.comp.jmm.ast.JmmNode;
 		import pt.up.fe.comp.jmm.ast.AJmmNode;
 		import pt.up.fe.specs.util.SpecsCollections;
@@ -181,13 +180,11 @@ INJECT BaseNode :
 {
     @Override
     public List<JmmNode> getChildren() {
-
         return SpecsCollections.cast(children(), JmmNode.class);
     }
 
     @Override
     public void add(JmmNode child, int index) {
-
         if (child instanceof Node) {
 
             addChild(index, (Node) child);
@@ -195,6 +192,5 @@ INJECT BaseNode :
 
             throw new RuntimeException("Node " + child + " is not a Node.");
         }
-
     }
 }

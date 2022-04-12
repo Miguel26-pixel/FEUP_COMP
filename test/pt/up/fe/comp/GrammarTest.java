@@ -258,5 +258,5 @@ public class GrammarTest {
     }
 
     @Test
-    public void testComplexExprChain() {noErrors("a.max()[2] + 3", EXPRESSION);}
+    public void testComplexExprChain() {noErrors("a.max(3)[2] + 3", EXPRESSION);}
 }
