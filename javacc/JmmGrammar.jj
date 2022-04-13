@@ -158,7 +158,7 @@ TerminalExpression #void:
 
 TerminalExpressionCompound #void:
     (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >) #Indexation
-    | (< DOT > (< LENGTH > | TerminalId < OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? < CLOSE_PARENTHESES >)) #MethodCall
+    | (< DOT > (< LENGTH > | TerminalId < OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? #Arguments < CLOSE_PARENTHESES >)) #MethodCall
 ;
 
 Terminal #void:
