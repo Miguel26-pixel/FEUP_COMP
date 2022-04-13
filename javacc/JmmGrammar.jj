@@ -134,18 +134,10 @@ AddExpression #void:
 ;
 
 MultExpression #void:
-    NewExpression (
-            (<TIMES> NewExpression { jjtThis.put("op", "mul"); }) #BinOp(2)
-            | (<DIVIDE> NewExpression { jjtThis.put("op", "div"); }) #BinOp(2)
+    NotExpression (
+            (<TIMES> NotExpression { jjtThis.put("op", "mul"); }) #BinOp(2)
+            | (<DIVIDE> NotExpression { jjtThis.put("op", "div"); }) #BinOp(2)
         )*
-;
-
-NewExpression #void:
-    < NEW > (
-                < INT > < OPEN_SQUARE_BRACKETS > NotExpression < CLOSE_SQUARE_BRACKETS > #NewArray
-                | < ID > < OPEN_PARENTHESES > < CLOSE_PARENTHESES > #NewObject
-            )
-    | NotExpression
 ;
 
 NotExpression #void:
@@ -156,6 +148,10 @@ NotExpression #void:
 TerminalExpression #void:
     ((
         < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
+        | < NEW > (
+                (< INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >) #NewArray
+                | ((< ID > { jjtThis.put("class", lastConsumedToken.getImage()); } ) < OPEN_PARENTHESES > < CLOSE_PARENTHESES >) #NewObject
+            )
         | Terminal
     ) (TerminalExpressionCompound)*) #CompoundExpression(>=2)
 ;
