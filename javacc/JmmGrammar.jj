@@ -47,7 +47,6 @@ TOKEN :
     | < IF : "if" >
     | < ELSE : "else" >
     | < WHILE : "while" >
-    | < LENGTH : "length" >
     | < RETURN : "return" >
     | < STRING : "String" >
     | < ID : ["A"-"Z","a"-"z","$","_"](["A"-"Z","a"-"z","0"-"9","$","_"])* >
@@ -158,7 +157,7 @@ TerminalExpression #void:
 
 TerminalExpressionCompound #void:
     (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >) #Indexation
-    | (< DOT > (< LENGTH > | TerminalId < OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? #Arguments < CLOSE_PARENTHESES >)) #MethodCall
+    | < DOT > ((TerminalId (< OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? #Arguments < CLOSE_PARENTHESES >)?) #AttributeGet(<2)) #MethodCall(>=2)
 ;
 
 Terminal #void:
