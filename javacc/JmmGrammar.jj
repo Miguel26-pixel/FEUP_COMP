@@ -102,10 +102,7 @@ Type:
 
 Statement #void:
     (SCAN 2
-        TerminalId (
-                (< EQUAL > Expression < SEMICOLON >) #VariableAssignment
-                | (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > < EQUAL > Expression < SEMICOLON >) #ArrayAssignment
-               )
+        (TerminalId (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >)? < EQUAL > { jjtThis.put("op", "assign"); } Expression < SEMICOLON >) #BinOp(2)
         | Expression < SEMICOLON >
     )
     | (< IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > (Statement #Then) < ELSE > (Statement) #Else) #If
