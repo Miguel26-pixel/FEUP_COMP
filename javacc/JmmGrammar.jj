@@ -75,9 +75,9 @@ MethodDeclaration #void:
 ;
 
 RegularMethod:
-    Type TerminalId < OPEN_PARENTHESES > (Parameter (< COMMA > Parameter)*)? < CLOSE_PARENTHESES >
+    Type TerminalId < OPEN_PARENTHESES > ((Parameter (< COMMA > Parameter)*)? #Parameters) < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS >
-        ( SCAN 2 VarDeclaration | Statement )*
+        (( SCAN 2 VarDeclaration | Statement )* #MethodBody)
         (< RETURN > Expression < SEMICOLON >) #Return
     < CLOSE_CURLY_BRACKETS >
 ;
@@ -85,7 +85,7 @@ RegularMethod:
 MainMethod:
     < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > (< STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > TerminalId) #Parameter < CLOSE_PARENTHESES >
     < OPEN_CURLY_BRACKETS >
-        (( SCAN 2 VarDeclaration | Statement )*) #MethodBody
+        ( SCAN 2 VarDeclaration | Statement )* #MethodBody
     < CLOSE_CURLY_BRACKETS >
 ;
 
@@ -158,7 +158,7 @@ TerminalExpression #void:
 
 TerminalExpressionCompound #void:
     (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >) #Indexation
-    | (< DOT > (< LENGTH > | TerminalId } < OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? < CLOSE_PARENTHESES >)) #MethodCall
+    | (< DOT > (< LENGTH > | TerminalId < OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? < CLOSE_PARENTHESES >)) #MethodCall
 ;
 
 Terminal #void:
