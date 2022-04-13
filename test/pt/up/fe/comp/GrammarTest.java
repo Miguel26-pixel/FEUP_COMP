@@ -259,4 +259,10 @@ public class GrammarTest {
 
     @Test
     public void testComplexExprChain() {noErrors("a.max(3)[2] + 3", EXPRESSION);}
+
+    @Test
+    public void testTerminalParentheses() {noErrors("a.max(5*b.a())[7+2] - (1+2)", EXPRESSION);}
+
+    @Test
+    public void testArrayAssignment() {noErrors("a[2] = 4;", STATEMENT);}
 }
