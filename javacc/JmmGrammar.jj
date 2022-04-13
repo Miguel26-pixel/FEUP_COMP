@@ -96,7 +96,7 @@ Parameter:
 Type:
     < INT > { jjtThis.put("name", "int"); } (< OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > { jjtThis.put("name", "intArray"); })?
     | < BOOLEAN > { jjtThis.put("name", "bool"); }
-    | < STRING > { jjtThis.put("name", "string"); } // this is here so that we can force string at main
+    | < STRING > { jjtThis.put("name", "string"); }
     | < ID > { jjtThis.put("name", lastConsumedToken.getImage()); }
 ;
 
