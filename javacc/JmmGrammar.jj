@@ -102,11 +102,11 @@ Type:
 
 Statement #void:
     (SCAN 2
-        (TerminalId (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >)? < EQUAL > { jjtThis.put("op", "assign"); } Expression < SEMICOLON >) #BinOp(2)
+        ((TerminalId (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >)?) #Indexation(>=2) < EQUAL > { jjtThis.put("op", "assign"); } Expression < SEMICOLON >) #BinOp(2)
         | Expression < SEMICOLON >
     )
-    | (< IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > (Statement #Then) < ELSE > (Statement) #Else) #If
-    | (< WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > (Statement) #Do) #While
+    | (< IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement #Then < ELSE > Statement #Else) #If
+    | (< WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement #Do) #While
     | < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS >
 ;
 
