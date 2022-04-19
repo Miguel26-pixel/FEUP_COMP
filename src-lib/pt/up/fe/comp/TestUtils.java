@@ -28,11 +28,6 @@ public class TestUtils {
 
     private static final Properties CONFIG = TestUtils.loadProperties("config.properties");
 
-    // private static final Properties PARSER_CONFIG = TestUtils.loadProperties("parser.properties");
-    // private static final Properties ANALYSIS_CONFIG = TestUtils.loadProperties("analysis.properties");
-    // private static final Properties OPTIMIZE_CONFIG = TestUtils.loadProperties("optimize.properties");
-    // private static final Properties BACKEND_CONFIG = TestUtils.loadProperties("backend.properties");
-
     public static Properties loadProperties(String filename) {
         try {
             Properties props = new Properties();
@@ -146,6 +141,12 @@ public class TestUtils {
         }
     }
 
+    /**
+     * Only calls the `JmmAnalysis` stage to analyse the AST.
+     * 
+     * @param parserResult
+     * @return
+     */
     public static JmmSemanticsResult analyse(JmmParserResult parserResult) {
 
         JmmAnalysis analysis = getJmmAnalysis();
@@ -153,16 +154,36 @@ public class TestUtils {
         return analysis.semanticAnalysis(parserResult);
     }
 
-    public static JmmSemanticsResult analyse(String code) {
-        return analyse(code, Collections.emptyMap());
+    /**
+     * Receives a string o Java-- code and calls JmmParser and JmmAnalysis stages to generate and analyse the AST.
+     * Assumes there is no configuration.
+     * 
+     * @param jmmCode
+     * @return
+     */
+    public static JmmSemanticsResult analyse(String jmmCode) {
+        return analyse(jmmCode, Collections.emptyMap());
     }
 
-    public static JmmSemanticsResult analyse(String code, Map<String, String> config) {
-        var parseResults = TestUtils.parse(code, config);
+    /**
+     * Receives a string o Java-- code and calls JmmParser and JmmAnalysis stages to generate and analyse the AST.
+     * 
+     * @param jmmCode
+     * @param config
+     * @return
+     */
+    public static JmmSemanticsResult analyse(String jmmCode, Map<String, String> config) {
+        var parseResults = TestUtils.parse(jmmCode, config);
         noErrors(parseResults.getReports());
         return analyse(parseResults);
     }
 
+    /**
+     * Only calls the `JmmOptimization` stage to optimize and generate the OLLIR code.
+     * 
+     * @param semanticsResult
+     * @return
+     */
     public static OllirResult optimize(JmmSemanticsResult semanticsResult) {
 
         JmmOptimization optimization = getJmmOptimization();
@@ -177,16 +198,37 @@ public class TestUtils {
 
     }
 
-    public static OllirResult optimize(String code, Map<String, String> config) {
-        var semanticsResult = analyse(code, config);
+    /**
+     * Receives a string o Java-- code and calls JmmParser and JmmAnalysis stages to generate and analyse the AST, and
+     * JmmOptimization to optimize and generate OLLIR code.
+     * 
+     * @param jmmCode
+     * @param config
+     * @return
+     */
+    public static OllirResult optimize(String jmmCode, Map<String, String> config) {
+        var semanticsResult = analyse(jmmCode, config);
         noErrors(semanticsResult.getReports());
         return optimize(semanticsResult);
     }
 
-    public static OllirResult optimize(String code) {
-        return optimize(code, Collections.emptyMap());
+    /**
+     * Receives a string o Java-- code and calls JmmParser and JmmAnalysis stages to generate and analyse the AST, and
+     * JmmOptimization to optimize and generate OLLIR code. Assumes there is no configuration.
+     * 
+     * @param jmmCode
+     * @return
+     */
+    public static OllirResult optimize(String jmmCode) {
+        return optimize(jmmCode, Collections.emptyMap());
     }
 
+    /**
+     * Only calls the `JasminBackend` stage to generate Jasmin code.
+     * 
+     * @param ollirResult
+     * @return
+     */
     public static JasminResult backend(OllirResult ollirResult) {
         JasminBackend backend = getJasminBackend();
 
@@ -196,10 +238,23 @@ public class TestUtils {
 
     }
 
-    public static JasminResult backend(String code) {
-        return backend(code, Collections.emptyMap());
+    /**
+     * Receives a string o Java-- code and calls all the stages to generate Jasmin code. Assumes there is no
+     * configuration.
+     * 
+     * @param jmmCode
+     * @return
+     */
+    public static JasminResult backend(String jmmCode) {
+        return backend(jmmCode, Collections.emptyMap());
     }
 
+    /**
+     * Receives a string o Java-- code and calls all the stages to generate Jasmin code.
+     * 
+     * @param jmmCode
+     * @return
+     */
     public static JasminResult backend(String code, Map<String, String> config) {
         var ollirResult = optimize(code, config);
         noErrors(ollirResult.getReports());

@@ -9,8 +9,4 @@ public interface JmmAnalysis {
 
     JmmSemanticsResult semanticAnalysis(JmmParserResult parserResult);
 
-    // TODO: Activate next year
-    // Test for this (that enabling/disabling works)
-    // JmmSemanticsResult semanticAnalysis(JmmParserResult parserResult, boolean enableAnalysis);
-
 }
