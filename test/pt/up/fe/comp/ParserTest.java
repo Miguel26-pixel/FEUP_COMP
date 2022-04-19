@@ -87,8 +87,8 @@ public class ParserTest {
     }
 
     @Test
-    public void lengthError() {
-        mustFail(SpecsIo.getResource("fixtures/public/fail/syntactical/LengthError.jmm"));
+    public void reservedWordError() {
+        mustFail(SpecsIo.getResource("fixtures/public/fail/syntactical/ReservedWordError.jmm"));
     }
 
     @Test

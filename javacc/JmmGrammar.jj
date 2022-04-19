@@ -3,54 +3,54 @@ PARSER_CLASS=JmmGrammarParser;
 SMART_NODE_CREATION=false;
 TOKENS_ARE_NODES=false;
 
-SKIP :
-    < SPACE : " " >
-    | < TAB : "\t" >
+SKIP:
+    < SPACE: " " >
+    | < TAB: "\t" >
     | < CARRIAGE_RETURN: "\r" >
     | < LINE_FEED: "\n" >
     | < SINGLE_LINE_COMMENT: "//" (~["\r", "\n"])* >
     | < MULTI_LINE_COMMENT: "/*" (~["*"])* "*" (~["*","/"] (~["*"])* "*" | "*")* "/" >
 ;
 
-TOKEN :
-	< PLUS : "+" >
-	| < MINUS : "-" >
-	| < TIMES : "*" >
-	| < DIVIDE : "/" >
-    | < EQUAL : "=" >
+TOKEN:
+	< PLUS: "+" >
+	| < MINUS: "-" >
+	| < TIMES: "*" >
+	| < DIVIDE: "/" >
+    | < EQUAL: "=" >
 	| < AND: "&&" >
 	| < OR: "||" >
 	| < LESS_THAN: "<" >
 	| < NOT: "!" >
-	| < OPEN_PARENTHESES : "(" >
-	| < CLOSE_PARENTHESES : ")" >
-	| < OPEN_CURLY_BRACKETS : "{" >
-    | < CLOSE_CURLY_BRACKETS : "}" >
-	| < OPEN_SQUARE_BRACKETS : "[" >
-    | < CLOSE_SQUARE_BRACKETS : "]" >
-	| < SEMICOLON : ";" >
-	| < DOT : "." >
-	| < COMMA : "," >
-	| < IMPORT : "import" >
-    | < CLASS : "class" >
-    | < EXTENDS : "extends" >
-    | < PUBLIC : "public" >
-    | < STATIC : "static" >
-    | < VOID : "void" >
-    | < MAIN : "main" >
-    | < THIS : "this" >
-    | < NEW : "new" >
-    | < BOOLEAN : "boolean" >
-    | < TRUE : "true" >
-    | < FALSE : "false" >
-    | < INT : "int" >
-    | < IF : "if" >
-    | < ELSE : "else" >
-    | < WHILE : "while" >
-    | < RETURN : "return" >
-    | < STRING : "String" >
-    | < ID : ["A"-"Z","a"-"z","$","_"](["A"-"Z","a"-"z","0"-"9","$","_"])* >
-    | < INTEGER : (["0" - "9"])+ >
+	| < OPEN_PARENTHESES: "(" >
+	| < CLOSE_PARENTHESES: ")" >
+	| < OPEN_CURLY_BRACKETS: "{" >
+    | < CLOSE_CURLY_BRACKETS: "}" >
+	| < OPEN_SQUARE_BRACKETS: "[" >
+    | < CLOSE_SQUARE_BRACKETS: "]" >
+	| < SEMICOLON: ";" >
+	| < DOT: "." >
+	| < COMMA: "," >
+	| < IMPORT: "import" >
+    | < CLASS: "class" >
+    | < EXTENDS: "extends" >
+    | < PUBLIC: "public" >
+    | < STATIC: "static" >
+    | < VOID: "void" >
+    | < MAIN: "main" >
+    | < THIS: "this" >
+    | < NEW: "new" >
+    | < BOOLEAN: "boolean" >
+    | < TRUE: "true" >
+    | < FALSE: "false" >
+    | < INT: "int" >
+    | < IF: "if" >
+    | < ELSE: "else" >
+    | < WHILE: "while" >
+    | < RETURN: "return" >
+    | < STRING: "String" >
+    | < ID: ["A"-"Z","a"-"z","$","_"](["A"-"Z","a"-"z","0"-"9","$","_"])* >
+    | < INTEGER: (["0" - "9"])+ >
 ;
 
 Start:
@@ -161,19 +161,17 @@ TerminalExpressionCompound #void:
 ;
 
 Terminal #void:
-    < TRUE > #True
-    | < FALSE > #False
-    | < THIS > #This
+    (< TRUE > { jjtThis.put("value", lastConsumedToken.getImage()); }) #BooleanLiteral
+    | (< FALSE > { jjtThis.put("value", lastConsumedToken.getImage()); }) #BooleanLiteral
+    | < THIS > #ThisLiteral
     | (< INTEGER > { jjtThis.put("value", lastConsumedToken.getImage()); }) #IntLiteral
     | TerminalId
 ;
 
 TerminalId #void:
-    (< ID > { jjtThis.put("name", lastConsumedToken.getImage()); }) #Id
+    (< ID > { jjtThis.put("name", lastConsumedToken.getImage()); }) #Identifier
 ;
 
-// Injections for the implementation of JmmNode
-// Since this is injected into BaseNode, it affects only non-terminals
 INJECT BaseNode:
 		import pt.up.fe.comp.jmm.ast.JmmNode;
 		import pt.up.fe.comp.jmm.ast.AJmmNode;
@@ -188,10 +186,8 @@ INJECT BaseNode:
     @Override
     public void add(JmmNode child, int index) {
         if (child instanceof Node) {
-
             addChild(index, (Node) child);
         } else {
-
             throw new RuntimeException("Node " + child + " is not a Node.");
         }
     }
