@@ -10,7 +10,7 @@ myClass {
 		
 		Loop:
 			t1.i32 :=.i32 arraylength($1.A.array.i32).i32;
-			if (i.i32 >=.i32 t1.i32) goto End;
+			if (i.i32 >=.bool t1.i32) goto End;
 			
 			t2.i32 :=.i32 $1.A[i.i32].i32;
 			t3.i32 :=.i32 $2.B[i.i32].i32;
