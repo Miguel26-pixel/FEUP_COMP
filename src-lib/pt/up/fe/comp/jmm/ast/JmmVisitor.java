@@ -31,7 +31,23 @@ public interface JmmVisitor<D, R> {
         return visit(jmmNode, null);
     }
 
+    /**
+     * Adds a visit for the node with the given kind name.
+     * 
+     * @param kind
+     * @param method
+     */
     void addVisit(String kind, BiFunction<JmmNode, D, R> method);
+
+    /**
+     * Overload that accepts any object as kind, and calls .toString() to determine the kind of node.
+     * 
+     * @param kind
+     * @param method
+     */
+    default void addVisit(Object kind, BiFunction<JmmNode, D, R> method) {
+        addVisit(kind.toString(), method);
+    }
 
     void setDefaultVisit(BiFunction<JmmNode, D, R> method);
 }
