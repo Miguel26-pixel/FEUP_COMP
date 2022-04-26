@@ -46,7 +46,13 @@ public class SimpleParser implements JmmParser {
             System.out.println(result.getRootNode().toTree());
             return result;
         } catch (Exception e) {
-            return JmmParserResult.newError(Report.newError(Stage.SYNTATIC, -1, -1, "Exception during parsing", e));
+            var ex = TestUtils.getException(e, ParseException.class);
+            Token t = ex.getToken();
+            int line = t.getBeginLine();
+            int column = t.getBeginColumn();
+            String message = ex.getMessage();
+            Report report = Report.newError(Stage.SYNTATIC,line,column,message,ex);
+            return JmmParserResult.newError(report);
         }
     }
 }

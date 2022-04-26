@@ -84,7 +84,7 @@ public class GrammarTest {
 
     @Test
     public void testStmtEmptyScope() {
-        noErrors("{}", STATEMENT);
+        noErrors("{@}", STATEMENT);
     }
 
     @Test
