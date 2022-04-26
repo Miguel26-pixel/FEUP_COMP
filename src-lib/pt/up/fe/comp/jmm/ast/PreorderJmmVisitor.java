@@ -15,7 +15,6 @@ package pt.up.fe.comp.jmm.ast;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiFunction;
 
 import pt.up.fe.specs.util.SpecsCheck;
 
@@ -25,26 +24,7 @@ import pt.up.fe.specs.util.SpecsCheck;
  * @author JBispo
  *
  */
-public class PreorderJmmVisitor<D, R> extends AJmmVisitor<D, R> {
-
-    private final BiFunction<R, List<R>, R> reduce;
-
-    /**
-     * 
-     * @param reduce
-     *            a reduce function, which returns a result based on the result of the current node and the results of
-     *            its children
-     */
-    public PreorderJmmVisitor(BiFunction<R, List<R>, R> reduce) {
-        this.reduce = reduce;
-    }
-
-    /**
-     * No arguments constructor which just returns the result of the current node
-     */
-    public PreorderJmmVisitor() {
-        this((nodeResult, childrenResults) -> nodeResult);
-    }
+public class PreorderJmmVisitor<D, R> extends AllNodesJmmVisitor<D, R> {
 
     @Override
     public R visit(JmmNode jmmNode, D data) {
@@ -61,6 +41,13 @@ public class PreorderJmmVisitor<D, R> extends AJmmVisitor<D, R> {
             childrenResults.add(visit(child, data));
         }
 
-        return reduce.apply(nodeResult, childrenResults);
+        var reduceFunction = getReduce();
+
+        // No reduce function, just return result of the node
+        if (reduceFunction == null) {
+            return nodeResult;
+        }
+
+        return reduceFunction.apply(nodeResult, childrenResults);
     }
 }

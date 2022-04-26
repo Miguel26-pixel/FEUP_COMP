@@ -32,14 +32,14 @@ class Life {
 
         lineLenA = new int[1];
 
-        /* "Static" variables */
+
         UNDERPOP_LIM = 2;
         OVERPOP_LIM = 3;
         REPRODUCE_NUM = 3;
 
         LOOPS_PER_MS = 225000;
 
-        /* Instance variables */
+
         field = this.field(lineLenA);
         lineLen = lineLenA[0];
 
@@ -49,13 +49,7 @@ class Life {
         return true;
     }
 
-    /* Change this! 
-     * (might want to write a script 
-     * to autogenerate every assignment...)
-     *
-     * lineLen is "pass by reference",
-     * and we modify it to return (e.g. time_t *time)
-     */
+
     public int[] field(int[] lineLen) {
         int[] field;
 
@@ -182,7 +176,7 @@ class Life {
             neighN = this.getLiveNeighborN(i);
             
 
-            // Live cell
+
             if (!(cur < 1)) {
                 goodPop = this.ge(neighN,UNDERPOP_LIM) && this.le(neighN,OVERPOP_LIM);
                 if (!goodPop) {
@@ -191,7 +185,7 @@ class Life {
                     newField[i] = field[i];
                 }
             }
-            // Dead cell
+
             else {
                 if (this.eq(neighN,REPRODUCE_NUM)) {
                     newField[i] = 1;
@@ -295,7 +289,7 @@ class Life {
         }
 
         result = new int[8];
-        // Clockwise from N
+
         result[0] = this.trIdx(x, upY);
         result[1] = this.trIdx(upX, upY);
         result[2] = this.trIdx(upX, y);
@@ -337,7 +331,7 @@ class Life {
         
         n = ms * LOOPS_PER_MS;
         
-        // Try optimizing this away!
+
         i = 0;
         while (i < n) {
             i = i + 1;

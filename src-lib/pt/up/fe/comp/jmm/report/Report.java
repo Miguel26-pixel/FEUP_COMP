@@ -29,7 +29,7 @@ public class Report {
     }
 
     public static Report newError(Stage stage, int line, int column, String message, Exception e) {
-        var report = new Report(ReportType.ERROR, stage, line, message);
+        var report = new Report(ReportType.ERROR, stage, line, column, message);
         report.setException(e);
         return report;
     }

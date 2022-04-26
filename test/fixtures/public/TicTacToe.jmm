@@ -9,7 +9,7 @@ class TicTacToe {
   int movesmade;
   int[] pieces;
 
-  // Initializes a Tic Tac Toe object.
+
   public boolean init() {
     row0 = new int[3];
     row1 = new int[3];
@@ -50,8 +50,7 @@ class TicTacToe {
     }
     return moved;
   }
-  // Tries to make a move at row, column. If it's valid the move is made
-  // and true is returned. Else nothing is done and false is returned.
+
 
   public boolean Move(int row, int column) {
     boolean mov;
@@ -68,7 +67,7 @@ class TicTacToe {
     return mov;
   }
 
-  // Returns true if indexes passed to the method are inbounds.
+
   public boolean inbounds(int row, int column) {
     boolean in;
     if (row < 0)
@@ -83,20 +82,20 @@ class TicTacToe {
     return in;
   }
 
-  // Changes whose turn it is.
+
   public boolean changeturn() {
     whoseturn = 1 - whoseturn;
     return true;
   }
 
-  // Returns the current player's name.
+
   public int getCurrentPlayer() {
     return whoseturn+1;
   }
 
 
 
-  // Returns a character signifying the winner.
+
   public int winner() {
     int[] test_array;
     int winner;
@@ -109,7 +108,7 @@ class TicTacToe {
     completeArray = BoardBase.sameArray(row0);
     completeArray1 = BoardBase.sameArray(row1);
     completeArray2 = BoardBase.sameArray(row2);
-    // Check for three X's or O's in a row.
+
     if (completeArray && 0 < row0[0]){
         winner = row0[0];
     }
@@ -157,7 +156,7 @@ class TicTacToe {
 
 
   public static void main(String[] args) {
-    // Create the TicTacToe object.
+
     TicTacToe mygame;
     int win;
     boolean done;
@@ -165,10 +164,10 @@ class TicTacToe {
     int player;
     mygame = new TicTacToe();
     mygame.init();
-    // Play as long as there is no winner or tie.
+
     while (!(mygame.winner() < 0-1) && !(0-1 < mygame.winner()) ) {
       done = false;
-      // Read in a move & check if it's valid.
+
       while(!done){
 	
         BoardBase.printBoard(mygame.getRow0(), 
@@ -189,11 +188,11 @@ class TicTacToe {
        } 
       }
 	
-      // Change who's turn it is.
+
       mygame.changeturn();
     }
 
-    // Print out a message with the winner.
+
     BoardBase.printBoard(mygame.getRow0(), 
           mygame.getRow1(), 
           mygame.getRow2());

@@ -87,6 +87,11 @@ public interface JmmNode {
      */
     List<JmmNode> getChildren();
 
+    /**
+     * 
+     * @param index
+     * @return the child at the given index
+     */
     default JmmNode getJmmChild(int index) {
         return getChildren().get(index);
     }
@@ -129,6 +134,11 @@ public interface JmmNode {
         return JmmNodeImpl.fromJson(json);
     }
 
+    /**
+     * Converts this node and all descendants to JmmNodeImpl.
+     * 
+     * @return
+     */
     default JmmNode sanitize() {
         return fromJson(this.toJson());
     }
@@ -144,6 +154,10 @@ public interface JmmNode {
         return Arrays.asList(jmmChildren);
     }
 
+    /**
+     * 
+     * @return a String with a tree representation of this node and its descendants
+     */
     default String toTree() {
         var tree = new StringBuilder();
         toTree(tree, "");

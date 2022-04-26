@@ -18,9 +18,11 @@ public class ExamplePreorderVisitor extends PreorderJmmVisitor<String, String> {
     private final String identifierAttribute;
 
     public ExamplePreorderVisitor(String identifierType, String identifierAttribute) {
-        super(ExamplePreorderVisitor::reduce);
+        super();
 
         this.identifierAttribute = identifierAttribute;
+
+        setReduce(ExamplePreorderVisitor::reduce);
 
         addVisit(identifierType, this::dealWithIdentifier);
         setDefaultVisit(this::defaultVisit);

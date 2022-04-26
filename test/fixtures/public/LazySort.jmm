@@ -1,4 +1,4 @@
-import MathUtils; //lowerLimit,upperLimit
+import MathUtils;
 import Quicksort;
 
 class Lazysort extends Quicksort {

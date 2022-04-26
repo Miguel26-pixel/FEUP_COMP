@@ -53,6 +53,10 @@ public interface SymbolTable {
      */
     List<Symbol> getLocalVariables(String methodSignature);
 
+    /**
+     * 
+     * @return a String with information about the contents of the SymbolTable
+     */
     default String print() {
         var builder = new StringBuilder();
 
@@ -82,12 +86,17 @@ public interface SymbolTable {
         builder.append("\nMethods: " + methods.size() + "\n");
 
         for (var method : methods) {
-            var returnType = getReturnType(method);
+            builder.append(" - signature: ").append(method);
+            builder.append("; returnType: ").append(getReturnType(method));
+
+            // var returnType = getReturnType(method);
             var params = getParameters(method);
-            builder.append(" - " + returnType.print() + " " + method + "(");
+            // builder.append(" - " + returnType.print() + " " + method + "(");
             var paramsString = params.stream().map(param -> param != null ? param.print() : "<null param>")
                     .collect(Collectors.joining(", "));
-            builder.append(paramsString + ")\n");
+            // builder.append(paramsString + ")\n");
+            builder.append("; params: ").append(paramsString);
+            builder.append("\n");
         }
 
         return builder.toString();
