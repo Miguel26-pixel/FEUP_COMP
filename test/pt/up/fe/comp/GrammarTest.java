@@ -17,11 +17,12 @@ import org.junit.Test;
 
 public class GrammarTest {
 
-    private static final String IMPORT = "";
-    private static final String MAIN_METHOD = "";
-    private static final String INSTANCE_METHOD = "";
-    private static final String STATEMENT = "";
-    private static final String EXPRESSION = "";
+    private static final String IMPORT = "ImportDeclaration";
+    private static final String CLASS = "ClassDeclaration";
+    private static final String METHOD = "MethodDeclaration";
+    private static final String STATEMENT = "Statement";
+    private static final String EXPRESSION = "Expression";
+    private static final String VAR_DECLARATION = "VarDeclaration";
 
     private static void noErrors(String code, String grammarRule) {
         if (grammarRule.isEmpty()) {
@@ -33,14 +34,11 @@ public class GrammarTest {
 
         var result = TestUtils.parse(code, grammarRule);
         TestUtils.noErrors(result.getReports());
-
-        System.out.println("Code: " + code + "\n");
-        System.out.println("AST:\n\n" + result.getRootNode().toTree());
         System.out.println("\n---------\n");
     }
 
     private static void noErrors(String code) {
-        noErrors(code, "Program");
+        noErrors(code, "Start");
     }
 
     @Test
@@ -55,28 +53,28 @@ public class GrammarTest {
 
     @Test
     public void testClass() {
-        noErrors("class Foo extends Bar {}");
+        noErrors("class Foo extends Bar {}", CLASS);
     }
 
     @Test
     public void testVarDecls() {
-        noErrors("class Foo {int a; int[] b; int c; boolean d; Bar e;}");
+        noErrors("class Foo {int a; int[] b; int c; boolean d; Bar e;}", CLASS);
     }
 
     @Test
     public void testVarDeclString() {
-        noErrors("String aString;", "VarDecl");
+        noErrors("String aString;", VAR_DECLARATION);
     }
 
     @Test
     public void testMainMethodEmpty() {
-        noErrors("public static void main(String[] args) {}", MAIN_METHOD);
+        noErrors("public static void main(String[] args) {}", METHOD);
     }
 
     @Test
     public void testInstanceMethodEmpty() {
         noErrors("public int foo(int anInt, int[] anArray, boolean aBool, String aString) {return a;}",
-                INSTANCE_METHOD);
+                METHOD);
     }
 
     @Test
@@ -86,7 +84,7 @@ public class GrammarTest {
 
     @Test
     public void testStmtEmptyScope() {
-        noErrors("{}", STATEMENT);
+        noErrors("{@}", STATEMENT);
     }
 
     @Test
@@ -259,4 +257,12 @@ public class GrammarTest {
         noErrors("1 && 2 < 3 + 4 - 5 * 6 / 7", EXPRESSION);
     }
 
+    @Test
+    public void testComplexExprChain() {noErrors("a.max(3)[2] + 3", EXPRESSION);}
+
+    @Test
+    public void testTerminalParentheses() {noErrors("a.max(5*b.a())[7+2] - (1+2)", EXPRESSION);}
+
+    @Test
+    public void testArrayAssignment() {noErrors("a[2] = 4;", STATEMENT);}
 }

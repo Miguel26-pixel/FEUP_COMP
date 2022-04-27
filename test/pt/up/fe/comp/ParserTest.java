@@ -32,7 +32,6 @@ public class ParserTest {
     /* 
      * Code that must be successfully parsed 
      */
-
     @Test
     public void helloWorld() {
         noErrors(SpecsIo.getResource("fixtures/public/HelloWorld.jmm"));
@@ -44,8 +43,8 @@ public class ParserTest {
     }
 
     @Test
-    public void lazysort() {
-        noErrors(SpecsIo.getResource("fixtures/public/Lazysort.jmm"));
+    public void lazySort() {
+        noErrors(SpecsIo.getResource("fixtures/public/LazySort.jmm"));
     }
 
     @Test
@@ -88,8 +87,8 @@ public class ParserTest {
     }
 
     @Test
-    public void lengthError() {
-        mustFail(SpecsIo.getResource("fixtures/public/fail/syntactical/LengthError.jmm"));
+    public void reservedWordError() {
+        mustFail(SpecsIo.getResource("fixtures/public/fail/syntactical/ReservedWordError.jmm"));
     }
 
     @Test
@@ -106,4 +105,5 @@ public class ParserTest {
     public void nestedLoop() {
         mustFail(SpecsIo.getResource("fixtures/public/fail/syntactical/NestedLoop.jmm"));
     }
+
 }

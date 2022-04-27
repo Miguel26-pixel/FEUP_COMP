@@ -1,142 +1,194 @@
 PARSER_PACKAGE=pt.up.fe.comp;
 PARSER_CLASS=JmmGrammarParser;
 SMART_NODE_CREATION=false;
+TOKENS_ARE_NODES=false;
 
-SKIP : " " | "\t" | "\r" | "\n";
-
-TOKEN :
-	< PLUS : "+" > |
-	< MINUS : "-" > |
-	< TIMES : "*" > |
-	< DIVIDE : "/" > |
-    < EQUAL : "=" > |
-	< AND: "&&" > |
-	< LESS_THAN: "<" > |
-	< NOT: "!" > |
-	< OPEN_PARENTHESES : "(" > |
-	< CLOSE_PARENTHESES : ")" > |
-	< OPEN_CURLY_BRACKETS : "{" > |
-    < CLOSE_CURLY_BRACKETS : "}" > |
-	< OPEN_SQUARE_BRACKETS : "[" > |
-    < CLOSE_SQUARE_BRACKETS : "]" > |
-	< INTEGER : (["0" - "9"])+ > |
-	< SEMICOLON : ";" > |
-	< DOT : "." > |
-	< COMMA : "," > |
-	< IMPORT : "import" > |
-	< ID : ["A"-"Z","a"-"z"](["A"-"Z","a"-"z","0"-"9"])* > | //not fully correct
-    < CLASS : "class" > |
-    < EXTENDS : "extends" > |
-    < PUBLIC : "public" > |
-    < STATIC : "static" > |
-    < VOID : "void" > |
-    < MAIN : "main" > |
-    < THIS : "this" > |
-    < NEW : "new" > |
-    < STRING : "String" > |
-    < BOOLEAN : "boolean" > |
-    < TRUE : "true" > |
-    < FALSE : "false" > |
-    < INT : "int" > |
-    < IF : "if" > |
-    < ELSE : "else" > |
-    < WHILE : "while" > |
-    < LENGTH : "length" > |
-    < RETURN : "return" >
+SKIP:
+    < SPACE: " " >
+    | < TAB: "\t" >
+    | < CARRIAGE_RETURN: "\r" >
+    | < LINE_FEED: "\n" >
+    | < SINGLE_LINE_COMMENT: "//" (~["\r", "\n"])* >
+    | < MULTI_LINE_COMMENT: "/*" (~["*"])* "*" (~["*","/"] (~["*"])* "*" | "*")* "/" >
 ;
 
-// from teacher's project infos
+TOKEN:
+	< PLUS: "+" >
+	| < MINUS: "-" >
+	| < TIMES: "*" >
+	| < DIVIDE: "/" >
+    | < EQUAL: "=" >
+	| < AND: "&&" >
+	| < OR: "||" >
+	| < LESS_THAN: "<" >
+	| < NOT: "!" >
+	| < OPEN_PARENTHESES: "(" >
+	| < CLOSE_PARENTHESES: ")" >
+	| < OPEN_CURLY_BRACKETS: "{" >
+    | < CLOSE_CURLY_BRACKETS: "}" >
+	| < OPEN_SQUARE_BRACKETS: "[" >
+    | < CLOSE_SQUARE_BRACKETS: "]" >
+	| < SEMICOLON: ";" >
+	| < DOT: "." >
+	| < COMMA: "," >
+	| < IMPORT: "import" >
+    | < CLASS: "class" >
+    | < EXTENDS: "extends" >
+    | < PUBLIC: "public" >
+    | < STATIC: "static" >
+    | < VOID: "void" >
+    | < MAIN: "main" >
+    | < THIS: "this" >
+    | < NEW: "new" >
+    | < BOOLEAN: "boolean" >
+    | < TRUE: "true" >
+    | < FALSE: "false" >
+    | < INT: "int" >
+    | < IF: "if" >
+    | < ELSE: "else" >
+    | < WHILE: "while" >
+    | < RETURN: "return" >
+    | < STRING: "String" >
+    | < ID: ["A"-"Z","a"-"z","$","_"](["A"-"Z","a"-"z","0"-"9","$","_"])* >
+    | < INTEGER: (["0" - "9"])+ >
+;
+
 Start:
-    ImportDeclaration |
-    ClassDeclaration |
-    <EOF>
+    (ImportDeclaration)* ClassDeclaration <EOF>
 ;
 
 ImportDeclaration:
-    < IMPORT > < ID >  ( < DOT > < ID > )* < SEMICOLON >
+    < IMPORT > TerminalId  (< DOT > TerminalId)* < SEMICOLON >
 ;
 
 ClassDeclaration:
-    < CLASS > < ID > (< EXTENDS > < ID >)* < OPEN_CURLY_BRACKETS > (VarDeclaration | MethodDeclaration)* < CLOSE_CURLY_BRACKETS >
+    < CLASS > TerminalId (< EXTENDS > TerminalId)? < OPEN_CURLY_BRACKETS > (VarDeclaration | MethodDeclaration)* < CLOSE_CURLY_BRACKETS >
 ;
 
 VarDeclaration:
-    Type < ID > < SEMICOLON >
+    Type TerminalId (< EQUAL > Expression)? < SEMICOLON >
 ;
 
-MethodDeclaration:
-    < PUBLIC > Type < ID > < OPEN_PARENTHESES > Type < ID > (< COMMA > Type < ID >)* < CLOSE_PARENTHESES >
-    < OPEN_CURLY_BRACKETS>
-        ( VarDeclaration /*| Statement*/ )*
-        < RETURN > Expressions < SEMICOLON >
+MethodDeclaration #void:
+    <PUBLIC> (MainMethod | RegularMethod)
+;
+
+RegularMethod:
+    Type TerminalId < OPEN_PARENTHESES > ((Parameter (< COMMA > Parameter)*)? #Parameters) < CLOSE_PARENTHESES >
+    < OPEN_CURLY_BRACKETS >
+        (( SCAN 2 VarDeclaration | Statement )* #MethodBody)
+        (< RETURN > Expression < SEMICOLON >) #Return
     < CLOSE_CURLY_BRACKETS >
-    |
-    < PUBLIC > < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > < STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > < ID > < CLOSE_PARENTHESES >
-    < OPEN_CURLY_BRACKETS>
-        ( VarDeclaration | Statement)*
+;
+
+MainMethod:
+    < STATIC > < VOID > < MAIN > < OPEN_PARENTHESES > (< STRING > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > TerminalId) #Parameter < CLOSE_PARENTHESES >
+    < OPEN_CURLY_BRACKETS >
+        ( SCAN 2 VarDeclaration | Statement )* #MethodBody
     < CLOSE_CURLY_BRACKETS >
+;
+
+Parameter:
+    Type TerminalId
 ;
 
 Type:
-    < INT > < OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS >
-    | < INT >
-    | < BOOLEAN >
-    | < ID >
+    < INT > { jjtThis.put("name", "int"); } (< OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > { jjtThis.put("name", "intArray"); })?
+    | < BOOLEAN > { jjtThis.put("name", "bool"); }
+    | < STRING > { jjtThis.put("name", "string"); }
+    | < ID > { jjtThis.put("name", lastConsumedToken.getImage()); }
 ;
 
-Statement:
-    < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS >
-    | < IF > < OPEN_PARENTHESES > Expressions < CLOSE_PARENTHESES > Statement < ELSE > Statement
-    | < WHILE > <OPEN_PARENTHESES > Expressions < CLOSE_PARENTHESES > Statement
-    | Expressions < SEMICOLON >
-    | < ID > < EQUAL > Expressions < SEMICOLON >
-    | < ID > < OPEN_SQUARE_BRACKETS > Expressions < CLOSE_SQUARE_BRACKETS > < EQUAL > Expressions < SEMICOLON >
+Statement #void:
+    (SCAN 2
+        ((TerminalId (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >)?) #Indexation(>=2) < EQUAL > { jjtThis.put("op", "assign"); } Expression < SEMICOLON >) #BinOp(2)
+        | Expression < SEMICOLON >
+    )
+    | (< IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement #Then < ELSE > Statement #Else) #If
+    | (< WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement #Do) #While
+    | < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS >
 ;
 
-Expressions:
-    (
-        Expression BinaryOP Expression |
-        Expression < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS > |
-        Expression < DOT > < LENGTH > |
-        Expression < DOT > < ID > < OPEN_PARENTHESES > Expression ( < COMMA > Expression )* < CLOSE_PARENTHESES >
-    ) (Expressions)*
+Expression #void:
+    OrExpression
 ;
 
-Expression: //without the comments gives an exception (infinite loop)
-    < INTEGER >
-    | < TRUE >
-    | < FALSE >
-    | < ID >
-    | < THIS >
-    | < NEW > < INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >
-    | < NEW > < ID > < OPEN_PARENTHESES > < CLOSE_PARENTHESES >
-    | < NOT > Expression
-    | < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
+OrExpression #void:
+    AndExpression ((<OR> AndExpression { jjtThis.put("op", "or"); }) #BinOp(2))*
 ;
 
-BinaryOP:
-    < AND > | < LESS_THAN > | < PLUS > | < MINUS > | < TIMES > | < DIVIDE >
+AndExpression #void:
+    RelationalExpression ((<AND> RelationalExpression { jjtThis.put("op", "and"); }) #BinOp(2) )*
 ;
 
-// simple expression
-AdditiveExpression :
-	MultiplicativeExpression
-	(
-		(< PLUS > | < MINUS >)
-		MultiplicativeExpression
-	)?
+RelationalExpression #void:
+    AddExpression ((<LESS_THAN> AddExpression { jjtThis.put("op", "lt"); }) #BinOp(2))?
 ;
 
-MultiplicativeExpression :
-	Factor
-	(
-		(< TIMES > | < DIVIDE >)
-		Factor
-	)?
+AddExpression #void:
+    MultExpression (
+            (<PLUS> MultExpression { jjtThis.put("op", "add"); }) #BinOp(2)
+            | (<MINUS> MultExpression { jjtThis.put("op", "sub"); }) #BinOp(2)
+        )*
 ;
 
-Factor :
-	< INTEGER > |
-	< MINUS> Factor |
-	< OPEN_PARENTHESES > AdditiveExpression < CLOSE_PARENTHESES >
+MultExpression #void:
+    NotExpression (
+            (<TIMES> NotExpression { jjtThis.put("op", "mul"); }) #BinOp(2)
+            | (<DIVIDE> NotExpression { jjtThis.put("op", "div"); }) #BinOp(2)
+        )*
 ;
+
+NotExpression #void:
+    (< NOT > TerminalExpression { jjtThis.put("op", "not"); }) #UnaryOp(1)
+    | TerminalExpression
+;
+
+TerminalExpression #void:
+    ((
+        < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES >
+        | < NEW > (
+                (< INT > < OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >) #NewArray
+                | ((< ID > { jjtThis.put("class", lastConsumedToken.getImage()); } ) < OPEN_PARENTHESES > < CLOSE_PARENTHESES >) #NewObject
+            )
+        | Terminal
+    ) (TerminalExpressionCompound)*) #CompoundExpression(>=2)
+;
+
+TerminalExpressionCompound #void:
+    (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >) #Indexation
+    | < DOT > ((TerminalId (< OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? #Arguments < CLOSE_PARENTHESES >)?) #AttributeGet(<2)) #MethodCall(>=2)
+;
+
+Terminal #void:
+    (< TRUE > { jjtThis.put("value", lastConsumedToken.getImage()); }) #BooleanLiteral
+    | (< FALSE > { jjtThis.put("value", lastConsumedToken.getImage()); }) #BooleanLiteral
+    | < THIS > #ThisLiteral
+    | (< INTEGER > { jjtThis.put("value", lastConsumedToken.getImage()); }) #IntLiteral
+    | TerminalId
+;
+
+TerminalId #void:
+    (< ID > { jjtThis.put("name", lastConsumedToken.getImage()); }) #Identifier
+;
+
+INJECT BaseNode:
+		import pt.up.fe.comp.jmm.ast.JmmNode;
+		import pt.up.fe.comp.jmm.ast.AJmmNode;
+		import pt.up.fe.specs.util.SpecsCollections;
+		extends AJmmNode
+{
+    @Override
+    public List<JmmNode> getChildren() {
+        return SpecsCollections.cast(children(), JmmNode.class);
+    }
+
+    @Override
+    public void add(JmmNode child, int index) {
+        if (child instanceof Node) {
+            addChild(index, (Node) child);
+        } else {
+            throw new RuntimeException("Node " + child + " is not a Node.");
+        }
+    }
+}
