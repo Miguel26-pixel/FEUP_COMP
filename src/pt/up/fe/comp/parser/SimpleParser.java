@@ -1,8 +1,9 @@
-package pt.up.fe.comp;
+package pt.up.fe.comp.parser;
 
 import java.util.Collections;
 import java.util.Map;
 
+import pt.up.fe.comp.*;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.parser.JmmParser;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;

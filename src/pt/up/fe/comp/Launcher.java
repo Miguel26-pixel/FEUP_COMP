@@ -5,7 +5,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
+import pt.up.fe.comp.parser.SimpleParser;
+import pt.up.fe.comp.semantic.JmmAnalyser;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsLogs;
 import pt.up.fe.specs.util.SpecsSystem;
@@ -43,7 +46,13 @@ public class Launcher {
         // Check if there are parsing errors
         TestUtils.noErrors(parserResult.getReports());
 
-        // ... add remaining stages
-    }
+        // Instantiate JmmAnalysis
+        JmmAnalyser analyser = new JmmAnalyser();
 
+        // Analysis stage
+        JmmSemanticsResult analysisResult = analyser.semanticAnalysis(parserResult);
+
+        // Check if there are semantic errors
+        TestUtils.noErrors(analysisResult.getReports());
+    }
 }
