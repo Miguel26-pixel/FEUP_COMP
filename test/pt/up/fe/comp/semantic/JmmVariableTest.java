@@ -1,4 +1,4 @@
-package pt.up.fe.comp;
+package pt.up.fe.comp.semantic;
 
 import org.junit.Test;
 import pt.up.fe.comp.semantic.JmmVariable;
