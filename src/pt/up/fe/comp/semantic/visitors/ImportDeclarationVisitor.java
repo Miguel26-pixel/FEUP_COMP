@@ -1,17 +1,41 @@
 package pt.up.fe.comp.semantic.visitors;
 
+import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
-import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class ImportDeclarationVisitor extends PreorderJmmVisitor<List<String>, Boolean> {
+public class ImportDeclarationVisitor extends AJmmVisitor<List<String>, Boolean> {
 
     public ImportDeclarationVisitor() {
+        addVisit("Start", this::visitStart);
         addVisit("ImportDeclaration", this::visitImportDeclaration);
+
+        setDefaultVisit(this::visitStart);
+    }
+
+    private Boolean visitStart(JmmNode start, List<String> imports) {
+        for (JmmNode child: start.getChildren()) {
+            if (child.getKind().equals("ImportDeclaration")) {
+                visit(child, imports);
+            }
+        }
+
+        for (var imp: imports) {
+            System.out.println(imp);
+        }
+
+        return true;
     }
 
     private Boolean visitImportDeclaration(JmmNode importDeclaration, List<String> imports) {
+        var importString = importDeclaration.getChildren().stream()
+                .map(id -> id.get("name"))
+                .collect(Collectors.joining("."));
+
+        imports.add(importString);
+
         return true;
     }
 }
