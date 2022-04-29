@@ -5,6 +5,7 @@ import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
+import pt.up.fe.comp.semantic.JmmMethodSignature;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,19 @@ public class LocalVariablesVisitor extends AJmmVisitor<Map<String, List<Symbol>>
     private Boolean visitIntermediate(JmmNode node, Map<String, List<Symbol>> localVariables) {
         for (JmmNode child: node.getChildren()) {
             this.visit(child, localVariables);
+        }
+
+        if (node.getKind().equals("Start")) {
+            for (Map.Entry<String, List<Symbol>> entry : localVariables.entrySet()) {
+                System.out.println("Method " + entry.getKey());
+                List<Symbol> variables = entry.getValue();
+
+                for (Symbol variable: variables) {
+                    System.out.println(variable);
+                }
+
+                System.out.println("--------------");
+            }
         }
 
         return true;
