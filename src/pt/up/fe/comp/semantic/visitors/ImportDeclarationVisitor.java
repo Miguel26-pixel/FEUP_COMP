@@ -12,14 +12,13 @@ public class ImportDeclarationVisitor extends AJmmVisitor<List<String>, Boolean>
         addVisit("Start", this::visitStart);
         addVisit("ImportDeclaration", this::visitImportDeclaration);
 
-        setDefaultVisit(this::visitStart);
+        setDefaultVisit((node, imports) -> true);
     }
 
     private Boolean visitStart(JmmNode start, List<String> imports) {
+
         for (JmmNode child: start.getChildren()) {
-            if (child.getKind().equals("ImportDeclaration")) {
-                visit(child, imports);
-            }
+            visit(child, imports);
         }
 
         for (var imp: imports) {
