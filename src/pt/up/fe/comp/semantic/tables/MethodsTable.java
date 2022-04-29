@@ -4,6 +4,7 @@ import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.semantic.JmmMethodSignature;
+import pt.up.fe.comp.semantic.visitors.LocalVariablesVisitor;
 import pt.up.fe.comp.semantic.visitors.MethodDeclarationVisitor;
 
 import java.util.ArrayList;
@@ -17,10 +18,12 @@ public class MethodsTable {
 
     public MethodsTable(JmmParserResult parserResult) {
         this.methodSignatures = new HashMap<>();
-        this.localVariables = new HashMap<>(); // WIP
+        this.localVariables = new HashMap<>();
 
         MethodDeclarationVisitor mdv = new MethodDeclarationVisitor();
+        LocalVariablesVisitor lvv = new LocalVariablesVisitor();
         mdv.visit(parserResult.getRootNode(), this.methodSignatures);
+        lvv.visit(parserResult.getRootNode(), this.localVariables);
     }
 
     public Map<String, JmmMethodSignature> getMethodSignatures() {
