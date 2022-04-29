@@ -60,7 +60,11 @@ public class MethodDeclarationVisitor extends AJmmVisitor<Map<String, JmmMethodS
             } else if (child.getKind().equals("Identifier")) {
                 name = child.get("name");
             } else if (child.getKind().equals("Type")) {
-                returnType = new Type(child.get("name"), child.get("name").equals("intarray"));
+                if (child.get("name").equals("intArray")) {
+                    returnType = new Type("int", true);
+                } else {
+                    returnType = new Type(child.get("name"), false);
+                }
             }
         }
 
