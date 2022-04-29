@@ -24,7 +24,7 @@ public class AnalyserTest {
 
     @Test
     public void testMethodDeclaration() {
-        JmmSemanticsResult result = TestUtils.analyse("class test{public Integer f1(int p1){return 0;}}");
+        JmmSemanticsResult result = TestUtils.analyse("class test{public Integer f1(int p1){int integerVar = 0; String stringVar; bool boolVar; int[] intArrayVar;return 0;}}");
 
         assertTrue(result.getSymbolTable().getMethods().contains("f1"));
 
