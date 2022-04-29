@@ -49,4 +49,12 @@ public class MethodsTable {
 
         return new ArrayList<>();
     }
+
+    public List<Symbol> getLocalVariables(String methodSignature) {
+        if (this.localVariables.containsKey(methodSignature)) {
+            return this.localVariables.get(methodSignature);
+        }
+
+        return new ArrayList<>();
+    }
 }
