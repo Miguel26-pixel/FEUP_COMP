@@ -58,11 +58,12 @@ Start:
 ;
 
 ImportDeclaration:
-    < IMPORT > TerminalId  (< DOT > TerminalId)* < SEMICOLON >
+    < IMPORT > TerminalId (< DOT > TerminalId)* < SEMICOLON >
 ;
 
 ClassDeclaration:
-    < CLASS > TerminalId (< EXTENDS > TerminalId)? < OPEN_CURLY_BRACKETS > (VarDeclaration | MethodDeclaration)* < CLOSE_CURLY_BRACKETS >
+    < CLASS > < ID > { jjtThis.put("name", lastConsumedToken.getImage()); } (< EXTENDS > < ID > { jjtThis.put("extends", lastConsumedToken.getImage()); })?
+            < OPEN_CURLY_BRACKETS > (VarDeclaration | MethodDeclaration)* < CLOSE_CURLY_BRACKETS >
 ;
 
 VarDeclaration:

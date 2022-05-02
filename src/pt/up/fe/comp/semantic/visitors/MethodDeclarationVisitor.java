@@ -4,7 +4,7 @@ import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
-import pt.up.fe.comp.semantic.JmmMethodSignature;
+import pt.up.fe.comp.semantic.types.JmmMethodSignature;
 
 import java.util.ArrayList;
 import java.util.List;

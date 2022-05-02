@@ -1,10 +1,10 @@
 package pt.up.fe.comp.semantic;
 
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
+import pt.up.fe.comp.semantic.types.JmmMethodSignature;
 
 import java.util.Arrays;
 import java.util.List;

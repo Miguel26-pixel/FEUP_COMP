@@ -1,4 +1,4 @@
-package pt.up.fe.comp.semantic;
+package pt.up.fe.comp.semantic.types;
 
 import java.util.ArrayList;
 import java.util.List;
