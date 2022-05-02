@@ -21,14 +21,11 @@ public class MethodsTable {
         LocalVariablesVisitor localVariablesVisitor = new LocalVariablesVisitor();
         methodDeclarationVisitor.visit(parserResult.getRootNode(), this.methodSignatures);
         localVariablesVisitor.visit(parserResult.getRootNode(), this.localVariables);
+        System.out.println(this);
     }
 
     public Map<String, JmmMethodSignature> getMethodSignatures() {
         return methodSignatures;
-    }
-
-    public Map<String, List<Symbol>> getLocalVariables() {
-        return localVariables;
     }
 
     public Type getReturnType(String methodSignature) {
@@ -51,5 +48,23 @@ public class MethodsTable {
             return this.localVariables.get(methodSignature);
         }
         return new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        for (Map.Entry<String, JmmMethodSignature> entry : methodSignatures.entrySet()) {
+            str.append("Method ").append(entry.getKey()).append("\n");
+            JmmMethodSignature method = entry.getValue();
+            str.append("Return Type: ").append(method.getReturnType()).append("\n");
+            for (Symbol parameter : method.getParameters()) {
+                str.append("Parameter Type: ").append(parameter.getType()).append(", Parameter Name: ").append(parameter.getName()).append("\n");
+            }
+            for (Symbol localVariable : localVariables.get(entry.getKey())) {
+                str.append("Local Variable Type: ").append(localVariable.getType()).append(", Local Variable Name: ").append(localVariable.getName()).append("\n");
+            }
+            str.append("-----\n");
+        }
+        return str.toString();
     }
 }

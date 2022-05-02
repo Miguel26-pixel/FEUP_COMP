@@ -90,9 +90,9 @@ public class AnalyserTest {
         assertEquals(symbolTable.getClassName(), "test");
         assertEquals(symbolTable.getSuper(), "other");
         assertEquals(symbolTable.getFields().size(), 3);
-        assertEquals(symbolTable.getFields().get(0), new Symbol(new Type("int",false), "a"));
-        assertEquals(symbolTable.getFields().get(1), new Symbol(new Type("String",false), "str"));
-        assertEquals(symbolTable.getFields().get(2), new Symbol(new Type("int",true), "b"));
+        assertEquals(symbolTable.getFields().get(0), new Symbol(new Type("int", false), "a"));
+        assertEquals(symbolTable.getFields().get(1), new Symbol(new Type("String", false), "str"));
+        assertEquals(symbolTable.getFields().get(2), new Symbol(new Type("int", true), "b"));
     }
 
     @Test
@@ -102,5 +102,28 @@ public class AnalyserTest {
         assertEquals(symbolTable.getClassName(), "test");
         assertNull(symbolTable.getSuper());
         assertEquals(symbolTable.getFields().size(), 0);
+    }
+
+    @Test
+    public void testLocalVariables() {
+        JmmSemanticsResult result = TestUtils.analyse(
+                "class test {" +
+                        "public int foo(){int a; String b; int[] c; return 0;}" +
+                        "public static void main(String[] args){int c;}" +
+                        "}"
+        );
+
+        assertEquals(result.getSymbolTable().getLocalVariables("bar").size(), 0);
+
+        var fooLocalVariables = result.getSymbolTable().getLocalVariables("foo");
+        var mainLocalVariables = result.getSymbolTable().getLocalVariables("main");
+
+        assertEquals(fooLocalVariables.size(), 3);
+        assertTrue(fooLocalVariables.contains(new Symbol(new Type("int", false), "a")));
+        assertTrue(fooLocalVariables.contains(new Symbol(new Type("String", false), "b")));
+        assertTrue(fooLocalVariables.contains(new Symbol(new Type("int", true), "c")));
+
+        assertEquals(mainLocalVariables.size(), 1);
+        assertTrue(mainLocalVariables.contains(new Symbol(new Type("int", false), "c")));
     }
 }

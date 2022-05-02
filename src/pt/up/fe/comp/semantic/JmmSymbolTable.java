@@ -18,8 +18,8 @@ public class JmmSymbolTable implements SymbolTable {
     private final JmmClassSignature classSignature = new JmmClassSignature();
 
     public JmmSymbolTable(JmmParserResult parserResult) {
-        methods = new MethodsTable(parserResult);
         imports = new ImportsTable(parserResult);
+        methods = new MethodsTable(parserResult);
         new ClassDeclarationVisitor().visit(parserResult.getRootNode(), classSignature);
     }
 

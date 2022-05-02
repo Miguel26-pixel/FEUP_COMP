@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class ClassDeclarationVisitor extends AJmmVisitor<JmmClassSignature, Boolean> {
 
-    public ClassDeclarationVisitor(){
+    public ClassDeclarationVisitor() {
         addVisit("Start", this::visitStart);
         addVisit("ClassDeclaration", this::visitClassDeclaration);
         addVisit("VarDeclaration", this::visitVarDeclaration);
@@ -18,36 +18,27 @@ public class ClassDeclarationVisitor extends AJmmVisitor<JmmClassSignature, Bool
     }
 
     private Boolean visitStart(JmmNode startNode, JmmClassSignature classSignature) {
-        for (JmmNode child: startNode.getChildren()) {
+        for (JmmNode child : startNode.getChildren()) {
             visit(child, classSignature);
         }
-
-        System.out.println(classSignature);
         return true;
     }
 
-    private Boolean visitClassDeclaration(JmmNode classNode, JmmClassSignature classSignature){
+    private Boolean visitClassDeclaration(JmmNode classNode, JmmClassSignature classSignature) {
         classSignature.setClassName(classNode.get("name"));
         Optional<String> superName = classNode.getOptional("extends");
         superName.ifPresent(classSignature::setSuperName);
 
-        for (JmmNode child: classNode.getChildren()){
+        for (JmmNode child : classNode.getChildren()) {
             visit(child, classSignature);
         }
         return true;
     }
 
-    private Boolean visitVarDeclaration(JmmNode varDeclarationNode, JmmClassSignature classSignature){
+    private Boolean visitVarDeclaration(JmmNode varDeclarationNode, JmmClassSignature classSignature) {
         JmmNode typeNode = varDeclarationNode.getJmmChild(0);
         JmmNode nameNode = varDeclarationNode.getJmmChild(1);
-        Type fieldType;
-
-        if (typeNode.get("name").equals("intArray")) {
-            fieldType = new Type("int", true);
-        } else {
-            fieldType = new Type(typeNode.get("name"), false);
-        }
-
+        Type fieldType = new Type(typeNode.get("name"), Boolean.parseBoolean(typeNode.get("isArray")));
         classSignature.getFields().add(new Symbol(fieldType, nameNode.get("name")));
         return true;
     }

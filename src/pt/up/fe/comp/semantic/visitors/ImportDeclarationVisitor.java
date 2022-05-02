@@ -16,12 +16,8 @@ public class ImportDeclarationVisitor extends AJmmVisitor<List<String>, Boolean>
     }
 
     private Boolean visitStart(JmmNode start, List<String> imports) {
-        for (JmmNode child: start.getChildren()) {
+        for (JmmNode child : start.getChildren()) {
             visit(child, imports);
-        }
-
-        for (var imp: imports) {
-            System.out.println(imp);
         }
         return true;
     }

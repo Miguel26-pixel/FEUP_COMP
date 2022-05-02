@@ -21,56 +21,32 @@ public class LocalVariablesVisitor extends AJmmVisitor<Map<String, List<Symbol>>
     }
 
     private Boolean visitIntermediate(JmmNode node, Map<String, List<Symbol>> localVariables) {
-        for (JmmNode child: node.getChildren()) {
+        for (JmmNode child : node.getChildren()) {
             this.visit(child, localVariables);
         }
-
-        if (node.getKind().equals("Start")) {
-            for (Map.Entry<String, List<Symbol>> entry : localVariables.entrySet()) {
-                System.out.println("Method " + entry.getKey());
-                List<Symbol> variables = entry.getValue();
-
-                for (Symbol variable: variables) {
-                    System.out.println(variable);
-                }
-
-                System.out.println("--------------");
-            }
-        }
-
         return true;
     }
 
     private Boolean visitMethodDeclaration(JmmNode methodDeclaration, Map<String, List<Symbol>> localVariables) {
-        String name = "";
+        String name = "main";
         List<Symbol> methodVariables = new ArrayList<>();
 
-        for (JmmNode child: methodDeclaration.getChildren()) {
+        for (JmmNode child : methodDeclaration.getChildren()) {
             if (child.getKind().equals("Identifier")) {
                 name = child.get("name");
-            }
-            else if (child.getKind().equals("MethodBody")) {
-
-                for (JmmNode line: child.getChildren()) {
-                    if (line.getKind().equals("VarDeclaration")) {
-                        JmmNode typeNode = line.getJmmChild(0), nameNode = line.getJmmChild(1);
-                        Type varType;
-
-                        if (typeNode.get("name").equals("intArray")) {
-                            varType = new Type("int", true);
-                        } else {
-                            varType = new Type(typeNode.get("name"), false);
-                        }
-
-                        methodVariables.add(new Symbol(varType, nameNode.get("name")));
+            } else if (child.getKind().equals("MethodBody")) {
+                for (JmmNode line : child.getChildren()) {
+                    if (!line.getKind().equals("VarDeclaration")) {
+                        continue;
                     }
+                    JmmNode typeNode = line.getJmmChild(0), nameNode = line.getJmmChild(1);
+                    Type variableType = new Type(typeNode.get("name"), Boolean.parseBoolean(typeNode.get("isArray")));
+                    methodVariables.add(new Symbol(variableType, nameNode.get("name")));
                 }
-
             }
         }
 
         localVariables.put(name, methodVariables);
-
         return true;
     }
 }

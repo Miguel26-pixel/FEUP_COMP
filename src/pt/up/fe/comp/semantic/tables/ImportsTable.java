@@ -12,9 +12,21 @@ public class ImportsTable {
     public ImportsTable(JmmParserResult parserResult) {
         ImportDeclarationVisitor importDeclarationVisitor = new ImportDeclarationVisitor();
         importDeclarationVisitor.visit(parserResult.getRootNode(), this.imports);
+        System.out.println(this);
     }
 
     public List<String> getImports() {
         return imports;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        str.append("Imports\n");
+        for (var imp : imports) {
+            str.append(imp).append("\n");
+        }
+        str.append("-----\n");
+        return str.toString();
     }
 }

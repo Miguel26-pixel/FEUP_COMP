@@ -25,21 +25,6 @@ public class MethodDeclarationVisitor extends AJmmVisitor<Map<String, JmmMethodS
         for (JmmNode child: node.getChildren()) {
             this.visit(child, methods);
         }
-
-        if (node.getKind().equals("Start")) {
-            for (Map.Entry<String, JmmMethodSignature> entry : methods.entrySet()) {
-                System.out.println("Method " + entry.getKey());
-                JmmMethodSignature jmmms = entry.getValue();
-
-                System.out.println("Return Type: " + jmmms.getReturnType());
-                for (Symbol parameter: jmmms.getParameters()) {
-                    System.out.println("Parameter Type: " + parameter.getType() + ", Parameter Name: " + parameter.getName());
-                }
-
-                System.out.println("--------------");
-            }
-        }
-
         return true;
     }
 
@@ -52,19 +37,15 @@ public class MethodDeclarationVisitor extends AJmmVisitor<Map<String, JmmMethodS
             if (child.getKind().equals("Parameters")) {
                 for (JmmNode parameterNode: child.getChildren()) {
                     List<JmmNode> typeNamePair = parameterNode.getChildren();
-                    String parameterType = typeNamePair.get(0).get("name");
+                    String parameterTypeName = typeNamePair.get(0).get("name");
+                    boolean parameterTypeIsArray = Boolean.parseBoolean(typeNamePair.get(0).get("isArray"));
                     String parameterName = typeNamePair.get(1).get("name");
-
-                    parameters.add(new Symbol(new Type(parameterType, false), parameterName));
+                    parameters.add(new Symbol(new Type(parameterTypeName, parameterTypeIsArray), parameterName));
                 }
             } else if (child.getKind().equals("Identifier")) {
                 name = child.get("name");
             } else if (child.getKind().equals("Type")) {
-                if (child.get("name").equals("intArray")) {
-                    returnType = new Type("int", true);
-                } else {
-                    returnType = new Type(child.get("name"), false);
-                }
+                returnType = new Type(child.get("name"), Boolean.parseBoolean(child.get("isArray")));
             }
         }
 
