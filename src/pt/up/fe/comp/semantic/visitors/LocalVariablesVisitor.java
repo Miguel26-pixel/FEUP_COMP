@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class LocalVariablesVisitor extends AJmmVisitor<Map<String, List<Symbol>>, Boolean> {
+public class LocalVariablesVisitor extends ReportCollectorJmmNodeVisitor<Map<String, List<Symbol>>, Boolean> {
 
     public LocalVariablesVisitor() {
         addVisit("Start", this::visitIntermediate);

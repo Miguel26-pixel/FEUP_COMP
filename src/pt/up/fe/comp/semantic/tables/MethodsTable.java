@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MethodsTable {
+public class MethodsTable extends ReportCollectorTable {
     private final Map<String, JmmMethodSignature> methodSignatures = new HashMap<>();
     private final Map<String, List<Symbol>> localVariables = new HashMap<>();
 
@@ -21,6 +21,8 @@ public class MethodsTable {
         LocalVariablesVisitor localVariablesVisitor = new LocalVariablesVisitor();
         methodDeclarationVisitor.visit(parserResult.getRootNode(), this.methodSignatures);
         localVariablesVisitor.visit(parserResult.getRootNode(), this.localVariables);
+        this.reports.addAll(methodDeclarationVisitor.getReports());
+        this.reports.addAll(localVariablesVisitor.getReports());
         System.out.println(this);
     }
 
@@ -32,7 +34,6 @@ public class MethodsTable {
         if (methodSignatures.containsKey(methodSignature)) {
             return methodSignatures.get(methodSignature).getReturnType();
         }
-
         return new Type("NULL", false);
     }
 

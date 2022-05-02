@@ -6,12 +6,13 @@ import pt.up.fe.comp.semantic.visitors.ImportDeclarationVisitor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ImportsTable {
+public class ImportsTable extends ReportCollectorTable {
     private final List<String> imports = new ArrayList<>();
 
     public ImportsTable(JmmParserResult parserResult) {
         ImportDeclarationVisitor importDeclarationVisitor = new ImportDeclarationVisitor();
         importDeclarationVisitor.visit(parserResult.getRootNode(), this.imports);
+        this.reports.addAll(importDeclarationVisitor.getReports());
         System.out.println(this);
     }
 

@@ -1,4 +1,4 @@
-package pt.up.fe.comp.semantic;
+package pt.up.fe.comp.model;
 
 import org.junit.Test;
 import org.mockito.Mockito;

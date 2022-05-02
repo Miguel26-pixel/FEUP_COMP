@@ -6,7 +6,7 @@ import pt.up.fe.comp.jmm.ast.JmmNode;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ImportDeclarationVisitor extends AJmmVisitor<List<String>, Boolean> {
+public class ImportDeclarationVisitor extends ReportCollectorJmmNodeVisitor<List<String>, Boolean> {
 
     public ImportDeclarationVisitor() {
         addVisit("Start", this::visitStart);

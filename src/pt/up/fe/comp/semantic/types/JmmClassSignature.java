@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JmmClassSignature {
-    String className;
-    String superName;
-    List<Symbol> fields = new ArrayList<>();
+    private String className;
+    private String superName;
+    private final List<Symbol> fields = new ArrayList<>();
 
     public String getClassName() {
         return className;
@@ -37,7 +37,7 @@ public class JmmClassSignature {
             str.append(" extends ").append(this.superName);
         }
         str.append("\n");
-        for (Symbol field: this.fields){
+        for (Symbol field : this.fields) {
             str.append(field.toString()).append("\n");
         }
         return str.toString();

@@ -1,31 +1,33 @@
-package pt.up.fe.comp.semantic;
+package pt.up.fe.comp.semantic.tables;
 
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
-import pt.up.fe.comp.semantic.tables.ImportsTable;
-import pt.up.fe.comp.semantic.tables.MethodsTable;
 import pt.up.fe.comp.semantic.types.JmmClassSignature;
 import pt.up.fe.comp.semantic.visitors.ClassDeclarationVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class JmmSymbolTable implements SymbolTable {
-    private final MethodsTable methods;
-    private final ImportsTable imports;
+public class JmmSymbolTable extends ReportCollectorTable implements SymbolTable {
+    private final MethodsTable methodsTable;
+    private final ImportsTable importsTable;
     private final JmmClassSignature classSignature = new JmmClassSignature();
 
     public JmmSymbolTable(JmmParserResult parserResult) {
-        imports = new ImportsTable(parserResult);
-        methods = new MethodsTable(parserResult);
-        new ClassDeclarationVisitor().visit(parserResult.getRootNode(), classSignature);
+        importsTable = new ImportsTable(parserResult);
+        methodsTable = new MethodsTable(parserResult);
+        ClassDeclarationVisitor classDeclarationVisitor = new ClassDeclarationVisitor();
+        classDeclarationVisitor.visit(parserResult.getRootNode(), classSignature);
+        this.reports.addAll(importsTable.getReports());
+        this.reports.addAll(methodsTable.getReports());
+        this.reports.addAll(classDeclarationVisitor.getReports());
     }
 
     @Override
     public List<String> getImports() {
-        return this.imports.getImports();
+        return this.importsTable.getImports();
     }
 
     @Override
@@ -44,22 +46,22 @@ public class JmmSymbolTable implements SymbolTable {
     }
 
     @Override
-    public List<String> getMethods() {
-        return new ArrayList<>(this.methods.getMethodSignatures().keySet());
+    public List<String> getMethodsTable() {
+        return new ArrayList<>(this.methodsTable.getMethodSignatures().keySet());
     }
 
     @Override
     public Type getReturnType(String methodSignature) {
-        return this.methods.getReturnType(methodSignature);
+        return this.methodsTable.getReturnType(methodSignature);
     }
 
     @Override
     public List<Symbol> getParameters(String methodSignature) {
-        return this.methods.getParameters(methodSignature);
+        return this.methodsTable.getParameters(methodSignature);
     }
 
     @Override
     public List<Symbol> getLocalVariables(String methodSignature) {
-        return this.methods.getLocalVariables(methodSignature);
+        return this.methodsTable.getLocalVariables(methodSignature);
     }
 }

@@ -8,7 +8,7 @@ import pt.up.fe.comp.semantic.types.JmmClassSignature;
 
 import java.util.Optional;
 
-public class ClassDeclarationVisitor extends AJmmVisitor<JmmClassSignature, Boolean> {
+public class ClassDeclarationVisitor extends ReportCollectorJmmNodeVisitor<JmmClassSignature, Boolean> {
 
     public ClassDeclarationVisitor() {
         addVisit("Start", this::visitStart);

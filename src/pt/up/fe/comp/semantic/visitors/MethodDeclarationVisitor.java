@@ -4,13 +4,18 @@ import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
+import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.ReportType;
+import pt.up.fe.comp.jmm.report.Stage;
 import pt.up.fe.comp.semantic.types.JmmMethodSignature;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MethodDeclarationVisitor extends AJmmVisitor<Map<String, JmmMethodSignature>, Boolean> {
+import static java.lang.Integer.parseInt;
+
+public class MethodDeclarationVisitor extends ReportCollectorJmmNodeVisitor<Map<String, JmmMethodSignature>, Boolean> {
 
     public MethodDeclarationVisitor() {
         addVisit("Start", this::visitIntermediate);
@@ -22,7 +27,7 @@ public class MethodDeclarationVisitor extends AJmmVisitor<Map<String, JmmMethodS
     }
 
     private Boolean visitIntermediate(JmmNode node, Map<String, JmmMethodSignature> methods) {
-        for (JmmNode child: node.getChildren()) {
+        for (JmmNode child : node.getChildren()) {
             this.visit(child, methods);
         }
         return true;
@@ -33,9 +38,9 @@ public class MethodDeclarationVisitor extends AJmmVisitor<Map<String, JmmMethodS
         Type returnType = new Type("", false);
         List<Symbol> parameters = new ArrayList<>();
 
-        for (JmmNode child: methodDeclaration.getChildren()) {
+        for (JmmNode child : methodDeclaration.getChildren()) {
             if (child.getKind().equals("Parameters")) {
-                for (JmmNode parameterNode: child.getChildren()) {
+                for (JmmNode parameterNode : child.getChildren()) {
                     List<JmmNode> typeNamePair = parameterNode.getChildren();
                     String parameterTypeName = typeNamePair.get(0).get("name");
                     boolean parameterTypeIsArray = Boolean.parseBoolean(typeNamePair.get(0).get("isArray"));
@@ -54,10 +59,16 @@ public class MethodDeclarationVisitor extends AJmmVisitor<Map<String, JmmMethodS
     }
 
     private Boolean visitMainMethodDeclaration(JmmNode methodDeclaration, Map<String, JmmMethodSignature> methods) {
-        for (JmmNode child: methodDeclaration.getChildren()) {
+        if (methods.containsKey("main")) {
+            int line = parseInt(methodDeclaration.get("line"));
+            this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, line, "Duplicate main method found on line " + line));
+            return false;
+        }
+        for (JmmNode child : methodDeclaration.getChildren()) {
             if (child.getKind().equals("Parameter")) {
                 Symbol parameter = new Symbol(new Type("String", true), child.getJmmChild(0).get("name"));
-                methods.put("main", new JmmMethodSignature(new Type("void",false), List.of(parameter)));
+                methods.put("main", new JmmMethodSignature(new Type("void", false), List.of(parameter)));
+                break;
             }
         }
         return true;
