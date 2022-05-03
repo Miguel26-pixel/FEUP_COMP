@@ -95,7 +95,7 @@ Parameter:
 
 Type:
     < INT > { jjtThis.put("name", "int"); jjtThis.put("isArray", "false");} (< OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > { jjtThis.put("isArray", "true"); })?
-    | < BOOLEAN > { jjtThis.put("name", "bool"); jjtThis.put("isArray", "false"); }
+    | < BOOLEAN > { jjtThis.put("name", "boolean"); jjtThis.put("isArray", "false"); }
     | < STRING > { jjtThis.put("name", "String"); jjtThis.put("isArray", "false"); }
     | < ID > { jjtThis.put("name", lastConsumedToken.getImage()); jjtThis.put("isArray", "false"); }
 ;
