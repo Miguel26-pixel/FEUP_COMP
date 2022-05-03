@@ -58,11 +58,12 @@ Start:
 ;
 
 ImportDeclaration:
-    < IMPORT > TerminalId  (< DOT > TerminalId)* < SEMICOLON >
+    < IMPORT > TerminalId (< DOT > TerminalId)* < SEMICOLON >
 ;
 
 ClassDeclaration:
-    < CLASS > TerminalId (< EXTENDS > TerminalId)? < OPEN_CURLY_BRACKETS > (VarDeclaration | MethodDeclaration)* < CLOSE_CURLY_BRACKETS >
+    < CLASS > < ID > { jjtThis.put("name", lastConsumedToken.getImage()); } (< EXTENDS > < ID > { jjtThis.put("extends", lastConsumedToken.getImage()); })?
+            < OPEN_CURLY_BRACKETS > (VarDeclaration | MethodDeclaration)* < CLOSE_CURLY_BRACKETS >
 ;
 
 VarDeclaration:
@@ -93,10 +94,10 @@ Parameter:
 ;
 
 Type:
-    < INT > { jjtThis.put("name", "int"); } (< OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > { jjtThis.put("name", "intArray"); })?
-    | < BOOLEAN > { jjtThis.put("name", "bool"); }
-    | < STRING > { jjtThis.put("name", "string"); }
-    | < ID > { jjtThis.put("name", lastConsumedToken.getImage()); }
+    < INT > { jjtThis.put("name", "int"); jjtThis.put("isArray", "false");} (< OPEN_SQUARE_BRACKETS > < CLOSE_SQUARE_BRACKETS > { jjtThis.put("isArray", "true"); })?
+    | < BOOLEAN > { jjtThis.put("name", "boolean"); jjtThis.put("isArray", "false"); }
+    | < STRING > { jjtThis.put("name", "String"); jjtThis.put("isArray", "false"); }
+    | < ID > { jjtThis.put("name", lastConsumedToken.getImage()); jjtThis.put("isArray", "false"); }
 ;
 
 Statement #void:
