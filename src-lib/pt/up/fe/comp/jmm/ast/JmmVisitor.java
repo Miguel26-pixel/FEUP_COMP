@@ -16,7 +16,7 @@ package pt.up.fe.comp.jmm.ast;
 import java.util.function.BiFunction;
 
 /**
- * 
+ * Represents all visitors of JmmNodes.
  * 
  * @author JBispo
  *

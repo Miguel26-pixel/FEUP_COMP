@@ -4,8 +4,8 @@ import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 
 /**
  * This Stage deals with optimizations performed at the AST level and at the OLLIR level.<br>
- * Note that for Checkpoint 2 (CP2) only the @{JmmOptimization#toOllir} has to be developed. The other two methods are
- * for Checkpoint 3 (CP3).
+ * Note that for Checkpoint 2 (CP2) only the {@link JmmOptimization#toOllir(JmmSemanticsResult)} has to be developed.
+ * The other two methods are for Checkpoint 3 (CP3).
  */
 public interface JmmOptimization {
 

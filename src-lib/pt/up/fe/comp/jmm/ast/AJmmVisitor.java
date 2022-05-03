@@ -6,6 +6,13 @@ import java.util.function.BiFunction;
 
 import pt.up.fe.specs.util.SpecsCheck;
 
+/**
+ * 
+ * @author Joao Bispo
+ *
+ * @param <D>
+ * @param <R>
+ */
 public abstract class AJmmVisitor<D, R> implements JmmVisitor<D, R> {
 
     private final Map<String, BiFunction<JmmNode, D, R>> visitMap;
@@ -73,5 +80,14 @@ public abstract class AJmmVisitor<D, R> implements JmmVisitor<D, R> {
         SpecsCheck.checkNotNull(jmmNode, () -> "Node should not be null");
 
         return getVisit(jmmNode.getKind()).apply(jmmNode, data);
+    }
+
+    protected R visitAllChildren(JmmNode node, D data) {
+        for (var child : node.getChildren()) {
+            visit(child, data);
+        }
+
+        return null;
+
     }
 }

@@ -11,6 +11,7 @@ import java.util.Properties;
 
 import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.ast2jasmin.AstToJasmin;
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.JmmOptimization;
@@ -59,12 +60,25 @@ public class TestUtils {
         return parser.parse(code, config);
     }
 
+    private static String getClassFromConfig(String property) {
+        // Get class name
+        String className = CONFIG.getProperty(property);
+
+        // Check if empty
+        if (className.isBlank()) {
+            throw new RuntimeException("Possible problem in file 'config.properties', property '" + property
+                    + "' is empty. Please provide a fully qualified class name for that compilation stage.");
+        }
+
+        return className;
+    }
+
     public static JmmParser getJmmParser() {
 
         SpecsSystem.programStandardInit();
 
         // Get Parser class
-        String parserClassName = CONFIG.getProperty("ParserClass");
+        String parserClassName = getClassFromConfig("ParserClass");
 
         try {
             // Get class with main
@@ -83,7 +97,7 @@ public class TestUtils {
         SpecsSystem.programStandardInit();
 
         // Get Analysis class
-        String analysisClassName = CONFIG.getProperty("AnalysisClass");
+        String analysisClassName = getClassFromConfig("AnalysisClass");
 
         try {
 
@@ -103,7 +117,7 @@ public class TestUtils {
         SpecsSystem.programStandardInit();
 
         // Get Optimization class
-        String optimizeClassName = CONFIG.getProperty("OptimizationClass");
+        String optimizeClassName = getClassFromConfig("OptimizationClass");
 
         try {
 
@@ -125,7 +139,7 @@ public class TestUtils {
         SpecsSystem.programStandardInit();
 
         // Get Backend class
-        String backendClassName = CONFIG.getProperty("BackendClass");
+        String backendClassName = getClassFromConfig("BackendClass");
 
         try {
             // Get class with main
@@ -137,6 +151,33 @@ public class TestUtils {
 
         } catch (Exception e) {
             throw new RuntimeException("Could not instantiate JasminBackend from class '" + backendClassName + "'",
+                    e);
+        }
+    }
+
+    public static boolean hasAstToJasminClass() {
+        return CONFIG.getProperty("AstToJasminClass") != null;
+    }
+
+    public static AstToJasmin getAstToJasmin() {
+
+        SpecsSystem.programStandardInit();
+
+        // Get Optimization class
+        String astToJasminClassName = getClassFromConfig("AstToJasminClass");
+
+        try {
+
+            // Get class with main
+            Class<?> astToJasminClass = Class.forName(astToJasminClassName);
+
+            // It is expected that the AstToJasmin class can be instantiated without arguments
+            AstToJasmin astToJasmin = (AstToJasmin) astToJasminClass.getConstructor().newInstance();
+            return astToJasmin;
+
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "Could not instantiate AstToJasmin from class '" + astToJasminClassName + "'",
                     e);
         }
     }
@@ -239,6 +280,24 @@ public class TestUtils {
     }
 
     /**
+     * Only calls the `JasminBackend` stage to generate Jasmin code.
+     * 
+     * @param ollirResult
+     * @return
+     */
+    public static JasminResult backend(JmmSemanticsResult semanticsResult) {
+        var astToJasmin = getAstToJasmin();
+
+        // Optimize
+        semanticsResult = astToJasmin.optimize(semanticsResult);
+
+        // Convert
+        var jasminResult = astToJasmin.toJasmin(semanticsResult);
+
+        return jasminResult;
+    }
+
+    /**
      * Receives a string o Java-- code and calls all the stages to generate Jasmin code. Assumes there is no
      * configuration.
      * 
@@ -256,6 +315,14 @@ public class TestUtils {
      * @return
      */
     public static JasminResult backend(String code, Map<String, String> config) {
+        // AstToJasmin path has priority
+        if (hasAstToJasminClass()) {
+            var semanticsResult = analyse(code, config);
+            noErrors(semanticsResult.getReports());
+            return backend(semanticsResult);
+        }
+
+        // Otherwise, run OLLIR path
         var ollirResult = optimize(code, config);
         noErrors(ollirResult.getReports());
         return backend(ollirResult);
