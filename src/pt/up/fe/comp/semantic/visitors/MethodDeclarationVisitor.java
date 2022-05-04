@@ -61,7 +61,7 @@ public class MethodDeclarationVisitor extends ReportCollectorJmmNodeVisitor<Map<
     private Boolean visitMainMethodDeclaration(JmmNode methodDeclaration, Map<String, JmmMethodSignature> methods) {
         if (methods.containsKey("main")) {
             int line = parseInt(methodDeclaration.get("line"));
-            this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, line, "Duplicate main method found on line " + line));
+            addSemanticErrorReport(line, "Duplicate main method found on line " + line);
             return false;
         }
         for (JmmNode child : methodDeclaration.getChildren()) {

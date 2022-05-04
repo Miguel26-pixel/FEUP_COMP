@@ -5,6 +5,8 @@ import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.analysis.table.Type;
+import pt.up.fe.comp.jmm.ast.JmmNode;
+import pt.up.fe.comp.semantic.tables.JmmSymbolTable;
 
 import java.util.List;
 
@@ -123,5 +125,67 @@ public class SymbolTableTest {
 
         assertEquals(mainLocalVariables.size(), 1);
         assertTrue(mainLocalVariables.contains(new Symbol(new Type("int", false), "c")));
+    }
+
+    @Test
+    public void testGetClosestSymbolPresentInMethod() {
+        JmmSemanticsResult result = TestUtils.analyse(
+                "class test {" +
+                        "String c;" +
+                        "public int foo() {int a; String b; int[] c = new int[3]; c[2] = 5; return 0;}" +
+                        "}"
+        );
+        JmmNode node = findChildIndexation(result.getRootNode(), "c");
+        JmmSymbolTable symbolTable = (JmmSymbolTable) result.getSymbolTable();
+        var closestSymbol = symbolTable.getClosestSymbol(node, "c");
+        assertTrue(closestSymbol.isPresent());
+        assertEquals("c", closestSymbol.get().getName());
+        assertEquals(closestSymbol.get().getType(), new Type("int", true));
+    }
+
+    @Test
+    public void testGetClosestSymbolNotPresent() {
+        JmmSemanticsResult result = TestUtils.analyse(
+                "class test {" +
+                        "String c;" +
+                        "public int foo() {int a; String b; d[2] = 5; return 0;}" +
+                        "}"
+        );
+        JmmNode node = findChildIndexation(result.getRootNode(), "d");
+        JmmSymbolTable symbolTable = (JmmSymbolTable) result.getSymbolTable();
+        var closestSymbol = symbolTable.getClosestSymbol(node, "d");
+        assertTrue(closestSymbol.isEmpty());
+    }
+
+    @Test
+    public void testGetClosestSymbolPresentAsClassField() {
+        JmmSemanticsResult result = TestUtils.analyse(
+                "class test {" +
+                        "int[] c = new int[3];" +
+                        "public int foo() {int a; String b; c[3] = 1; return 0;}" +
+                        "}"
+        );
+        JmmNode node = findChildIndexation(result.getRootNode(), "c");
+        JmmSymbolTable symbolTable = (JmmSymbolTable) result.getSymbolTable();
+        var closestSymbol = symbolTable.getClosestSymbol(node, "c");
+        assertTrue(closestSymbol.isPresent());
+        assertEquals("c", closestSymbol.get().getName());
+        assertEquals(closestSymbol.get().getType(), new Type("int", true));
+    }
+
+    private JmmNode findChildIndexation(JmmNode node, String name) {
+        if (node.getKind().equals("Indexation")) {
+            JmmNode identifier = node.getChildren().get(0);
+            if (identifier.get("name").equals(name)) {
+                return identifier;
+            }
+        }
+        for (var child : node.getChildren()) {
+            var identifier = findChildIndexation(child, name);
+            if (identifier != null) {
+                return identifier;
+            }
+        }
+        return null;
     }
 }

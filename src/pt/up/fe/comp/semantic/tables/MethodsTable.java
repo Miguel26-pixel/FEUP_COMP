@@ -37,16 +37,16 @@ public class MethodsTable extends ReportCollectorTable {
         return new Type("NULL", false);
     }
 
-    public List<Symbol> getParameters(String methodSignature) {
-        if (methodSignatures.containsKey(methodSignature)) {
-            return methodSignatures.get(methodSignature).getParameters();
+    public List<Symbol> getParameters(String methodName) {
+        if (methodSignatures.containsKey(methodName)) {
+            return methodSignatures.get(methodName).getParameters();
         }
         return new ArrayList<>();
     }
 
-    public List<Symbol> getLocalVariables(String methodSignature) {
-        if (this.localVariables.containsKey(methodSignature)) {
-            return this.localVariables.get(methodSignature);
+    public List<Symbol> getLocalVariables(String methodName) {
+        if (this.localVariables.containsKey(methodName)) {
+            return this.localVariables.get(methodName);
         }
         return new ArrayList<>();
     }

@@ -3,12 +3,14 @@ package pt.up.fe.comp.semantic.tables;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.analysis.table.Type;
+import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.semantic.types.JmmClassSignature;
 import pt.up.fe.comp.semantic.visitors.ClassDeclarationVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class JmmSymbolTable extends ReportCollectorTable implements SymbolTable {
     private final MethodsTable methodsTable;
@@ -63,5 +65,37 @@ public class JmmSymbolTable extends ReportCollectorTable implements SymbolTable 
     @Override
     public List<Symbol> getLocalVariables(String methodSignature) {
         return this.methodsTable.getLocalVariables(methodSignature);
+    }
+
+    public Optional<Symbol> getClosestSymbol(JmmNode node, String name) {
+        var method = getClosestMethod(node);
+        if (method.isPresent()) {
+            String methodName = method.get().getChildren().get(1).get("name");
+            for (Symbol symbol : methodsTable.getLocalVariables(methodName)) {
+                if (symbol.getName().equals(name)) {
+                    return Optional.of(symbol);
+                }
+            }
+            for (Symbol symbol : methodsTable.getParameters(methodName)) {
+                if (symbol.getName().equals(name)) {
+                    return Optional.of(symbol);
+                }
+            }
+        }
+        for (Symbol symbol : classSignature.getFields()) {
+            if (symbol.getName().equals(name)) {
+                return Optional.of(symbol);
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<JmmNode> getClosestMethod(JmmNode node) {
+        var method = node.getAncestor("RegularMethod");
+        if (method.isPresent()) {
+            return method;
+        }
+        method = node.getAncestor("MainMethod");
+        return method;
     }
 }
