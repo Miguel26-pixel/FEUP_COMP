@@ -144,7 +144,7 @@ public class SymbolTableTest {
     }
 
     @Test
-    public void testGetClosestSymbolNotPresent() {
+    public void testGetClosestSymbolNotPresent1() {
         JmmSemanticsResult result = TestUtils.analyse(
                 "class test {" +
                         "String c;" +

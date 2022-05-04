@@ -1,10 +1,10 @@
-package pt.up.fe.comp.semantic.visitors;
+package pt.up.fe.comp.semantic.visitors.symbolTableBuilder;
 
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
-import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.semantic.types.JmmClassSignature;
+import pt.up.fe.comp.semantic.visitors.ReportCollectorJmmNodeVisitor;
 
 import java.util.Optional;
 

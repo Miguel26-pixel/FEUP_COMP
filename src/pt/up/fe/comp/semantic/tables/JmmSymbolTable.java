@@ -6,7 +6,7 @@ import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.semantic.types.JmmClassSignature;
-import pt.up.fe.comp.semantic.visitors.ClassDeclarationVisitor;
+import pt.up.fe.comp.semantic.visitors.symbolTableBuilder.ClassDeclarationVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +70,8 @@ public class JmmSymbolTable extends ReportCollectorTable implements SymbolTable 
     public Optional<Symbol> getClosestSymbol(JmmNode node, String name) {
         var method = getClosestMethod(node);
         if (method.isPresent()) {
-            String methodName = method.get().getChildren().get(1).get("name");
+            String methodName = method.get().getKind().equals("RegularMethod") ?
+                    method.get().getChildren().get(1).get("name") : "main";
             for (Symbol symbol : methodsTable.getLocalVariables(methodName)) {
                 if (symbol.getName().equals(name)) {
                     return Optional.of(symbol);

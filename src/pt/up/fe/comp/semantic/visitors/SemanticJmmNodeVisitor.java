@@ -2,6 +2,7 @@ package pt.up.fe.comp.semantic.visitors;
 
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.semantic.tables.JmmSymbolTable;
+import pt.up.fe.comp.semantic.visitors.ReportCollectorJmmNodeVisitor;
 
 public abstract class SemanticJmmNodeVisitor extends ReportCollectorJmmNodeVisitor<Boolean, Boolean> {
     protected final JmmSymbolTable symbolTable;
