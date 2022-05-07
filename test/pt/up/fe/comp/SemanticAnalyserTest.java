@@ -91,4 +91,79 @@ public class SemanticAnalyserTest {
                 "}");
         TestUtils.mustFail(result.getReports());
     }
+
+    @Test
+    public void testAssignTypeCorrect() {
+        JmmSemanticsResult result = TestUtils.analyse(
+            "class dummy {" +
+                    "int a;" +
+                    "public int foo() {" +
+                        "a = 0;" +
+                        "a = 5;" +
+                        "return 0;" +
+                    "}" +
+                "}");
+        TestUtils.noErrors(result.getReports());
+
+        result = TestUtils.analyse(
+                "class dummy {" +
+                        "int a;" +
+                        "public int foo() {" +
+                        "a = 2;" +
+                        "a = 5 + a + (4 * 3);" +
+                        "return 0;" +
+                        "}" +
+                        "}");
+        TestUtils.noErrors(result.getReports());
+
+        result = TestUtils.analyse(
+                "class dummy {" +
+                        "int[] a = new int[5];" +
+                        "public int[] bar() {int[] a; return a;}" +
+                        "public int foo() {" +
+                        //"a = 5 + a.add() + (4 * 3);" +
+                        "int b;" +
+                        "b = 5 + a[3] + (4 * 3);" +
+                        //"b = 5 + this.bar()[1] + (4 * 3);" +
+                        "return 0;" +
+                        "}" +
+                        "}");
+        TestUtils.noErrors(result.getReports());
+    }
+
+    @Test
+    public void testAssignTypeError() {
+        JmmSemanticsResult result = TestUtils.analyse(
+                "class dummy {" +
+                        "int a;" +
+                        "public int foo() {" +
+                        "a = 0;" +
+                        "a = false;" +
+                        "return 0;" +
+                        "}" +
+                        "}");
+        TestUtils.mustFail(result.getReports());
+
+        result = TestUtils.analyse(
+                "class dummy {" +
+                        "int a;" +
+                        "public int foo() {" +
+                        "a = 0;" +
+                        "a = false;" +
+                        "return 0;" +
+                        "}" +
+                        "}");
+        TestUtils.mustFail(result.getReports());
+
+        result = TestUtils.analyse(
+                "class dummy {" +
+                        "int[] a = new int[5];" +
+                        "public int foo() {" +
+                        "a = 2;" +
+                        "a = 5 + a + (4 * 3);" +
+                        "return 0;" +
+                        "}" +
+                        "}");
+        TestUtils.mustFail(result.getReports());
+    }
 }

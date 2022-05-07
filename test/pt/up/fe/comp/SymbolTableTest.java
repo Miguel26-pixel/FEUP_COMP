@@ -162,7 +162,7 @@ public class SymbolTableTest {
         JmmSemanticsResult result = TestUtils.analyse(
                 "class test {" +
                         "int[] c = new int[3];" +
-                        "public int foo() {int a; String b; c[3] = 1; return 0;}" +
+                        "public int foo() {int a; String b; c[3] = c + a + 2; return 0;}" +
                         "}"
         );
         JmmNode node = findChildIndexation(result.getRootNode(), "c");
@@ -188,4 +188,6 @@ public class SymbolTableTest {
         }
         return null;
     }
+
+
 }

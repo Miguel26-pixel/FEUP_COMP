@@ -7,6 +7,7 @@ import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.semantic.tables.JmmSymbolTable;
 import pt.up.fe.comp.semantic.visitors.symbolTableLookup.ArrayAccessVisitor;
 import pt.up.fe.comp.semantic.visitors.symbolTableLookup.MethodCallVisitor;
+import pt.up.fe.comp.semantic.visitors.symbolTableLookup.OperandsVisitor;
 import pt.up.fe.comp.semantic.visitors.symbolTableLookup.VariableAccessVisitor;
 
 import java.util.*;
@@ -22,15 +23,20 @@ public class JmmAnalyser implements JmmAnalysis {
         variableAccessVisitor.visit(parserResult.getRootNode(), Boolean.TRUE);
         reports.addAll(variableAccessVisitor.getReports());
 
+        // Check called methods existence
+        MethodCallVisitor methodCallVisitor = new MethodCallVisitor(symbolTable);
+        methodCallVisitor.visit(parserResult.getRootNode(), Boolean.TRUE);
+        reports.addAll(methodCallVisitor.getReports());
+
         // Check array access on array type
         ArrayAccessVisitor arrayAccessVisitor = new ArrayAccessVisitor(symbolTable);
         arrayAccessVisitor.visit(parserResult.getRootNode(), Boolean.TRUE);
         reports.addAll(arrayAccessVisitor.getReports());
 
-        // Check called methods existence
-        MethodCallVisitor methodCallVisitor = new MethodCallVisitor(symbolTable);
-        methodCallVisitor.visit(parserResult.getRootNode(), Boolean.TRUE);
-        reports.addAll(methodCallVisitor.getReports());
+        // Check operands type
+        OperandsVisitor operandsVisitor = new OperandsVisitor(symbolTable);
+        operandsVisitor.visit(parserResult.getRootNode(), Boolean.TRUE);
+        reports.addAll(operandsVisitor.getReports());
 
         return new JmmSemanticsResult(parserResult, symbolTable, reports);
     }
