@@ -94,7 +94,7 @@ public class SemanticAnalyserTest {
 
     @Test
     public void testAssignTypeCorrect() {
-        JmmSemanticsResult result = TestUtils.analyse(
+        /*JmmSemanticsResult result = TestUtils.analyse(
             "class dummy {" +
                     "int a;" +
                     "public int foo() {" +
@@ -103,9 +103,9 @@ public class SemanticAnalyserTest {
                         "return 0;" +
                     "}" +
                 "}");
-        TestUtils.noErrors(result.getReports());
+        TestUtils.noErrors(result.getReports());*/
 
-        result = TestUtils.analyse(
+        /*result = TestUtils.analyse(
                 "class dummy {" +
                         "int a;" +
                         "public int foo() {" +
@@ -114,15 +114,16 @@ public class SemanticAnalyserTest {
                         "return 0;" +
                         "}" +
                         "}");
-        TestUtils.noErrors(result.getReports());
+        TestUtils.noErrors(result.getReports());*/
 
-        result = TestUtils.analyse(
+        JmmSemanticsResult result = TestUtils.analyse(
                 "class dummy {" +
                         "int[] a = new int[5];" +
                         "public int[] bar() {int[] a; return a;}" +
                         "public int foo() {" +
                         //"a = 5 + a.add() + (4 * 3);" +
                         "int b;" +
+                        "a[2] = 0;" +
                         "b = 5 + a[3] + (4 * 3);" +
                         //"b = 5 + this.bar()[1] + (4 * 3);" +
                         "return 0;" +
