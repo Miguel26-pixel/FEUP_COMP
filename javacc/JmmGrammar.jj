@@ -67,7 +67,7 @@ ClassDeclaration:
 ;
 
 VarDeclaration:
-    Type TerminalId (< EQUAL > Expression #VariableValue)? < SEMICOLON >
+    Type TerminalId < SEMICOLON >
 ;
 
 MethodDeclaration #void:
