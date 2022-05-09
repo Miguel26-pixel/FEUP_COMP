@@ -2,6 +2,7 @@ package pt.up.fe.comp.semantic;
 
 import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.semantic.tables.JmmSymbolTable;
@@ -30,7 +31,7 @@ public class JmmAnalyser implements JmmAnalysis {
 
         // Type verification
         TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor(symbolTable);
-        typeCheckVisitor.visit(parserResult.getRootNode(), Boolean.TRUE);
+        typeCheckVisitor.visit(parserResult.getRootNode(), new Type("",false));
         reports.addAll(typeCheckVisitor.getReports());
 
         // Check called methods existence

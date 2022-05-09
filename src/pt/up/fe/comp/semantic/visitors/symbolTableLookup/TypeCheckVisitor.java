@@ -9,7 +9,7 @@ import pt.up.fe.comp.semantic.visitors.ReportCollectorJmmNodeVisitor;
 import java.util.List;
 import java.util.Optional;
 
-public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Boolean,Type> {
+public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
 
     JmmSymbolTable symbolTable;
 
@@ -21,23 +21,25 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Boolean,Type
         addVisit("UnaryOp", this::visitUnaryOp);
         addVisit("BinOp", this::visitBinOp);
         addVisit("ArrayElement", this::visitArrayElement);
+        addVisit("CompoundExpression", this::visitCompoundExpression);
+        addVisit("Indexation", this::visitIndexation);
         //addVisit("MethodCall", this::visitMethodCall);
 
         setDefaultVisit(this::visitDefault);
     }
 
-    private Type visitDefault(JmmNode node, Boolean dummy) {
+    private Type visitDefault(JmmNode node, Type dummy) {
         for (var child : node.getChildren()) {
             visit(child, dummy);
         }
         return null;
     }
 
-    public Type visitIntLiteral(JmmNode node, Boolean dummy) { return new Type("int",false); }
+    public Type visitIntLiteral(JmmNode node, Type dummy) { return new Type("int",false); }
 
-    public Type visitBoolLiteral(JmmNode node, Boolean dummy) { return new Type("bool",false); }
+    public Type visitBoolLiteral(JmmNode node, Type dummy) { return new Type("bool",false); }
 
-    public Type visitIdentifier(JmmNode node, Boolean dummy) {
+    public Type visitIdentifier(JmmNode node, Type dummy) {
         if (node.getAncestor("MethodBody").isEmpty()) { return null; }
 
         if (node.getJmmParent().getKind().equals("MethodCall")) {
@@ -79,7 +81,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Boolean,Type
         return false;
     }
 
-    public Type visitUnaryOp(JmmNode node, Boolean dummy) {
+    public Type visitUnaryOp(JmmNode node, Type dummy) {
         Type childType = visit(node.getChildren().get(0), dummy);
 
         if ((childType.getName().equals("bool") && !childType.isArray()) || childType.getName().equals("extern")) {
@@ -90,7 +92,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Boolean,Type
         return new Type("", false);
     }
 
-    public Type visitBinOp(JmmNode node, Boolean dummy) {
+    public Type visitBinOp(JmmNode node, Type dummy) {
         Type firstChildType = visit(node.getChildren().get(0), dummy);
         Type secondChildType = visit(node.getChildren().get(1), dummy);
 
@@ -129,7 +131,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Boolean,Type
         }
     }
 
-    public Type visitArrayElement(JmmNode node, Boolean dummy) {
+    public Type visitArrayElement(JmmNode node, Type dummy) {
         //Type firstChildType = visit(node.getChildren().get(0), dummy);
         Type secondChildType = visit(node.getChildren().get(1), dummy);
 
@@ -137,5 +139,36 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Boolean,Type
             addSemanticErrorReport(node, "Array access index must be an expression of type integer");
         }
         return new Type("int", false);
+    }
+
+    public Type visitCompoundExpression(JmmNode node, Type dummy) {
+        List<JmmNode> children = node.getChildren();
+        Type type = dummy;
+        for (JmmNode child : children) {
+            type = visit(child, type);
+            if (type.getName().isEmpty()) { break; }
+        }
+        return type;
+    }
+
+    public Type visitIndexation(JmmNode node, Type type) {
+        boolean err = false;
+        Type firstChildType = visit(node.getChildren().get(0), type);
+
+        if (!type.getName().equals("extern")) {
+            if (!type.isArray()) {
+                addSemanticErrorReport(node, "Array access is not done over an array");
+                err = true;
+            }
+            if (!firstChildType.getName().equals("int")) {
+                addSemanticErrorReport(node, "Array access index must be an expression of type integer");
+                err = true;
+            }
+            if (err) {
+                return new Type("", false);
+            }
+        }
+
+        return new Type(type.getName(),false); //only work for 1d array
     }
 }
