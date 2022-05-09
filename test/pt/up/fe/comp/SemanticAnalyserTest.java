@@ -102,6 +102,12 @@ public class SemanticAnalyserTest {
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy {int a; public int foo(){ a = 2; return 0; }}");
         TestUtils.noErrors(result.getReports());
+        result = TestUtils.analyse("class dummy {bool a; public int foo(){ a = true; bool b; b = !a; a = false || true && b; !a; return 0; }}");
+        TestUtils.noErrors(result.getReports());
+        result = TestUtils.analyse("class dummy {int a; public int foo(){ int b; bool c; b = 5; a = 2 + 7 - b * 2; c = b < a; return 0; }}");
+        TestUtils.noErrors(result.getReports());
+        result = TestUtils.analyse("class dummy {int a; public int foo(){ int b; b = 5; a = 2 + 7 - b * 2; return 0; }}");
+        TestUtils.noErrors(result.getReports());
         //result = TestUtils.analyse("class dummy extends other {int a; public int foo(){ a = this.hello(); return 0; }}");
         //TestUtils.noErrors(result.getReports());
         //result = TestUtils.analyse("class dummy extends other {int a; public int foo(){ a = this.hello()[2]; return 0; }}");

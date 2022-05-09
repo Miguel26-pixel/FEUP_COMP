@@ -98,19 +98,36 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Boolean,Type
 
         switch (node.get("op")) {
             case "assign":
-                if (!firstChildType.getName().equals(secondChildType.getName())) {
+                if ((!firstChildType.getName().equals(secondChildType.getName()) ||
+                        firstChildType.isArray() != secondChildType.isArray()) &&
+                        !secondChildType.getName().equals("extern")) {
                     addSemanticErrorReport(node,"Type of the assignee must be compatible with the assigned");
                 }
                 return new Type("", false);
 
             case "and": case "or":
-                return new Type("", false);
+                if ((!firstChildType.getName().equals("bool") && !firstChildType.isArray()) ||
+                        !((secondChildType.getName().equals("bool") && !secondChildType.isArray()) ||
+                                secondChildType.getName().equals("extern"))) {
+                    addSemanticErrorReport(node,"Types are not compatible with the operation");
+                }
+                return new Type("bool", false);
 
             case "lt":
-                return new Type("", false);
+                if ((!firstChildType.getName().equals("int") && !firstChildType.isArray()) ||
+                        !((secondChildType.getName().equals("int") && !secondChildType.isArray()) ||
+                                secondChildType.getName().equals("extern"))) {
+                    addSemanticErrorReport(node,"Types are not compatible with the operation");
+                }
+                return new Type("bool", false);
 
             default:
-                return new Type("", false);
+                if ((!firstChildType.getName().equals("int") && !firstChildType.isArray()) ||
+                        !((secondChildType.getName().equals("int") && !secondChildType.isArray()) ||
+                                secondChildType.getName().equals("extern"))) {
+                    addSemanticErrorReport(node,"Types are not compatible with the operation");
+                }
+                return new Type("int", false);
         }
     }
 }
