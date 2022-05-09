@@ -3,21 +3,23 @@ package pt.up.fe.comp.optimization;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
-import java.util.Objects;
-
 public class OllirUtils {
-    private static String getOllirType(Symbol symbol) {
-        Type type = symbol.getType();
-        if (type.isArray()) {
-            return "array";
-        }
+    public static String getOllirType(Type type) {
+        String ollirType = type.isArray() ? "array." : "";
         if (type.getName().equals("boolean")) {
-            return "bool";
+            return ollirType + "bool";
         }
         if (type.getName().equals("int")) {
-            return "i32";
+            return ollirType + "i32";
         }
-        return symbol.getName();
+        if (type.getName().equals("void")) {
+            return ollirType + "V";
+        }
+        return ollirType + type.getName();
+    }
+
+    public static String getOllirType(Symbol symbol) {
+        return getOllirType(symbol.getType());
     }
 
     public static String putField(String className, Symbol field, int valuePosition, Symbol value) {

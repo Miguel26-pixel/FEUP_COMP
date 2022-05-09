@@ -15,6 +15,9 @@ public class OllirEmitter extends AJmmVisitor<Boolean, Boolean> {
         this.symbolTable = symbolTable;
         addVisit("Start", this::visitStart);
         addVisit("ClassDeclaration", this::visitClassDeclaration);
+        addVisit("VarDeclaration", this::visitVarDeclaration);
+        addVisit("RegularMethod", this::visitMethod);
+        addVisit("MainMethod", this::visitMethod);
         setDefaultVisit((node, dummy) -> true);
     }
 
@@ -26,9 +29,7 @@ public class OllirEmitter extends AJmmVisitor<Boolean, Boolean> {
 
     private Boolean visitStart(JmmNode node, Boolean dummy) {
         fillImports();
-        for (var child : node.getChildren()) {
-            visit(child);
-        }
+        visitAllChildren(node, dummy);
         return true;
     }
 
@@ -45,11 +46,38 @@ public class OllirEmitter extends AJmmVisitor<Boolean, Boolean> {
         }
         ollirCode.append(OllirUtils.defaultConstructor(className));
         for (var child : node.getChildren().stream().filter((n) -> n.getKind().equals("MainMethod")).collect(Collectors.toList())) {
+            ollirCode.append(".method public static ");
             visit(child);
         }
         for (var child : node.getChildren().stream().filter((n) -> n.getKind().equals("RegularMethod")).collect(Collectors.toList())) {
+            ollirCode.append(".method public ");
             visit(child);
         }
+        ollirCode.append("}\n");
+        return true;
+    }
+
+    private Boolean visitVarDeclaration(JmmNode node, Boolean dummy) {
+        String variableName = node.getChildren().get(1).get("name");
+        var symbol = symbolTable.getFields().stream().
+                filter((s) -> s.getName().equals(variableName)).collect(Collectors.toList()).get(0);
+        ollirCode.append(variableName).append(".").append(OllirUtils.getOllirType(symbol));
+        /*if (node.getChildren().size() > 2) {
+            ollirCode.append(" :=").append("").append(" 0");
+        }*/
+        ollirCode.append(";\n");
+        return true;
+    }
+
+    private Boolean visitMethod(JmmNode node, Boolean dummy) {
+        String methodName = node.getKind().equals("RegularMethod") ? node.getChildren().get(1).get("name") : "main";
+        var returnType = symbolTable.getReturnType(methodName);
+        ollirCode.append(methodName).append("(");
+        for (var parameter : symbolTable.getParameters(methodName)) {
+            ollirCode.append(parameter.getName()).append(".").append(OllirUtils.getOllirType(parameter)).append(", ");
+        }
+        ollirCode.delete(ollirCode.lastIndexOf(","), ollirCode.length());
+        ollirCode.append(").").append(OllirUtils.getOllirType(returnType)).append(" {\n");
         ollirCode.append("}\n");
         return true;
     }

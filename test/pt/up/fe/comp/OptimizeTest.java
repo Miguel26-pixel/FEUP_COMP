@@ -27,4 +27,14 @@ public class OptimizeTest {
     public void testHelloWorld() {
         testOptimize("fixtures/public/HelloWorld.jmm");
     }
+
+    @Test
+    public void testFindMaximum() {
+        testOptimize("fixtures/public/FindMaximum.jmm");
+    }
+
+    @Test
+    public void testFieldTester() {
+        testOptimize("fixtures/public/FieldTester.jmm");
+    }
 }
