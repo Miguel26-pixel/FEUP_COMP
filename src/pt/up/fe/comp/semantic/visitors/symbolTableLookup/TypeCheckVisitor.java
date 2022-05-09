@@ -39,32 +39,61 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Boolean,Type
     public Type visitIdentifier(JmmNode node, Boolean dummy) {
         if (node.getAncestor("MethodBody").isEmpty()) { return null; }
 
+        if (node.getJmmParent().getKind().equals("MethodCall")) {
+            System.out.println("entrei1");
+            if (isThisMethodCall(node.getJmmParent()) && symbolTable.getMethodsTable().contains(node.get("name"))) {
+                List<String> methods = symbolTable.getMethodsTable();
+                for (String method : methods) {
+                    if (node.get("name").equals(method)) {
+                        return symbolTable.getReturnType(method);
+                    }
+                }
+            } else if (isThisMethodCall(node.getJmmParent()) && symbolTable.getSuper() != null) {
+                return new Type("extern",false);
+            } else if (!isThisMethodCall(node.getJmmParent())) {
+                return new Type("extern",false);
+            }
+        }
+
         Optional<Symbol> child = symbolTable.getClosestSymbol(node, node.get("name"));
         if (child.isPresent()) {
             return child.get().getType();
         }
 
-        if (node.getJmmParent().getKind().equals("MethodCall")) {
-            List<String> methods = symbolTable.getMethodsTable();
-            for (String method : methods) {
-                if (node.get("name").equals(method)) {
-                    return symbolTable.getReturnType(method);
-                }
+        addSemanticErrorReport(node, "Identifier " + node.get("name") + " does not exists");
+        return new Type("", false);
+    }
+
+    private Boolean isThisMethodCall(JmmNode methodCall) {
+        Optional<JmmNode> compoundExpression = methodCall.getAncestor("CompoundExpression");
+        if (compoundExpression.isPresent()) {
+            JmmNode child = compoundExpression.get().getChildren().get(0);
+
+            if (child.getKind().equals("ThisLiteral")) { return true; }
+
+            Optional<Symbol> closest = symbolTable.getClosestSymbol(child, child.get("name"));
+            if (closest.isPresent()) {
+                return closest.get().getType().getName().equals(symbolTable.getClassName());
             }
         }
-
-        addSemanticErrorReport(node, "Variable identifier " + node.get("name") + " does not exists");
-        return new Type("", false);
+        return false;
     }
 
     public Type visitUnaryOp(JmmNode node, Boolean dummy) {
         Type childType = visit(node.getChildren().get(0), dummy);
 
-        if (childType.getName().equals("bool") && !childType.isArray()) {
+        if ((childType.getName().equals("bool") && !childType.isArray()) || childType.getName().equals("extern")) {
             return childType;
         }
 
         addSemanticErrorReport(node, "Incompatible types. Not operation expects a bool");
         return new Type("", false);
+    }
+
+    public Type visitBinOp(JmmNode node, Boolean dummy) {
+        Type firstChildType = visit(node.getChildren().get(0), dummy);
+        Type secondChildType = visit(node.getChildren().get(1), dummy);
+
+        return null;
     }
 }

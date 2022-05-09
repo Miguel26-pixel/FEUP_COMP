@@ -77,10 +77,12 @@ public class SemanticAnalyserTest {
     public void testMethodCallCorrect() {
         JmmSemanticsResult result = TestUtils.analyse("class dummy {public int foo(){return 0;} public int bar(){this.foo(); return 0;}}");
         TestUtils.noErrors(result.getReports());
-        /*result = TestUtils.analyse("class dummy extends other {public int bar(){this.foo(); return 0;}}");
+        result = TestUtils.analyse("class dummy extends other {public int bar(){ this.foo(); return 0;}}");
+        TestUtils.noErrors(result.getReports());
+        result = TestUtils.analyse("class dummy {public int bar(){ dummy a; a.bar(); return 0; }}");
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("import Animal.Dog; class dummy {public int bar(Dog a){a.bark(); return 0;}}");
-        TestUtils.noErrors(result.getReports());*/
+        TestUtils.noErrors(result.getReports());
     }
 
     @Test

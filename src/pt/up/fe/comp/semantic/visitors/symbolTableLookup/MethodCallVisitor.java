@@ -1,5 +1,6 @@
 package pt.up.fe.comp.semantic.visitors.symbolTableLookup;
 
+import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.semantic.tables.JmmSymbolTable;
 import pt.up.fe.comp.semantic.visitors.SemanticJmmNodeVisitor;
@@ -23,6 +24,16 @@ public class MethodCallVisitor extends SemanticJmmNodeVisitor {
 
     private Boolean isThisMethodCall(JmmNode methodCall) {
         Optional<JmmNode> compoundExpression = methodCall.getAncestor("CompoundExpression");
-        return compoundExpression.isPresent() && compoundExpression.get().getChildren().get(0).getKind().equals("ThisLiteral");
+        if (compoundExpression.isPresent()) {
+            JmmNode child = compoundExpression.get().getChildren().get(0);
+
+            if (child.getKind().equals("ThisLiteral")) { return true; }
+
+            Optional<Symbol> closest = symbolTable.getClosestSymbol(child, child.get("name"));
+            if (closest.isPresent()) {
+                return closest.get().getType().getName().equals(symbolTable.getClassName());
+            }
+        }
+        return false;
     }
 }
