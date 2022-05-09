@@ -20,6 +20,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Boolean,Type
         addVisit("Identifier", this::visitIdentifier);
         addVisit("UnaryOp", this::visitUnaryOp);
         addVisit("BinOp", this::visitBinOp);
+        addVisit("ArrayElement", this::visitArrayElement);
         //addVisit("MethodCall", this::visitMethodCall);
 
         setDefaultVisit(this::visitDefault);
@@ -93,9 +94,6 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Boolean,Type
         Type firstChildType = visit(node.getChildren().get(0), dummy);
         Type secondChildType = visit(node.getChildren().get(1), dummy);
 
-        System.out.println(firstChildType.getName());
-        System.out.println(secondChildType.getName());
-
         switch (node.get("op")) {
             case "assign":
                 if ((!firstChildType.getName().equals(secondChildType.getName()) ||
@@ -129,5 +127,15 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Boolean,Type
                 }
                 return new Type("int", false);
         }
+    }
+
+    public Type visitArrayElement(JmmNode node, Boolean dummy) {
+        //Type firstChildType = visit(node.getChildren().get(0), dummy);
+        Type secondChildType = visit(node.getChildren().get(1), dummy);
+
+        if (!secondChildType.getName().equals("int")) {
+            addSemanticErrorReport(node, "Array access index must be an expression of type integer");
+        }
+        return new Type("int", false);
     }
 }

@@ -8,7 +8,7 @@ public class ArrayAccessVisitor extends SemanticJmmNodeVisitor {
 
     public ArrayAccessVisitor(JmmSymbolTable symbolTable) {
         super(symbolTable);
-        addVisit("Indexation", this::visitIndexation);
+        addVisit("ArrayElement", this::visitIndexation);
     }
 
     private Boolean visitIndexation(JmmNode node, Boolean dummy) {

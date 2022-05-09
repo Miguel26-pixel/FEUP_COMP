@@ -102,7 +102,7 @@ Type:
 
 Statement #void:
     (SCAN 2
-        ((TerminalId (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >)?) #Indexation(>=2) < EQUAL > { jjtThis.put("op", "assign"); } Expression < SEMICOLON >) #BinOp(2)
+        ((TerminalId (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >)?) #ArrayElement(>=2) < EQUAL > { jjtThis.put("op", "assign"); } Expression < SEMICOLON >) #BinOp(2)
         | Expression < SEMICOLON >
     )
     | (< IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement #Then < ELSE > Statement #Else) #If
@@ -157,7 +157,7 @@ TerminalExpression #void:
 ;
 
 TerminalExpressionCompound #void:
-    (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >) #Indexation(>=2)
+    (< OPEN_SQUARE_BRACKETS > Expression < CLOSE_SQUARE_BRACKETS >) #Indexation
     | < DOT > ((TerminalId (< OPEN_PARENTHESES > (Expression (< COMMA > Expression)*)? #Arguments < CLOSE_PARENTHESES >)?) #AttributeGet(<2)) #MethodCall(>=2)
 ;
 

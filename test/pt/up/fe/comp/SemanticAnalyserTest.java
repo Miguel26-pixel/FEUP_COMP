@@ -28,8 +28,8 @@ public class SemanticAnalyserTest {
                 "public int bar(int a){this.foo(b); return 0;}" +
                 "}");
         TestUtils.noErrors(result.getReports());
-        result = TestUtils.analyse("class dummy {String a; public static void main(String[] args){args[0] = this.a;}}");
-        TestUtils.noErrors(result.getReports());
+        //result = TestUtils.analyse("class dummy {String a; public static void main(String[] args){args[0] = this.a;}}");
+        //TestUtils.noErrors(result.getReports());
     }
 
     @Test
@@ -71,6 +71,8 @@ public class SemanticAnalyserTest {
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy {public int foo(int a){a[2] = 0; return 0;}}");
         TestUtils.mustFail(result.getReports());
+        //JmmSemanticsResult result = TestUtils.analyse("class dummy {public int foo(int a){a[2] = b.c().d()[5].f()[10]; return 0;}}");
+        //TestUtils.mustFail(result.getReports());
     }
 
     @Test
@@ -108,6 +110,8 @@ public class SemanticAnalyserTest {
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy {int a; public int foo(){ int b; b = 5; a = 2 + 7 - b * 2; return 0; }}");
         TestUtils.noErrors(result.getReports());
+        result = TestUtils.analyse("class dummy {public int foo(int[] a){a[123] = 0; return 0;}}");
+        TestUtils.noErrors(result.getReports());
         //result = TestUtils.analyse("class dummy extends other {int a; public int foo(){ a = this.hello(); return 0; }}");
         //TestUtils.noErrors(result.getReports());
         //result = TestUtils.analyse("class dummy extends other {int a; public int foo(){ a = this.hello()[2]; return 0; }}");
@@ -127,6 +131,8 @@ public class SemanticAnalyserTest {
         result = TestUtils.analyse("class dummy {int a; public int foo(){ int b; bool c; b = 5; a = 2 + false - b * 2; c = b < a; return 0; }}");
         TestUtils.mustFail(result.getReports());
         result = TestUtils.analyse("class dummy {int a; public int foo(){ int b; bool c; b = 5; a = 2 + 7 - b * 2; c = false < a; return 0; }}");
+        TestUtils.mustFail(result.getReports());
+        result = TestUtils.analyse("class dummy {public int foo(int[] a){a[false] = 0; return 0;}}");
         TestUtils.mustFail(result.getReports());
     }
 }
