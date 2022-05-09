@@ -53,11 +53,11 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Boolean,Type
             } else if (!isThisMethodCall(node.getJmmParent())) {
                 return new Type("extern",false);
             }
-        }
-
-        Optional<Symbol> child = symbolTable.getClosestSymbol(node, node.get("name"));
-        if (child.isPresent()) {
-            return child.get().getType();
+        } else {
+            Optional<Symbol> child = symbolTable.getClosestSymbol(node, node.get("name"));
+            if (child.isPresent()) {
+                return child.get().getType();
+            }
         }
 
         addSemanticErrorReport(node, "Identifier " + node.get("name") + " does not exists");
