@@ -100,7 +100,7 @@ public class SemanticAnalyserTest {
 
     @Test
     public void testSimpleTypeCheckError() {
-        JmmSemanticsResult result = TestUtils.analyse("class dummy {int a; public int foo(){ !a; return 0; }}");
+        JmmSemanticsResult result = TestUtils.analyse("class dummy {int a; public int foo(){ !a; return 0; }}"); //this.foo()[1];
         TestUtils.mustFail(result.getReports());
     }
 }

@@ -38,16 +38,21 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Boolean,Type
 
     public Type visitIdentifier(JmmNode node, Boolean dummy) {
         if (node.getAncestor("MethodBody").isEmpty()) { return null; }
+
         Optional<Symbol> child = symbolTable.getClosestSymbol(node, node.get("name"));
         if (child.isPresent()) {
             return child.get().getType();
         }
-        List<String> methods = symbolTable.getMethodsTable();
-        for (String method: methods) {
-            if (node.get("name").equals(method)) {
-                return symbolTable.getReturnType(method);
+
+        if (node.getJmmParent().getKind().equals("MethodCall")) {
+            List<String> methods = symbolTable.getMethodsTable();
+            for (String method : methods) {
+                if (node.get("name").equals(method)) {
+                    return symbolTable.getReturnType(method);
+                }
             }
         }
+
         addSemanticErrorReport(node, "Variable identifier " + node.get("name") + " does not exists");
         return new Type("", false);
     }
