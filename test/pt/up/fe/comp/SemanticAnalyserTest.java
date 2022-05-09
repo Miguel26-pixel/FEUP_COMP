@@ -77,10 +77,10 @@ public class SemanticAnalyserTest {
     public void testMethodCallCorrect() {
         JmmSemanticsResult result = TestUtils.analyse("class dummy {public int foo(){return 0;} public int bar(){this.foo(); return 0;}}");
         TestUtils.noErrors(result.getReports());
-        result = TestUtils.analyse("class dummy extends other {public int bar(){this.foo(); return 0;}}");
+        /*result = TestUtils.analyse("class dummy extends other {public int bar(){this.foo(); return 0;}}");
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("import Animal.Dog; class dummy {public int bar(Dog a){a.bark(); return 0;}}");
-        TestUtils.noErrors(result.getReports());
+        TestUtils.noErrors(result.getReports());*/
     }
 
     @Test
@@ -89,6 +89,18 @@ public class SemanticAnalyserTest {
                 "int b;" +
                 "public int bar(int a){this.foo(a); return 0;}" +
                 "}");
+        TestUtils.mustFail(result.getReports());
+    }
+
+    @Test
+    public void testSimpleTypeCheckCorrect() {
+        JmmSemanticsResult result = TestUtils.analyse("class dummy {bool a; public int foo(){ !a; return 0; }}");
+        TestUtils.noErrors(result.getReports());
+    }
+
+    @Test
+    public void testSimpleTypeCheckError() {
+        JmmSemanticsResult result = TestUtils.analyse("class dummy {int a; public int foo(){ !a; return 0; }}");
         TestUtils.mustFail(result.getReports());
     }
 }

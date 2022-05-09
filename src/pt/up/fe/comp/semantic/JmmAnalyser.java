@@ -7,6 +7,7 @@ import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.semantic.tables.JmmSymbolTable;
 import pt.up.fe.comp.semantic.visitors.symbolTableLookup.ArrayAccessVisitor;
 import pt.up.fe.comp.semantic.visitors.symbolTableLookup.MethodCallVisitor;
+import pt.up.fe.comp.semantic.visitors.symbolTableLookup.TypeCheckVisitor;
 import pt.up.fe.comp.semantic.visitors.symbolTableLookup.VariableAccessVisitor;
 
 import java.util.*;
@@ -26,6 +27,11 @@ public class JmmAnalyser implements JmmAnalysis {
         ArrayAccessVisitor arrayAccessVisitor = new ArrayAccessVisitor(symbolTable);
         arrayAccessVisitor.visit(parserResult.getRootNode(), Boolean.TRUE);
         reports.addAll(arrayAccessVisitor.getReports());
+
+        // Type verification
+        TypeCheckVisitor typeCheckVisitor = new TypeCheckVisitor(symbolTable);
+        typeCheckVisitor.visit(parserResult.getRootNode(), Boolean.TRUE);
+        reports.addAll(typeCheckVisitor.getReports());
 
         // Check called methods existence
         MethodCallVisitor methodCallVisitor = new MethodCallVisitor(symbolTable);
