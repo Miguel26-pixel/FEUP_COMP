@@ -17,9 +17,14 @@ import pt.up.fe.specs.util.SpecsIo;
 
 public class OptimizeTest {
 
+    private void testOptimize(String resourcePath) {
+        var result = TestUtils.optimize(SpecsIo.getResource(resourcePath));
+        System.out.println(result.getOllirCode());
+        TestUtils.noErrors(result.getReports());
+    }
+
     @Test
     public void testHelloWorld() {
-        var result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/HelloWorld.jmm"));
-        TestUtils.noErrors(result.getReports());
+        testOptimize("fixtures/public/HelloWorld.jmm");
     }
 }
