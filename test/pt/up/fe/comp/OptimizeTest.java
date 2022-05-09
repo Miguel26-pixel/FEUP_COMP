@@ -29,12 +29,12 @@ public class OptimizeTest {
     }
 
     @Test
-    public void testFindMaximum() {
-        testOptimize("fixtures/public/FindMaximum.jmm");
+    public void testFac() {
+        testOptimize("fixtures/public/Fac.jmm");
     }
 
     @Test
-    public void testFieldTester() {
-        testOptimize("fixtures/public/FieldTester.jmm");
+    public void testFindMaximum() {
+        testOptimize("fixtures/public/FindMaximum.jmm");
     }
 }

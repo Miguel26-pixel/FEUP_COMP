@@ -1,5 +1,0 @@
-class FieldTester {
-    int b;
-    int a;
-    public static void main(String[] args){}
-}
