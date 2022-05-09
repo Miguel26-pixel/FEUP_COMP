@@ -17,13 +17,14 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         this.symbolTable = symbolTable;
         addVisit("IntLiteral", this::visitIntLiteral);
         addVisit("BooleanLiteral", this::visitBoolLiteral);
+        addVisit("ThisLiteral", this::visitThisLiteral);
         addVisit("Identifier", this::visitIdentifier);
         addVisit("UnaryOp", this::visitUnaryOp);
         addVisit("BinOp", this::visitBinOp);
         addVisit("ArrayElement", this::visitArrayElement);
         addVisit("CompoundExpression", this::visitCompoundExpression);
         addVisit("Indexation", this::visitIndexation);
-        //addVisit("MethodCall", this::visitMethodCall);
+        addVisit("MethodCall", this::visitMethodCall);
 
         setDefaultVisit(this::visitDefault);
     }
@@ -38,6 +39,8 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
     public Type visitIntLiteral(JmmNode node, Type dummy) { return new Type("int",false); }
 
     public Type visitBoolLiteral(JmmNode node, Type dummy) { return new Type("bool",false); }
+
+    public Type visitThisLiteral(JmmNode node, Type type) { return new Type(symbolTable.getClassName(), false); }
 
     public Type visitIdentifier(JmmNode node, Type dummy) {
         if (node.getAncestor("MethodBody").isEmpty()) { return null; }
@@ -170,5 +173,9 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         }
 
         return new Type(type.getName(),false); //only work for 1d array
+    }
+
+    public Type visitMethodCall(JmmNode node, Type type) {
+        return visit(node.getChildren().get(0), type);
     }
 }
