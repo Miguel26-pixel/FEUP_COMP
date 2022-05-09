@@ -1,0 +1,24 @@
+import io;
+
+Test {
+
+	.construct Test().V {
+		invokespecial(this, "<init>").V;
+	}
+
+	.method public static main(args.array.String).V {
+		test.Test :=.Test new(Test).Test;	
+		invokespecial(test.Test,"<init>").V;
+			
+		invokevirtual(test.Test, "foo").V;
+		ret.V;
+	}
+
+	
+	.method public foo().V {
+
+		invokestatic(io, "println", 10.i32).V;
+
+		ret.V;
+	}
+}
