@@ -10,6 +10,9 @@ class Test {
 		A a;
 		boolean b;
 		
+		a = new A();
+		b = true;
+		
 		return a.foo(b);
 	}
 }

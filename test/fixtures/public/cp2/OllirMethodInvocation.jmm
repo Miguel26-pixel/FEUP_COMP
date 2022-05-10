@@ -9,6 +9,8 @@ class Test {
 	public int foo() {
 		int a;
 		
+		a = 1;
+		
 		io.println(a);
 		
 		return 0;

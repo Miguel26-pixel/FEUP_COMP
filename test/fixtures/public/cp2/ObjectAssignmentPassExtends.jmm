@@ -9,6 +9,10 @@ class A extends B {
 	public A foo() {
 		A a;
 		B b;
+		
+		a = new A();
+		b = new B();
+		
 		// A extends B
 		a = b;
 		

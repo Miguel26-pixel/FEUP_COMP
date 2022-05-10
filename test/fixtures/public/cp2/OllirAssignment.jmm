@@ -10,6 +10,8 @@ class Test {
 		int a;
 		int b;
 		
+		b = 2;
+		
 		a = b;
 		
 		return 0;

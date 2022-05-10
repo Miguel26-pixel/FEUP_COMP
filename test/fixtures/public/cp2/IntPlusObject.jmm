@@ -7,6 +7,10 @@ class Test {
 	}
 	
 	public int foo() {
-		return 10 + A;
+		A a;
+		
+		a = new A();
+		
+		return 10 + a;
 	}
 }

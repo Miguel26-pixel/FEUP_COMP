@@ -8,6 +8,7 @@ class Test {
 	
 	public int foo() {
 		int a;
+		a = 0;
 		
 		return a[10];
 	}

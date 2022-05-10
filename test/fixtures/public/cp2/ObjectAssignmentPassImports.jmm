@@ -10,6 +10,10 @@ class Test {
 	public A foo() {
 		A a;
 		B b;
+		
+		a = new A();
+		b = new B();
+		
 		// A and B imported, assume it is correct
 		a = b;
 		

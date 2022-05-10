@@ -39,7 +39,7 @@ public class Cp2Test {
 
     @Test
     public void test_1_02_ClassNotImported() {
-        var result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cp2/VarNotDeclared.jmm"));
+        var result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cp2/ClassNotImported.jmm"));
         TestUtils.mustFail(result);
     }
 

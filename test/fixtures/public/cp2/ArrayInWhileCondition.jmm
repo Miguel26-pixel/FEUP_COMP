@@ -8,6 +8,7 @@ class Test {
 	
 	public int foo() {
 		int[] a;
+		a = new int[2];
 		
 		while(a) {
 		}
