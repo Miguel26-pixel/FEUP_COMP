@@ -16,6 +16,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import pt.up.fe.comp.jmm.jasmin.JasminResult;
+import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsStrings;
 
@@ -31,9 +33,15 @@ public class BackendTest {
 
     @Test
     public void testHelloWorld() {
-
         String jasminCode = SpecsIo.getResource("fixtures/public/jasmin/HelloWorld.j");
         var output = TestUtils.runJasmin(jasminCode);
         assertEquals("Hello World!\nHello World Again!\n", SpecsStrings.normalizeFileContents(output));
+    }
+
+    @Test
+    public void testToJasmin() {
+        String jmmCode = SpecsIo.getResource("fixtures/public/HelloWorld.jmm");
+        var jasminResult = TestUtils.backend(jmmCode);
+        System.out.println(jasminResult.getJasminCode());
     }
 }
