@@ -15,6 +15,7 @@ package pt.up.fe.comp;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.util.Collections;
 
 import org.junit.Test;
@@ -23,6 +24,60 @@ import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.specs.util.SpecsIo;
 
 public class Cp2Test {
+
+    public static void testOllirToJasmin(String resource, String expectedOutput) {
+        // If AstToJasmin pipeline, do not execute test
+        if (TestUtils.hasAstToJasminClass()) {
+            return;
+        }
+
+        var ollirResult = new OllirResult(SpecsIo.getResource(resource), Collections.emptyMap());
+
+        var result = TestUtils.backend(ollirResult);
+
+        var testName = new File(resource).getName();
+        System.out.println(testName + ":\n" + result.getJasminCode());
+        var runOutput = result.runWithFullOutput();
+        assertEquals("Error while running compiled Jasmin: " + runOutput.getOutput(), 0, runOutput.getReturnValue());
+        System.out.println("\n Result: " + runOutput.getOutput());
+
+        if (expectedOutput != null) {
+            assertEquals(expectedOutput, runOutput.getOutput());
+        }
+    }
+
+    public static void testOllirToJasmin(String resource) {
+        testOllirToJasmin(resource, null);
+    }
+
+    public static void testJmmCompilation(String resource, String expectedOutput) {
+        // If AstToJasmin pipeline, generate Jasmin
+        if (TestUtils.hasAstToJasminClass()) {
+
+            var result = TestUtils.backend(SpecsIo.getResource(resource));
+
+            var testName = new File(resource).getName();
+            System.out.println(testName + ":\n" + result.getJasminCode());
+            var runOutput = result.runWithFullOutput();
+            assertEquals("Error while running compiled Jasmin: " + runOutput.getOutput(), 0,
+                    runOutput.getReturnValue());
+            System.out.println("\n Result: " + runOutput.getOutput());
+
+            if (expectedOutput != null) {
+                assertEquals(expectedOutput, runOutput.getOutput());
+            }
+
+            return;
+        }
+
+        var result = TestUtils.optimize(SpecsIo.getResource(resource));
+        var testName = new File(resource).getName();
+        System.out.println(testName + ":\n" + result.getOllirCode());
+    }
+
+    public static void testJmmCompilation(String resource) {
+        testJmmCompilation(resource, null);
+    }
 
     @Test
     public void test_1_00_SymbolTable() {
@@ -153,89 +208,43 @@ public class Cp2Test {
     }
 
     @Test
-    public void test_2_01_OllirBasic() {
-        var result = TestUtils
-                .optimize(SpecsIo.getResource("fixtures/public/cp2/OllirBasic.jmm"));
-
-        System.out.println("OllirBasic:\n" + result.getOllirCode());
+    public void test_2_01_CompileBasic() {
+        testJmmCompilation("fixtures/public/cp2/CompileBasic.jmm");
     }
 
     @Test
-    public void test_2_02_OllirArithmetic() {
-        var result = TestUtils
-                .optimize(SpecsIo.getResource("fixtures/public/cp2/OllirArithmetic.jmm"));
-
-        System.out.println("OllirArithmetic:\n" + result.getOllirCode());
+    public void test_2_02_CompileArithmetic() {
+        testJmmCompilation("fixtures/public/cp2/CompileArithmetic.jmm");
     }
 
     @Test
-    public void test_2_03_OllirMethodInvocation() {
-        var result = TestUtils
-                .optimize(SpecsIo.getResource("fixtures/public/cp2/OllirMethodInvocation.jmm"));
-
-        System.out.println("OllirMethodInvocation:\n" + result.getOllirCode());
+    public void test_2_03_CompileMethodInvocation() {
+        testJmmCompilation("fixtures/public/cp2/CompileMethodInvocation.jmm");
     }
 
     @Test
-    public void test_2_04_OllirAssignment() {
-        var result = TestUtils
-                .optimize(SpecsIo.getResource("fixtures/public/cp2/OllirAssignment.jmm"));
-
-        System.out.println("OllirAssignment:\n" + result.getOllirCode());
+    public void test_2_04_CompileAssignment() {
+        testJmmCompilation("fixtures/public/cp2/CompileAssignment.jmm");
     }
 
     @Test
     public void test_3_01_OllirToJasminBasic() {
-        var ollirResult = new OllirResult(SpecsIo.getResource("fixtures/public/cp2/OllirToJasminBasic.ollir"),
-                Collections.emptyMap());
-
-        var result = TestUtils.backend(ollirResult);
-
-        System.out.println("OllirToJasminBasic:\n" + result.getJasminCode());
-        var runOutput = result.runWithFullOutput();
-        assertEquals("Error while running compiled Jasmin: " + runOutput.getOutput(), 0, runOutput.getReturnValue());
-        System.out.println("\n Result: " + runOutput.getOutput());
+        testOllirToJasmin("fixtures/public/cp2/OllirToJasminBasic.ollir");
     }
 
     @Test
     public void test_3_02_OllirToJasminArithmetics() {
-        var ollirResult = new OllirResult(SpecsIo.getResource("fixtures/public/cp2/OllirToJasminArithmetics.ollir"),
-                Collections.emptyMap());
-
-        var result = TestUtils.backend(ollirResult);
-
-        System.out.println("OllirToJasminArithmetics:\n" + result.getJasminCode());
-        var runOutput = result.runWithFullOutput();
-        assertEquals("Error while running compiled Jasmin: " + runOutput.getOutput(), 0, runOutput.getReturnValue());
-        System.out.println("\n Result: " + runOutput.getOutput());
+        testOllirToJasmin("fixtures/public/cp2/OllirToJasminArithmetics.ollir");
     }
 
     @Test
     public void test_3_03_OllirToJasminInvoke() {
-        var ollirResult = new OllirResult(SpecsIo.getResource("fixtures/public/cp2/OllirToJasminInvoke.ollir"),
-                Collections.emptyMap());
-
-        var result = TestUtils.backend(ollirResult);
-
-        System.out.println("OllirToJasminInvoke:\n" + result.getJasminCode());
-        var runOutput = result.runWithFullOutput();
-        assertEquals("Error while running compiled Jasmin: " + runOutput.getOutput(), 0, runOutput.getReturnValue());
-        System.out.println("\n Result: " + runOutput.getOutput());
+        testOllirToJasmin("fixtures/public/cp2/OllirToJasminInvoke.ollir");
     }
 
     @Test
     public void test_3_04_OllirToJasminFields() {
-        var ollirResult = new OllirResult(SpecsIo.getResource("fixtures/public/cp2/OllirToJasminFields.ollir"),
-                Collections.emptyMap());
-
-        var result = TestUtils.backend(ollirResult);
-
-        System.out.println("OllirToJasminFields:\n" + result.getJasminCode());
-        result.compile();
-
-        var runOutput = result.runWithFullOutput();
-        assertEquals("Error while running compiled Jasmin: " + runOutput.getOutput(), 0, runOutput.getReturnValue());
-        System.out.println("\n Result: " + runOutput.getOutput());
+        testOllirToJasmin("fixtures/public/cp2/OllirToJasminFields.ollir");
     }
 
 }
