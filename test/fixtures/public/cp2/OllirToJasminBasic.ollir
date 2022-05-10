@@ -1,8 +1,7 @@
 import io;
-import foo.Bar;
-import comp.Table;
+import Quicksort;
 
-SymbolTable extends Table {
+SymbolTable extends Quicksort {
 
 	.field public intField.i32;
 	.field public boolField.bool;
@@ -14,13 +13,12 @@ SymbolTable extends Table {
 	.method public method1().i32 {
 		intLocal1.i32 :=.i32 0.i32;
 		boolLocal1.bool :=.bool 1.bool;
-		barLocal1.Bar :=.Bar new(Bar).Bar;
 
 		ret.i32 0.i32;
 	}
 	
-	.method public method2(intParam1.i32, boolParam1.bool, barParam1.Bar).Bar {
-		ret.Bar barParam1.Bar;
+	.method public method2(intParam1.i32, boolParam1.bool).bool {
+		ret.bool boolParam1.bool;
 	}	
 
 
