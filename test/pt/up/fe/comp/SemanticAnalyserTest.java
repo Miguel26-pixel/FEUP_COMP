@@ -130,13 +130,13 @@ public class SemanticAnalyserTest {
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy extends other { public int hello(){ int[] b; b[2] = this.a; return 0; }}");
         TestUtils.noErrors(result.getReports());
-        result = TestUtils.analyse("class dummy {int a; public int hello(){ other b; a = b.intA; return 0; }}");
+        result = TestUtils.analyse("import Helpers.Classes.other; class dummy {int a; public int hello(){ other b; a = b.intA; return 0; }}");
         TestUtils.noErrors(result.getReports());
-        result = TestUtils.analyse("class dummy {public int foo(int[] a){some b; a[2] = b.c().d()[5].f()[10]; return 0;}}");
+        result = TestUtils.analyse("import Helpers.some; class dummy {public int foo(int[] a){some b; a[2] = b.c().d()[5].f()[10]; return 0;}}");
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy {public int foo(){ int[] a; a = new int[5]; return 0; }}");
         TestUtils.noErrors(result.getReports());
-        result = TestUtils.analyse("class dummy {public int foo(){ ola a; a = new ola(); return 0; }}");
+        result = TestUtils.analyse("import Saudation.Portuguese.ola; class dummy {public int foo(){ ola a; a = new ola(); return 0; }}");
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy {public int foo(){ int a; if (5 < 6) { a = 5; } else { a = 6; } return a; }}");
         TestUtils.noErrors(result.getReports());
