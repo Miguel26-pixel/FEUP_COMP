@@ -15,7 +15,13 @@ public class JmmBackend implements JasminBackend {
     public JasminResult toJasmin(OllirResult ollirResult) {
         String jasminCode = "";
 
-        jasminCode += getClassDirective(ollirResult.getOllirClass());
+        ClassUnit ollirClass = ollirResult.getOllirClass();
+        jasminCode += getClassDirective(ollirClass) + "\n";
+        jasminCode += getSuperDirective(ollirClass) + "\n";
+        jasminCode += "\n";
+
+
+
         return new JasminResult(ollirResult, jasminCode, Collections.emptyList());
     }
 
@@ -43,5 +49,9 @@ public class JmmBackend implements JasminBackend {
         classDirective += ollirClass.getClassName();
 
         return classDirective;
+    }
+
+    private String getSuperDirective(ClassUnit ollirClass) {
+        return ollirClass.getSuperClass() != null ? ".super " + ollirClass.getSuperClass() : ".super java/lang/Object";
     }
 }
