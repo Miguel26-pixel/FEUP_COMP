@@ -117,7 +117,7 @@ public class SemanticAnalyserTest {
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy extends other {int a; public int foo(){ a = this.hello()[2]; return 0; }}");
         TestUtils.noErrors(result.getReports());
-        result = TestUtils.analyse("class dummy extends other {int a; public int[] hello(){ return 0; } public int foo(){ a = this.hello()[2]; return 0; }}");
+        result = TestUtils.analyse("class dummy extends other {int a; public int[] hello(){ int[] b; return b; } public int foo(){ a = this.hello()[2]; return 0; }}");
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy extends other {int a; public int hello(){ int[] b; b[2] = this.a; return 0; }}");
         TestUtils.noErrors(result.getReports());

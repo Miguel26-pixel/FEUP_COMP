@@ -30,6 +30,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         addVisit("NewObject",this::visitNewObject);
         addVisit("If", this::visitIf);
         addVisit("While", this::visitWhile);
+        addVisit("Return", this::visitReturn);
 
         setDefaultVisit(this::visitDefault);
     }
@@ -241,5 +242,24 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         }
 
         return new Type("", false);
+    }
+
+    public Type visitReturn(JmmNode node, Type dummy) {
+        Type retType = visit(node.getChildren().get(0),dummy);
+        Optional<JmmNode> regularMethod = node.getAncestor("RegularMethod");
+        Type ret = new Type("", false);
+        if (regularMethod.isPresent()) {
+            for (var method : symbolTable.getMethodsTable()) {
+                if (method.equals(regularMethod.get().getChildren().get(1).get("name"))) {
+                    ret = symbolTable.getReturnType(method);
+                }
+            }
+        } else {
+            addSemanticErrorReport(node, "Invalid return");
+        }
+        if (!(retType.getName().equals(ret.getName()) && retType.isArray() == ret.isArray()) && !retType.getName().equals("extern")) {
+            addSemanticErrorReport(node, "Invalid return type");
+        }
+        return ret;
     }
 }
