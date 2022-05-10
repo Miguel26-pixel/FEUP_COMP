@@ -16,7 +16,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
     public TypeCheckVisitor(JmmSymbolTable symbolTable) {
         this.symbolTable = symbolTable;
         addVisit("IntLiteral", this::visitIntLiteral);
-        addVisit("BooleanLiteral", this::visitBoolLiteral);
+        addVisit("BooleanLiteral", this::visitBooleanLiteral);
         addVisit("ThisLiteral", this::visitThisLiteral);
         addVisit("Identifier", this::visitIdentifier);
         addVisit("UnaryOp", this::visitUnaryOp);
@@ -45,7 +45,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
 
     public Type visitIntLiteral(JmmNode node, Type dummy) { return new Type("int",false); }
 
-    public Type visitBoolLiteral(JmmNode node, Type dummy) { return new Type("bool",false); }
+    public Type visitBooleanLiteral(JmmNode node, Type dummy) { return new Type("boolean",false); }
 
     public Type visitThisLiteral(JmmNode node, Type type) { return new Type(symbolTable.getClassName(), false); }
 
@@ -101,47 +101,71 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
     public Type visitUnaryOp(JmmNode node, Type dummy) {
         Type childType = visit(node.getChildren().get(0), dummy);
 
-        if ((childType.getName().equals("bool") && !childType.isArray()) || childType.getName().equals("extern")) {
+        if ((childType.getName().equals("boolean") && !childType.isArray()) || childType.getName().equals("extern")) {
             return childType;
         }
 
-        addSemanticErrorReport(node, "Incompatible types. Not operation expects a bool");
+        addSemanticErrorReport(node, "Incompatible types. Not operation expects a boolean");
         return new Type("", false);
     }
 
+    private boolean isExtending(Type assigned, Type assignee) {
+        return assignee.getName().equals(symbolTable.getClassName()) && assigned.getName().equals(symbolTable.getSuper());
+    }
+
+    private boolean isImported(Type type) {
+        for (var imp: symbolTable.getImports()) {
+            String classImported = imp.substring(imp.lastIndexOf('.') + 1);
+            if (classImported.equals(type.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Type visitBinOp(JmmNode node, Type dummy) {
+        System.out.println("entrei binop");
         Type firstChildType = visit(node.getChildren().get(0), dummy);
         Type secondChildType = visit(node.getChildren().get(1), dummy);
 
         switch (node.get("op")) {
             case "assign":
-                if ((!firstChildType.getName().equals(secondChildType.getName()) ||
+                System.out.println(firstChildType.getName());
+                System.out.println(firstChildType.isArray());
+                System.out.println(secondChildType.getName());
+                System.out.println(secondChildType.isArray());
+
+                if (((!firstChildType.getName().equals(secondChildType.getName()) && !isExtending(firstChildType,secondChildType)) ||
                         firstChildType.isArray() != secondChildType.isArray()) &&
-                        !secondChildType.getName().equals("extern")) {
+                        !(firstChildType.getName().equals("extern") || secondChildType.getName().equals("extern")) &&
+                        !(isImported(firstChildType) && isImported(secondChildType))) {
                     addSemanticErrorReport(node,"olaType of the assignee must be compatible with the assigned");
                 }
                 return new Type("", false);
 
             case "and": case "or":
-                if ((!firstChildType.getName().equals("bool") && !firstChildType.isArray()) ||
-                        !((secondChildType.getName().equals("bool") && !secondChildType.isArray()) ||
-                                secondChildType.getName().equals("extern"))) {
+                if ((!firstChildType.getName().equals("extern") &&
+                        (!firstChildType.getName().equals("boolean") || firstChildType.isArray())) ||
+                    (!secondChildType.getName().equals("extern") &&
+                        (!secondChildType.getName().equals("boolean") || secondChildType.isArray()))) {
                     addSemanticErrorReport(node,"Types are not compatible with the operation");
                 }
-                return new Type("bool", false);
+                return new Type("boolean", false);
 
             case "lt":
-                if ((!firstChildType.getName().equals("int") && !firstChildType.isArray()) ||
-                        !((secondChildType.getName().equals("int") && !secondChildType.isArray()) ||
-                                secondChildType.getName().equals("extern"))) {
+                if ((!firstChildType.getName().equals("extern") &&
+                        (!firstChildType.getName().equals("int") || firstChildType.isArray())) ||
+                    (!secondChildType.getName().equals("extern") &&
+                        (!secondChildType.getName().equals("int") || secondChildType.isArray()))) {
                     addSemanticErrorReport(node,"Types are not compatible with the operation");
                 }
-                return new Type("bool", false);
+                return new Type("boolean", false);
 
             default:
-                if ((!firstChildType.getName().equals("int") && !firstChildType.isArray()) ||
-                        !((secondChildType.getName().equals("int") && !secondChildType.isArray()) ||
-                                secondChildType.getName().equals("extern"))) {
+                if ((!firstChildType.getName().equals("extern") &&
+                        (!firstChildType.getName().equals("int") || firstChildType.isArray())) ||
+                    (!secondChildType.getName().equals("extern") &&
+                        (!secondChildType.getName().equals("int") || secondChildType.isArray()))) {
                     addSemanticErrorReport(node,"Types are not compatible with the operation");
                 }
                 return new Type("int", false);
@@ -239,8 +263,8 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         Type condition = visit(node.getChildren().get(0), type);
 
         if (!condition.getName().equals("extern")) {
-            if (!condition.getName().equals("bool")) {
-                addSemanticErrorReport(node, "IF condition must be of type bool");
+            if (!condition.getName().equals("boolean")) {
+                addSemanticErrorReport(node, "IF condition must be of type boolean");
             }
         }
 
@@ -250,8 +274,8 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
     public Type visitWhile(JmmNode node, Type type) {
         Type condition = visit(node.getChildren().get(0), type);
         if (!condition.getName().equals("extern")) {
-            if (!condition.getName().equals("bool")) {
-                addSemanticErrorReport(node, "WHILE condition must be of type bool");
+            if (!condition.getName().equals("boolean")) {
+                addSemanticErrorReport(node, "WHILE condition must be of type boolean");
             }
         }
 
@@ -259,6 +283,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
     }
 
     public Type visitReturn(JmmNode node, Type dummy) {
+        System.out.println("entrei return");
         Type retType = visit(node.getChildren().get(0),dummy);
         Optional<JmmNode> regularMethod = node.getAncestor("RegularMethod");
         Type ret = new Type("", false);

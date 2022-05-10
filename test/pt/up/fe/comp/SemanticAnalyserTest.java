@@ -60,13 +60,13 @@ public class SemanticAnalyserTest {
 
         result = TestUtils.analyse("class dummy {" +
                 "public int foo(int a){a = 5; return 0;}" +
-                "public int bar(int a){bool b; this.foo(b); return 0;}" +
+                "public int bar(int a){boolean b; this.foo(b); return 0;}" +
                 "}");
         TestUtils.mustFail(result.getReports());
 
         result = TestUtils.analyse("class dummy {" +
                 "public int foo(int a){a = 5; return 0;}" +
-                "public int bar(int a){bool b; this.foo(b,a); return 0;}" +
+                "public int bar(int a){boolean b; this.foo(b,a); return 0;}" +
                 "}");
         TestUtils.mustFail(result.getReports());
 
@@ -116,15 +116,15 @@ public class SemanticAnalyserTest {
 
     @Test
     public void testSimpleTypeCheckCorrect() {
-        JmmSemanticsResult result = TestUtils.analyse("class dummy {bool a; public int foo(){ !a; return 0; }}");
+        JmmSemanticsResult result = TestUtils.analyse("class dummy {boolean a; public int foo(){ !a; return 0; }}");
         TestUtils.noErrors(result.getReports());
-        result = TestUtils.analyse("class dummy {bool a; public int foo(){ a = false; !a; return 0; }}");
+        result = TestUtils.analyse("class dummy {boolean a; public int foo(){ a = false; !a; return 0; }}");
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy {int a; public int foo(){ a = 2; return 0; }}");
         TestUtils.noErrors(result.getReports());
-        result = TestUtils.analyse("class dummy {bool a; public int foo(){ a = true; bool b; b = !a; a = false || true && b; !a; return 0; }}");
+        result = TestUtils.analyse("class dummy {boolean a; public int foo(){ a = true; boolean b; b = !a; a = false || true && b; !a; return 0; }}");
         TestUtils.noErrors(result.getReports());
-        result = TestUtils.analyse("class dummy {int a; public int foo(){ int b; bool c; b = 5; a = 2 + 7 - b * 2; c = b < a; return 0; }}");
+        result = TestUtils.analyse("class dummy {int a; public int foo(){ int b; boolean c; b = 5; a = 2 + 7 - b * 2; c = b < a; return 0; }}");
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy {int a; public int foo(){ int b; b = 5; a = 2 + 7 - b * 2; return 0; }}");
         TestUtils.noErrors(result.getReports());
@@ -132,7 +132,7 @@ public class SemanticAnalyserTest {
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy {public int foo(int[] a){a[10] = 5 + a[1]; return 0;}}");
         TestUtils.noErrors(result.getReports());
-        result = TestUtils.analyse("class dummy extends other {int a; public int foo(){ int b; bool c; a = this.hello(b,c); return 0; }}");
+        result = TestUtils.analyse("class dummy extends other {int a; public int foo(){ int b; boolean c; a = this.hello(b,c); return 0; }}");
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy extends other {int a; public int foo(){ a = this.hello()[2]; return 0; }}");
         TestUtils.noErrors(result.getReports());
@@ -152,7 +152,7 @@ public class SemanticAnalyserTest {
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy {public int foo(){ int a; if (5 < 6) { a = 5; } else { a = 6; } return a; }}");
         TestUtils.noErrors(result.getReports());
-        result = TestUtils.analyse("class dummy {public int foo(){ bool b; int a; while (b) { a = a + 1; } return 0; }}");
+        result = TestUtils.analyse("class dummy {public int foo(){ boolean b; int a; while (b) { a = a + 1; } return 0; }}");
         TestUtils.noErrors(result.getReports());
     }
 
@@ -160,15 +160,15 @@ public class SemanticAnalyserTest {
     public void testSimpleTypeCheckError() {
         JmmSemanticsResult result = TestUtils.analyse("class dummy {int a; public int foo(){ !a; return 0; }}"); //this.foo()[1];
         TestUtils.mustFail(result.getReports());
-        result = TestUtils.analyse("class dummy {bool a; public int foo(){ a = 2; !a; return 0; }}");
+        result = TestUtils.analyse("class dummy {boolean a; public int foo(){ a = 2; !a; return 0; }}");
         TestUtils.mustFail(result.getReports());
         result = TestUtils.analyse("class dummy {int a; public int foo(){ a = true; return 0; }}");
         TestUtils.mustFail(result.getReports());
-        result = TestUtils.analyse("class dummy {bool a; public int foo(){ a = true; bool b; b = !a; a = false || 2 && b; !a; return 0; }}");
+        result = TestUtils.analyse("class dummy {boolean a; public int foo(){ a = true; boolean b; b = !a; a = false || 2 && b; !a; return 0; }}");
         TestUtils.mustFail(result.getReports());
-        result = TestUtils.analyse("class dummy {int a; public int foo(){ int b; bool c; b = 5; a = 2 + false - b * 2; c = b < a; return 0; }}");
+        result = TestUtils.analyse("class dummy {int a; public int foo(){ int b; boolean c; b = 5; a = 2 + false - b * 2; c = b < a; return 0; }}");
         TestUtils.mustFail(result.getReports());
-        result = TestUtils.analyse("class dummy {int a; public int foo(){ int b; bool c; b = 5; a = 2 + 7 - b * 2; c = false < a; return 0; }}");
+        result = TestUtils.analyse("class dummy {int a; public int foo(){ int b; boolean c; b = 5; a = 2 + 7 - b * 2; c = false < a; return 0; }}");
         TestUtils.mustFail(result.getReports());
         result = TestUtils.analyse("class dummy {public int foo(int[] a){a[false] = 0; return 0;}}");
         TestUtils.mustFail(result.getReports());
@@ -180,7 +180,7 @@ public class SemanticAnalyserTest {
         TestUtils.mustFail(result.getReports());
         result = TestUtils.analyse("class dummy {public int foo(){ int a; if (5 + 6) { a = 5; } else { a = 6; } return a; }}");
         TestUtils.mustFail(result.getReports());
-        result = TestUtils.analyse("class dummy {public int foo(){ bool b; int a; while (a * 2) { a = a + 1; } return 0; }}");
+        result = TestUtils.analyse("class dummy {public int foo(){ boolean b; int a; while (a * 2) { a = a + 1; } return 0; }}");
         TestUtils.mustFail(result.getReports());
     }
 }

@@ -26,7 +26,7 @@ public class ImportCheckVisitor extends ReportCollectorJmmNodeVisitor<Type, Type
         if (!node.getJmmParent().getKind().equals("VarDeclaration")) { return null; }
         JmmNode varDecl = node.getJmmParent();
         String className = varDecl.getChildren().get(0).get("name");
-        if (!className.equals("int") && !className.equals("bool") &&
+        if (!className.equals("int") && !className.equals("boolean") &&
                 !className.equals("String") && !className.equals(symbolTable.getClassName())) {
             for (var imp: symbolTable.getImports()) {
                 String classImported = imp.substring(imp.lastIndexOf('.') + 1);

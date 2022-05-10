@@ -58,7 +58,7 @@ public class SymbolTableTest {
 
     @Test
     public void testMixedMethodDeclaration() {
-        JmmSemanticsResult result = TestUtils.analyse("class test{public static void main(String[] args){} public String f2(bool p1){return true;}}");
+        JmmSemanticsResult result = TestUtils.analyse("class test{public static void main(String[] args){} public String f2(boolean p1){return true;}}");
 
         assertTrue(result.getSymbolTable().getMethods().contains("main"));
 
@@ -79,7 +79,7 @@ public class SymbolTableTest {
         assertEquals(result.getSymbolTable().getParameters("f2").size(), 1);
 
         assertEquals(result.getSymbolTable().getParameters("f2").get(0).getName(), "p1");
-        assertEquals(result.getSymbolTable().getParameters("f2").get(0).getType().getName(), "bool");
+        assertEquals(result.getSymbolTable().getParameters("f2").get(0).getType().getName(), "boolean");
         assertFalse(result.getSymbolTable().getParameters("f2").get(0).getType().isArray());
     }
 

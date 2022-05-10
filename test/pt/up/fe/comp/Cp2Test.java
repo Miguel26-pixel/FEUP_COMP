@@ -152,6 +152,18 @@ public class Cp2Test {
         TestUtils.noErrors(result);
     }
 
+    @Test
+    public void test_RemainingFiles() {
+        var result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cp2/OllirBasic.jmm"));
+        TestUtils.noErrors(result);
+        result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cp2/OllirArithmetic.jmm"));
+        TestUtils.noErrors(result);
+        result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cp2/OllirMethodInvocation.jmm"));
+        TestUtils.noErrors(result);
+        result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cp2/OllirAssignment.jmm"));
+        TestUtils.noErrors(result);
+    }
+
     /*@Test
     public void test_2_01_OllirBasic() {
         var result = TestUtils
