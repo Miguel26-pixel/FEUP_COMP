@@ -1,12 +1,11 @@
 package pt.up.fe.comp.backend;
 
 import org.specs.comp.ollir.ClassUnit;
-import org.specs.comp.ollir.Ollir;
-import org.specs.comp.ollir.parser.OllirParser;
+import org.specs.comp.ollir.Method;
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
-import pt.up.fe.comp.jmm.ollir.OllirUtils;
+
 
 import java.util.Collections;
 
@@ -20,7 +19,7 @@ public class JmmBackend implements JasminBackend {
         jasminCode += getSuperDirective(ollirClass) + "\n";
         jasminCode += "\n";
 
-
+        jasminCode += getMethodsDefinitions(ollirClass);
 
         return new JasminResult(ollirResult, jasminCode, Collections.emptyList());
     }
@@ -53,5 +52,21 @@ public class JmmBackend implements JasminBackend {
 
     private String getSuperDirective(ClassUnit ollirClass) {
         return ollirClass.getSuperClass() != null ? ".super " + ollirClass.getSuperClass() : ".super java/lang/Object";
+    }
+
+    private String getMethodsDefinitions(ClassUnit ollirClass) {
+        String methodDefinitions = "";
+
+        for(Method method: ollirClass.getMethods()) {
+            if (method.isConstructMethod()) {
+                methodDefinitions += MethodDefinitionGenerator.getConstructorDefinition(method, ollirClass.getSuperClass());
+            } else {
+                methodDefinitions += MethodDefinitionGenerator.getMethodDefinition(method);
+            }
+
+            methodDefinitions += "\n";
+        }
+
+        return methodDefinitions;
     }
 }
