@@ -26,6 +26,8 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         addVisit("Indexation", this::visitIndexation);
         addVisit("MethodCall", this::visitMethodCall);
         addVisit("AttributeGet", this::visitAttributeGet);
+        addVisit("NewArray", this::visitNewArray);
+        addVisit("NewObject",this::visitNewObject);
 
         setDefaultVisit(this::visitDefault);
     }
@@ -105,7 +107,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
                 if ((!firstChildType.getName().equals(secondChildType.getName()) ||
                         firstChildType.isArray() != secondChildType.isArray()) &&
                         !secondChildType.getName().equals("extern")) {
-                    addSemanticErrorReport(node,"Type of the assignee must be compatible with the assigned");
+                    addSemanticErrorReport(node,"olaType of the assignee must be compatible with the assigned");
                 }
                 return new Type("", false);
 
@@ -161,7 +163,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
 
         if (!type.getName().equals("extern")) {
             if (!type.isArray()) {
-                addSemanticErrorReport(node, "asdArray access is not done over an array");
+                addSemanticErrorReport(node, "Array access is not done over an array");
                 err = true;
             }
             if (!childType.getName().equals("int")) {
@@ -197,5 +199,21 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
             return new Type("extern", false);
         }
         return new Type("", false);
+    }
+
+    public Type visitNewArray(JmmNode node, Type type) {
+        Type childType = visit(node.getChildren().get(0), type);
+
+        if (!childType.getName().equals("extern")) {
+            if (!childType.getName().equals("int")) {
+                addSemanticErrorReport(node, "Array access index must be an expression of type integer");
+            }
+        }
+
+        return new Type("int", true);
+    }
+
+    public Type visitNewObject(JmmNode node, Type type) {
+        return new Type(node.get("class"), false);
     }
 }

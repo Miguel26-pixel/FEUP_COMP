@@ -127,6 +127,10 @@ public class SemanticAnalyserTest {
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy {public int foo(int[] a){some b; a[2] = b.c().d()[5].f()[10]; return 0;}}");
         TestUtils.noErrors(result.getReports());
+        result = TestUtils.analyse("class dummy {public int foo(){ int[] a; a = new int[5]; return 0; }}");
+        TestUtils.noErrors(result.getReports());
+        result = TestUtils.analyse("class dummy {public int foo(){ ola a; a = new ola(); return 0; }}");
+        TestUtils.noErrors(result.getReports());
     }
 
     @Test
@@ -151,7 +155,5 @@ public class SemanticAnalyserTest {
         TestUtils.mustFail(result.getReports());
         result = TestUtils.analyse("class dummy { public int hello(){ int[] b; b[2] = this.a; return 0; }}");
         TestUtils.mustFail(result.getReports());
-        //result = TestUtils.analyse("class dummy {int a; public int hello(){ other b; a = b.intA; return 0; }}");
-        //TestUtils.noErrors(result.getReports());
     }
 }
