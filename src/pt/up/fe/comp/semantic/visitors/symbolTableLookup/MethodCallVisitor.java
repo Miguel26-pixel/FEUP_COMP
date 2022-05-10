@@ -15,7 +15,7 @@ public class MethodCallVisitor extends SemanticJmmNodeVisitor {
 
     private Boolean visitMethodCall(JmmNode node, Boolean dummy) {
         String methodName = node.getChildren().get(0).get("name");
-        if (isThisMethodCall(node) && symbolTable.getSuper() == null && !symbolTable.getMethodsTable().contains(methodName)) {
+        if (isThisMethodCall(node) && symbolTable.getSuper() == null && !symbolTable.getMethods().contains(methodName)) {
             addSemanticErrorReport(node, "Call to a non existing method: " + methodName);
             return false;
         }

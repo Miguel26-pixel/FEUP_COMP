@@ -53,8 +53,8 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         if (node.getAncestor("MethodBody").isEmpty() && node.getAncestor("Return").isEmpty()) { return null; }
 
         if (node.getJmmParent().getKind().equals("MethodCall")) {
-            if (isThisMethodCall(node.getJmmParent()) && symbolTable.getMethodsTable().contains(node.get("name"))) {
-                List<String> methods = symbolTable.getMethodsTable();
+            if (isThisMethodCall(node.getJmmParent()) && symbolTable.getMethods().contains(node.get("name"))) {
+                List<String> methods = symbolTable.getMethods();
                 for (String method : methods) {
                     if (node.get("name").equals(method)) {
                         return symbolTable.getReturnType(method);
@@ -263,7 +263,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         Optional<JmmNode> regularMethod = node.getAncestor("RegularMethod");
         Type ret = new Type("", false);
         if (regularMethod.isPresent()) {
-            for (var method : symbolTable.getMethodsTable()) {
+            for (var method : symbolTable.getMethods()) {
                 if (method.equals(regularMethod.get().getChildren().get(1).get("name"))) {
                     ret = symbolTable.getReturnType(method);
                 }

@@ -28,7 +28,7 @@ public class SymbolTableTest {
     public void testMethodDeclaration() {
         JmmSemanticsResult result = TestUtils.analyse("class test{public Integer f1(int p1){return 0;}}");
 
-        assertTrue(result.getSymbolTable().getMethodsTable().contains("f1"));
+        assertTrue(result.getSymbolTable().getMethods().contains("f1"));
 
         assertEquals(result.getSymbolTable().getReturnType("f1").getName(), "Integer");
         assertFalse(result.getSymbolTable().getReturnType("f1").isArray());
@@ -44,7 +44,7 @@ public class SymbolTableTest {
     public void testMainMethodDeclaration() {
         JmmSemanticsResult result = TestUtils.analyse("class test{public static void main(String[] args){}}");
 
-        assertTrue(result.getSymbolTable().getMethodsTable().contains("main"));
+        assertTrue(result.getSymbolTable().getMethods().contains("main"));
 
         assertEquals(result.getSymbolTable().getReturnType("main").getName(), "void");
         assertFalse(result.getSymbolTable().getReturnType("main").isArray());
@@ -60,7 +60,7 @@ public class SymbolTableTest {
     public void testMixedMethodDeclaration() {
         JmmSemanticsResult result = TestUtils.analyse("class test{public static void main(String[] args){} public String f2(bool p1){return true;}}");
 
-        assertTrue(result.getSymbolTable().getMethodsTable().contains("main"));
+        assertTrue(result.getSymbolTable().getMethods().contains("main"));
 
         assertEquals(result.getSymbolTable().getReturnType("main").getName(), "void");
         assertFalse(result.getSymbolTable().getReturnType("main").isArray());
@@ -71,7 +71,7 @@ public class SymbolTableTest {
         assertEquals(result.getSymbolTable().getParameters("main").get(0).getType().getName(), "String");
         assertTrue(result.getSymbolTable().getParameters("main").get(0).getType().isArray());
 
-        assertTrue(result.getSymbolTable().getMethodsTable().contains("f2"));
+        assertTrue(result.getSymbolTable().getMethods().contains("f2"));
 
         assertEquals(result.getSymbolTable().getReturnType("f2").getName(), "String");
         assertFalse(result.getSymbolTable().getReturnType("f2").isArray());
