@@ -38,22 +38,4 @@ public class ImportCheckVisitor extends ReportCollectorJmmNodeVisitor<Type, Type
         }
         return new Type("", false);
     }
-
-    /*private Type visitArguments(JmmNode node, Type dummy) {
-        Optional<JmmNode> methodCall = node.getAncestor("MethodCall");
-        List<JmmNode> args = node.getChildren();
-        if (methodCall.isPresent()) {
-            List<Symbol> params = symbolTable.getParameters(methodCall.get().getChildren().get(0).get("name"));
-            if (params.size() != args.size()) {
-                addSemanticErrorReport(node, "Invalid number of arguments");
-            } else {
-                for (int i = 0; i < args.size(); i++) {
-
-                }
-            }
-        } else {
-            addSemanticErrorReport(node, "Invalid arguments");
-        }
-        return new Type("", false);
-    }*/
 }

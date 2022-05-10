@@ -52,11 +52,23 @@ public class SemanticAnalyserTest {
                 "}");
         TestUtils.mustFail(result.getReports());
 
-        /*JmmSemanticsResult result = TestUtils.analyse("class dummy {" +
+        result = TestUtils.analyse("class dummy {" +
                 "public int foo(int a){a = 5; return 0;}" +
                 "public int bar(int a){this.foo(b); return 0;}" +
                 "}");
-        TestUtils.noErrors(result.getReports());*/
+        TestUtils.mustFail(result.getReports());
+
+        result = TestUtils.analyse("class dummy {" +
+                "public int foo(int a){a = 5; return 0;}" +
+                "public int bar(int a){bool b; this.foo(b); return 0;}" +
+                "}");
+        TestUtils.mustFail(result.getReports());
+
+        result = TestUtils.analyse("class dummy {" +
+                "public int foo(int a){a = 5; return 0;}" +
+                "public int bar(int a){bool b; this.foo(b,a); return 0;}" +
+                "}");
+        TestUtils.mustFail(result.getReports());
 
         result = TestUtils.analyse("class dummy {" +
                 "public int foo(int a){a = 5; return 0;}" +

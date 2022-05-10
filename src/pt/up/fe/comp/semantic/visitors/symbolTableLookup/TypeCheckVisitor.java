@@ -31,6 +31,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         addVisit("If", this::visitIf);
         addVisit("While", this::visitWhile);
         addVisit("Return", this::visitReturn);
+        addVisit("Arguments", this::visitArguments);
 
         setDefaultVisit(this::visitDefault);
     }
@@ -189,6 +190,13 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
     }
 
     public Type visitMethodCall(JmmNode node, Type type) {
+        Type childType = visit(node.getChildren().get(0), type);
+        if (!childType.getName().equals("extern")) {
+            List<JmmNode> children = node.getChildren();
+            for (int i = 1 ; i < children.size(); i++) {
+                visit(children.get(i),type);
+            }
+        }
         return visit(node.getChildren().get(0), type);
     }
 
@@ -267,5 +275,30 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
             addSemanticErrorReport(node, "Invalid return type");
         }
         return ret;
+    }
+
+    private Type visitArguments(JmmNode node, Type dummy) {
+        Optional<JmmNode> methodCall = node.getAncestor("MethodCall");
+        List<JmmNode> args = node.getChildren();
+        if (methodCall.isPresent()) {
+            System.out.println("tou");
+            List<Symbol> params = symbolTable.getParameters(methodCall.get().getChildren().get(0).get("name"));
+            if (params.size() != args.size()) {
+                addSemanticErrorReport(node, "Invalid number of arguments");
+            } else {
+                System.out.println("tou2");
+                for (int i = 0; i < args.size(); i++) {
+                    Type paramType = params.get(i).getType();
+                    Type argType = visit(args.get(i), dummy);
+                    if (!argType.getName().equals("extern") && !argType.getName().equals(paramType.getName())) {
+                        addSemanticErrorReport(node, "Invalid Argument of type " + argType.getName() +
+                                ". Expected argument of type " + paramType.getName());
+                    }
+                }
+            }
+        } else {
+            addSemanticErrorReport(node, "Invalid arguments");
+        }
+        return new Type("", false);
     }
 }
