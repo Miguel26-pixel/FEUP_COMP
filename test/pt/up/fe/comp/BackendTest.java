@@ -16,10 +16,16 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import org.specs.comp.ollir.parser.OllirParser;
+import pt.up.fe.comp.backend.JmmBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
+import pt.up.fe.comp.jmm.ollir.OllirUtils;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsStrings;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class BackendTest {
 
@@ -40,8 +46,11 @@ public class BackendTest {
 
     @Test
     public void testToJasmin() {
-        String jmmCode = SpecsIo.getResource("fixtures/public/HelloWorld.jmm");
-        var jasminResult = TestUtils.backend(jmmCode);
-        System.out.println(jasminResult.getJasminCode());
+        String ollirCode = SpecsIo.getResource("fixtures/public/ollir/myclass1.ollir");
+
+        Map<String, String> config = new HashMap<>();
+        OllirResult ollirResult = new OllirResult(ollirCode, config);
+
+        System.out.println(new JmmBackend().toJasmin(ollirResult).getJasminCode());
     }
 }
