@@ -1,0 +1,16 @@
+import A;
+
+class Test {
+	
+	public static void main(String[] args) {
+	
+	}
+	
+	public boolean foo() {
+		boolean a;
+		
+		a = 10;
+		
+		return a;
+	}
+}

@@ -1,0 +1,20 @@
+class A {
+	
+	public static void main(String[] args) {
+	
+	}
+	
+	public int foo(int a) {		
+		return a + 1;
+	}
+	
+	public int bar() {		
+		A a;
+		boolean b;
+
+		a = new A();
+		b = true;
+		
+		return a.foo(b);
+	}
+}
