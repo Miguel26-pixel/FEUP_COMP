@@ -69,6 +69,13 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
             if (child.isPresent()) {
                 return child.get().getType();
             }
+
+            for (var imp: symbolTable.getImports()) {
+                String classImported = imp.substring(imp.lastIndexOf('.') + 1);
+                if (classImported.equals(node.get("name"))) {
+                    return new Type(classImported, false);
+                }
+            }
         }
 
         addSemanticErrorReport(node, "Identifier " + node.get("name") + " does not exists");
@@ -234,7 +241,6 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
 
     public Type visitWhile(JmmNode node, Type type) {
         Type condition = visit(node.getChildren().get(0), type);
-        System.out.println(condition.getName());
         if (!condition.getName().equals("extern")) {
             if (!condition.getName().equals("bool")) {
                 addSemanticErrorReport(node, "WHILE condition must be of type bool");

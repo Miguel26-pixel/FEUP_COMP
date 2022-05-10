@@ -30,6 +30,13 @@ public class SemanticAnalyserTest {
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy {String a; public static void main(String[] args){args[0] = this.a;}}");
         TestUtils.noErrors(result.getReports());
+        result = TestUtils.analyse("import ioPlus;" +
+                "class HelloWorld {" +
+                "public static void main(String[] args) {" +
+                "ioPlus.printHelloWorld();" +
+                "}" +
+                "}");
+        TestUtils.noErrors(result.getReports());
     }
 
     @Test
@@ -45,11 +52,11 @@ public class SemanticAnalyserTest {
                 "}");
         TestUtils.mustFail(result.getReports());
 
-        result = TestUtils.analyse("class dummy {" +
+        /*JmmSemanticsResult result = TestUtils.analyse("class dummy {" +
                 "public int foo(int a){a = 5; return 0;}" +
                 "public int bar(int a){this.foo(b); return 0;}" +
                 "}");
-        TestUtils.mustFail(result.getReports());
+        TestUtils.noErrors(result.getReports());*/
 
         result = TestUtils.analyse("class dummy {" +
                 "public int foo(int a){a = 5; return 0;}" +

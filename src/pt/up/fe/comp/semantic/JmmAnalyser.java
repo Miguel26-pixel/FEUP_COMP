@@ -9,7 +9,6 @@ import pt.up.fe.comp.semantic.tables.JmmSymbolTable;
 import pt.up.fe.comp.semantic.visitors.symbolTableLookup.ArrayAccessVisitor;
 import pt.up.fe.comp.semantic.visitors.symbolTableLookup.MethodCallVisitor;
 import pt.up.fe.comp.semantic.visitors.symbolTableLookup.TypeCheckVisitor;
-import pt.up.fe.comp.semantic.visitors.symbolTableLookup.VariableAccessVisitor;
 
 import java.util.*;
 
@@ -18,11 +17,6 @@ public class JmmAnalyser implements JmmAnalysis {
     public JmmSemanticsResult semanticAnalysis(JmmParserResult parserResult) {
         JmmSymbolTable symbolTable = new JmmSymbolTable(parserResult);
         List<Report> reports = new ArrayList<>(symbolTable.getReports());
-
-        // Check variable existence
-        VariableAccessVisitor variableAccessVisitor = new VariableAccessVisitor(symbolTable);
-        variableAccessVisitor.visit(parserResult.getRootNode(), Boolean.TRUE);
-        reports.addAll(variableAccessVisitor.getReports());
 
         // Check array access on array type
         ArrayAccessVisitor arrayAccessVisitor = new ArrayAccessVisitor(symbolTable);
