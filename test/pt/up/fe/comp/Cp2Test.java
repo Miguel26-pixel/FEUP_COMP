@@ -13,6 +13,8 @@
 
 package pt.up.fe.comp;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Collections;
 
 import org.junit.Test;
@@ -190,8 +192,9 @@ public class Cp2Test {
         var result = TestUtils.backend(ollirResult);
 
         System.out.println("OllirToJasminBasic:\n" + result.getJasminCode());
-        result.compile();
-        System.out.println("\n Result: " + result.run());
+        var runOutput = result.runWithFullOutput();
+        assertEquals("Error while running compiled Jasmin: " + runOutput.getOutput(), 0, runOutput.getReturnValue());
+        System.out.println("\n Result: " + runOutput.getOutput());
     }
 
     @Test
@@ -202,8 +205,9 @@ public class Cp2Test {
         var result = TestUtils.backend(ollirResult);
 
         System.out.println("OllirToJasminArithmetics:\n" + result.getJasminCode());
-        result.compile();
-        System.out.println("\n Result: " + result.run());
+        var runOutput = result.runWithFullOutput();
+        assertEquals("Error while running compiled Jasmin: " + runOutput.getOutput(), 0, runOutput.getReturnValue());
+        System.out.println("\n Result: " + runOutput.getOutput());
     }
 
     @Test
@@ -214,8 +218,9 @@ public class Cp2Test {
         var result = TestUtils.backend(ollirResult);
 
         System.out.println("OllirToJasminInvoke:\n" + result.getJasminCode());
-        result.compile();
-        System.out.println("\n Result: " + result.run());
+        var runOutput = result.runWithFullOutput();
+        assertEquals("Error while running compiled Jasmin: " + runOutput.getOutput(), 0, runOutput.getReturnValue());
+        System.out.println("\n Result: " + runOutput.getOutput());
     }
 
     @Test
@@ -227,7 +232,10 @@ public class Cp2Test {
 
         System.out.println("OllirToJasminFields:\n" + result.getJasminCode());
         result.compile();
-        System.out.println("\n Result: " + result.run());
+
+        var runOutput = result.runWithFullOutput();
+        assertEquals("Error while running compiled Jasmin: " + runOutput.getOutput(), 0, runOutput.getReturnValue());
+        System.out.println("\n Result: " + runOutput.getOutput());
     }
 
 }
