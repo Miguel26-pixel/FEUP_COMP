@@ -21,6 +21,8 @@ public class VariableAccessVisitor extends SemanticJmmNodeVisitor {
             return true;
         } else if (node.getJmmParent().getKind().equals("MethodCall")) {
             return true;
+        } else if (node.getJmmParent().getKind().equals("AttributeGet")) { //not sure
+            return true;
         }
         if (symbolTable.getClosestSymbol(node, node.get("name")).isEmpty()) {
             addSemanticErrorReport(node, "Variable " + node.get("name") + " has not been declared");

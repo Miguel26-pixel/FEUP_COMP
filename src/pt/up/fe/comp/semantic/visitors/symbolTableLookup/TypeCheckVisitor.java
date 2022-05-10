@@ -25,6 +25,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         addVisit("CompoundExpression", this::visitCompoundExpression);
         addVisit("Indexation", this::visitIndexation);
         addVisit("MethodCall", this::visitMethodCall);
+        addVisit("AttributeGet", this::visitAttributeGet);
 
         setDefaultVisit(this::visitDefault);
     }
@@ -43,7 +44,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
     public Type visitThisLiteral(JmmNode node, Type type) { return new Type(symbolTable.getClassName(), false); }
 
     public Type visitIdentifier(JmmNode node, Type dummy) {
-        if (node.getAncestor("MethodBody").isEmpty()) { return null; }
+        if (node.getAncestor("MethodBody").isEmpty() && node.getAncestor("Return").isEmpty()) { return null; }
 
         if (node.getJmmParent().getKind().equals("MethodCall")) {
             if (isThisMethodCall(node.getJmmParent()) && symbolTable.getMethodsTable().contains(node.get("name"))) {
@@ -135,13 +136,13 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
     }
 
     public Type visitArrayElement(JmmNode node, Type dummy) {
-        //Type firstChildType = visit(node.getChildren().get(0), dummy);
+        Type firstChildType = visit(node.getChildren().get(0), dummy);
         Type secondChildType = visit(node.getChildren().get(1), dummy);
 
         if (!secondChildType.getName().equals("int")) {
             addSemanticErrorReport(node, "Array access index must be an expression of type integer");
         }
-        return new Type("int", false);
+        return new Type(firstChildType.getName(), false);
     }
 
     public Type visitCompoundExpression(JmmNode node, Type dummy) {
@@ -156,14 +157,14 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
 
     public Type visitIndexation(JmmNode node, Type type) {
         boolean err = false;
-        Type firstChildType = visit(node.getChildren().get(0), type);
+        Type childType = visit(node.getChildren().get(0), type);
 
         if (!type.getName().equals("extern")) {
             if (!type.isArray()) {
-                addSemanticErrorReport(node, "Array access is not done over an array");
+                addSemanticErrorReport(node, "asdArray access is not done over an array");
                 err = true;
             }
-            if (!firstChildType.getName().equals("int")) {
+            if (!childType.getName().equals("int")) {
                 addSemanticErrorReport(node, "Array access index must be an expression of type integer");
                 err = true;
             }
@@ -177,5 +178,24 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
 
     public Type visitMethodCall(JmmNode node, Type type) {
         return visit(node.getChildren().get(0), type);
+    }
+
+    public Type visitAttributeGet(JmmNode node, Type type) {
+        if (type.getName().equals(symbolTable.getClassName())) {
+            for (var field : symbolTable.getFields()) {
+                if (field.getName().equals(node.getChildren().get(0).get("name"))) {
+                    return field.getType();
+                }
+            }
+            if (symbolTable.getSuper() == null) {
+                addSemanticErrorReport(node, "Attribute " + node.getChildren().get(0).get("name") +
+                        " of class " + type.getName() + " does not exist");
+            } else {
+                return new Type("extern", false);
+            }
+        } else {
+            return new Type("extern", false);
+        }
+        return new Type("", false);
     }
 }
