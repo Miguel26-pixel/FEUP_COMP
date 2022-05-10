@@ -4,7 +4,7 @@ import org.specs.comp.ollir.Method;
 
 public class MethodDefinitionGenerator {
     public static String getConstructorDefinition(Method method, String superName) {
-        String constructorDefinition = ".method public <init>()V\n";
+        String constructorDefinition = ".method " + method.getMethodAccessModifier().toString() + " <init>()V\n";
         constructorDefinition += "\taload_0\n";
 
         if (superName == null) {
