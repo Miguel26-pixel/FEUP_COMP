@@ -32,6 +32,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         addVisit("While", this::visitWhile);
         addVisit("Return", this::visitReturn);
         addVisit("Arguments", this::visitArguments);
+        addVisit("VarDeclaration", this::visitVarDeclaration);
 
         setDefaultVisit(this::visitDefault);
     }
@@ -130,11 +131,6 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
 
         switch (node.get("op")) {
             case "assign":
-                System.out.println(firstChildType.getName());
-                System.out.println(firstChildType.isArray());
-                System.out.println(secondChildType.getName());
-                System.out.println(secondChildType.isArray());
-
                 if (((!firstChildType.getName().equals(secondChildType.getName()) && !isExtending(firstChildType,secondChildType)) ||
                         firstChildType.isArray() != secondChildType.isArray()) &&
                         !(firstChildType.getName().equals("extern") || secondChildType.getName().equals("extern")) &&
@@ -323,6 +319,17 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
             }
         } else {
             addSemanticErrorReport(node, "Invalid arguments");
+        }
+        return new Type("", false);
+    }
+
+    private Type visitVarDeclaration(JmmNode node, Type dummy) {
+        Type type = new Type(node.getChildren().get(0).get("name"),node.getChildren().get(0).get("isArray").equals("true"));
+        if (!type.getName().equals("int") && !type.getName().equals("boolean") && !type.getName().equals("String") &&
+                !type.getName().equals(symbolTable.getClassName()) &&
+                !type.getName().equals(symbolTable.getSuper()) &&
+                !isImported(type)) {
+            addSemanticErrorReport(node, "Class " + type.getName() + " does not exists");
         }
         return new Type("", false);
     }
