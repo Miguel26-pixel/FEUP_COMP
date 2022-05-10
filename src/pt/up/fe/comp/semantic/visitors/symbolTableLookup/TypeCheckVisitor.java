@@ -28,6 +28,8 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         addVisit("AttributeGet", this::visitAttributeGet);
         addVisit("NewArray", this::visitNewArray);
         addVisit("NewObject",this::visitNewObject);
+        addVisit("If", this::visitIf);
+        addVisit("While", this::visitWhile);
 
         setDefaultVisit(this::visitDefault);
     }
@@ -215,5 +217,29 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
 
     public Type visitNewObject(JmmNode node, Type type) {
         return new Type(node.get("class"), false);
+    }
+
+    public Type visitIf(JmmNode node, Type type) {
+        Type condition = visit(node.getChildren().get(0), type);
+
+        if (!condition.getName().equals("extern")) {
+            if (!condition.getName().equals("bool")) {
+                addSemanticErrorReport(node, "IF condition must be of type bool");
+            }
+        }
+
+        return new Type("", false);
+    }
+
+    public Type visitWhile(JmmNode node, Type type) {
+        Type condition = visit(node.getChildren().get(0), type);
+        System.out.println(condition.getName());
+        if (!condition.getName().equals("extern")) {
+            if (!condition.getName().equals("bool")) {
+                addSemanticErrorReport(node, "WHILE condition must be of type bool");
+            }
+        }
+
+        return new Type("", false);
     }
 }

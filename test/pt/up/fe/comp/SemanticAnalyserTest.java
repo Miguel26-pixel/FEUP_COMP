@@ -131,6 +131,10 @@ public class SemanticAnalyserTest {
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy {public int foo(){ ola a; a = new ola(); return 0; }}");
         TestUtils.noErrors(result.getReports());
+        result = TestUtils.analyse("class dummy {public int foo(){ int a; if (5 < 6) { a = 5; } else { a = 6; } return a; }}");
+        TestUtils.noErrors(result.getReports());
+        result = TestUtils.analyse("class dummy {public int foo(){ bool b; int a; while (b) { a = a + 1; } return 0; }}");
+        TestUtils.noErrors(result.getReports());
     }
 
     @Test
@@ -154,6 +158,10 @@ public class SemanticAnalyserTest {
         result = TestUtils.analyse("class dummy extends other {int a; public int hello(){ return 0; } public int foo(){ a = this.hello()[2]; return 0; }}");
         TestUtils.mustFail(result.getReports());
         result = TestUtils.analyse("class dummy { public int hello(){ int[] b; b[2] = this.a; return 0; }}");
+        TestUtils.mustFail(result.getReports());
+        result = TestUtils.analyse("class dummy {public int foo(){ int a; if (5 + 6) { a = 5; } else { a = 6; } return a; }}");
+        TestUtils.mustFail(result.getReports());
+        result = TestUtils.analyse("class dummy {public int foo(){ bool b; int a; while (a * 2) { a = a + 1; } return 0; }}");
         TestUtils.mustFail(result.getReports());
     }
 }
