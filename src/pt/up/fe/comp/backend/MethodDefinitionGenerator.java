@@ -8,15 +8,9 @@ import java.nio.charset.StandardCharsets;
 
 public class MethodDefinitionGenerator {
     public static String getConstructorDefinition(Method method, String superName) {
-        StringBuilder constructorDefinition = new StringBuilder(".method ");
+        StringBuilder constructorDefinition = new StringBuilder();
 
-        if (method.getMethodAccessModifier().toString().equals("DEFAULT")) {
-            constructorDefinition.append("public ");
-        } else {
-            constructorDefinition.append(method.getMethodAccessModifier().toString().toLowerCase()).append(" ");
-        }
-
-        constructorDefinition.append("<init>()V\n");
+        constructorDefinition.append(getConstructorHeader(method));
 
         constructorDefinition.append("\taload_0\n");
 
@@ -37,6 +31,20 @@ public class MethodDefinitionGenerator {
         methodDefinition.append(getMethodHeader(method));
 
         return methodDefinition.toString();
+    }
+
+    private static String getConstructorHeader(Method method) {
+        StringBuilder constructorHeader = new StringBuilder(".method ");
+
+        if (method.getMethodAccessModifier().toString().equals("DEFAULT")) {
+            constructorHeader.append("public ");
+        } else {
+            constructorHeader.append(method.getMethodAccessModifier().toString().toLowerCase()).append(" ");
+        }
+
+        constructorHeader.append("<init>()V\n");
+
+        return constructorHeader.toString();
     }
 
     private static String getMethodHeader(Method method) {
