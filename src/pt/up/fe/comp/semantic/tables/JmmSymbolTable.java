@@ -91,12 +91,17 @@ public class JmmSymbolTable extends ReportCollectorTable implements SymbolTable 
         return Optional.empty();
     }
 
-    private Optional<JmmNode> getClosestMethod(JmmNode node) {
+    public static Optional<JmmNode> getClosestMethod(JmmNode node) {
         var method = node.getAncestor("RegularMethod");
         if (method.isPresent()) {
             return method;
         }
         method = node.getAncestor("MainMethod");
         return method;
+    }
+
+    public static String getMethodName(JmmNode method) {
+        return method.getKind().equals("RegularMethod") ?
+                method.getChildren().get(1).get("name") : "main";
     }
 }

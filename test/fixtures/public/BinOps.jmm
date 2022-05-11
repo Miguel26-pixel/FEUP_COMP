@@ -1,0 +1,7 @@
+class BinOps {
+    public int foo(){
+        int c;
+        c = 2;
+        return c;
+    }
+}

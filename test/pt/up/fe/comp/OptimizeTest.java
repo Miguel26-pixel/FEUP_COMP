@@ -24,6 +24,9 @@ public class OptimizeTest {
     }
 
     @Test
+    public void testBinOps(){testOptimize("fixtures/public/BinOps.jmm");}
+
+    @Test
     public void testHelloWorld() {
         testOptimize("fixtures/public/HelloWorld.jmm");
     }
