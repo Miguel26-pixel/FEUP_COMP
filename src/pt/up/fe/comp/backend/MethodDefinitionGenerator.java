@@ -58,6 +58,19 @@ public class MethodDefinitionGenerator {
 
         methodHeader.append(method.getMethodName()).append("(");
 
+        getParameters(method);
+
         return methodHeader.toString();
+    }
+
+    private static String getParameters(Method method) {
+        StringBuilder methodParameters = new StringBuilder();
+        method.show();
+
+        for (Element parameter: method.getParams()) {
+            parameter.show();
+        }
+
+        return methodParameters.toString();
     }
 }
