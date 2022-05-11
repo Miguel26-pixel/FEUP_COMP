@@ -54,16 +54,17 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         if (node.getAncestor("MethodBody").isEmpty() && node.getAncestor("Return").isEmpty()) { return null; }
 
         if (node.getJmmParent().getKind().equals("MethodCall")) {
-            if (isThisMethodCall(node.getJmmParent()) && symbolTable.getMethods().contains(node.get("name"))) {
+            var ownClassMethodCall = MethodCallVisitor.isThisMethodCall(node.getJmmParent(), symbolTable);
+            if (ownClassMethodCall && symbolTable.getMethods().contains(node.get("name"))) {
                 List<String> methods = symbolTable.getMethods();
                 for (String method : methods) {
                     if (node.get("name").equals(method)) {
                         return symbolTable.getReturnType(method);
                     }
                 }
-            } else if (isThisMethodCall(node.getJmmParent()) && symbolTable.getSuper() != null) {
+            } else if (ownClassMethodCall && symbolTable.getSuper() != null) {
                 return new Type("extern",false);
-            } else if (!isThisMethodCall(node.getJmmParent())) {
+            } else if (!ownClassMethodCall) {
                 return new Type("extern",false);
             }
         } else {
@@ -80,23 +81,8 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
             }
         }
 
-        addSemanticErrorReport(node, "Identifier " + node.get("name") + " does not exists");
+        addSemanticErrorReport(node, "Identifier " + node.get("name") + " does not exist");
         return new Type("", false);
-    }
-
-    private Boolean isThisMethodCall(JmmNode methodCall) {
-        Optional<JmmNode> compoundExpression = methodCall.getAncestor("CompoundExpression");
-        if (compoundExpression.isPresent()) {
-            JmmNode child = compoundExpression.get().getChildren().get(0);
-
-            if (child.getKind().equals("ThisLiteral")) { return true; }
-
-            Optional<Symbol> closest = symbolTable.getClosestSymbol(child, child.get("name"));
-            if (closest.isPresent()) {
-                return closest.get().getType().getName().equals(symbolTable.getClassName());
-            }
-        }
-        return false;
     }
 
     public Type visitUnaryOp(JmmNode node, Type dummy) {
@@ -125,7 +111,6 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
     }
 
     public Type visitBinOp(JmmNode node, Type dummy) {
-        System.out.println("entrei binop");
         Type firstChildType = visit(node.getChildren().get(0), dummy);
         Type secondChildType = visit(node.getChildren().get(1), dummy);
 
@@ -279,7 +264,6 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
     }
 
     public Type visitReturn(JmmNode node, Type dummy) {
-        System.out.println("entrei return");
         Type retType = visit(node.getChildren().get(0),dummy);
         Optional<JmmNode> regularMethod = node.getAncestor("RegularMethod");
         Type ret = new Type("", false);
@@ -302,12 +286,10 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         Optional<JmmNode> methodCall = node.getAncestor("MethodCall");
         List<JmmNode> args = node.getChildren();
         if (methodCall.isPresent()) {
-            System.out.println("tou");
             List<Symbol> params = symbolTable.getParameters(methodCall.get().getChildren().get(0).get("name"));
             if (params.size() != args.size()) {
                 addSemanticErrorReport(node, "Invalid number of arguments");
             } else {
-                System.out.println("tou2");
                 for (int i = 0; i < args.size(); i++) {
                     Type paramType = params.get(i).getType();
                     Type argType = visit(args.get(i), dummy);

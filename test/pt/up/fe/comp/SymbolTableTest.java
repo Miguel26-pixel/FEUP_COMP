@@ -132,10 +132,10 @@ public class SymbolTableTest {
         JmmSemanticsResult result = TestUtils.analyse(
                 "class test {" +
                         "String c;" +
-                        "public int foo() {int a; String b; int[] c = new int[3]; c[2] = 5; return 0;}" +
+                        "public int foo() {int a; String b; int[] c; c = new int[3]; c[2] = 5; return 0;}" +
                         "}"
         );
-        JmmNode node = findChildIndexation(result.getRootNode(), "c");
+        JmmNode node = findArrayElement(result.getRootNode(), "c");
         JmmSymbolTable symbolTable = (JmmSymbolTable) result.getSymbolTable();
         var closestSymbol = symbolTable.getClosestSymbol(node, "c");
         assertTrue(closestSymbol.isPresent());
@@ -151,7 +151,7 @@ public class SymbolTableTest {
                         "public int foo() {int a; String b; d[2] = 5; return 0;}" +
                         "}"
         );
-        JmmNode node = findChildIndexation(result.getRootNode(), "d");
+        JmmNode node = findArrayElement(result.getRootNode(), "d");
         JmmSymbolTable symbolTable = (JmmSymbolTable) result.getSymbolTable();
         var closestSymbol = symbolTable.getClosestSymbol(node, "d");
         assertTrue(closestSymbol.isEmpty());
@@ -161,11 +161,11 @@ public class SymbolTableTest {
     public void testGetClosestSymbolPresentAsClassField() {
         JmmSemanticsResult result = TestUtils.analyse(
                 "class test {" +
-                        "int[] c = new int[3];" +
-                        "public int foo() {int a; String b; c[3] = c + a + 2; return 0;}" +
+                        "int[] c;" +
+                        "public int foo() {int a; c = new int[3]; String b; c[3] = c + a + 2; return 0;}" +
                         "}"
         );
-        JmmNode node = findChildIndexation(result.getRootNode(), "c");
+        JmmNode node = findArrayElement(result.getRootNode(), "c");
         JmmSymbolTable symbolTable = (JmmSymbolTable) result.getSymbolTable();
         var closestSymbol = symbolTable.getClosestSymbol(node, "c");
         assertTrue(closestSymbol.isPresent());
@@ -173,15 +173,15 @@ public class SymbolTableTest {
         assertEquals(closestSymbol.get().getType(), new Type("int", true));
     }
 
-    private JmmNode findChildIndexation(JmmNode node, String name) {
-        if (node.getKind().equals("Indexation")) {
+    private JmmNode findArrayElement(JmmNode node, String name) {
+        if (node.getKind().equals("ArrayElement")) {
             JmmNode identifier = node.getChildren().get(0);
             if (identifier.get("name").equals(name)) {
                 return identifier;
             }
         }
         for (var child : node.getChildren()) {
-            var identifier = findChildIndexation(child, name);
+            var identifier = findArrayElement(child, name);
             if (identifier != null) {
                 return identifier;
             }
