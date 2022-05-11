@@ -15,25 +15,21 @@ public class MethodCallVisitor extends SemanticJmmNodeVisitor {
 
     private Boolean visitMethodCall(JmmNode node, Boolean dummy) {
         String methodName = node.getChildren().get(0).get("name");
-        if (isThisMethodCall(node) && symbolTable.getSuper() == null && !symbolTable.getMethodsTable().contains(methodName)) {
+        if (isThisMethodCall(node, symbolTable) && symbolTable.getSuper() == null && !symbolTable.getMethods().contains(methodName)) {
             addSemanticErrorReport(node, "Call to a non existing method: " + methodName);
             return false;
         }
         return true;
     }
 
-    private Boolean isThisMethodCall(JmmNode methodCall) {
+    public static Boolean isThisMethodCall(JmmNode methodCall, JmmSymbolTable symbolTable) {
         Optional<JmmNode> compoundExpression = methodCall.getAncestor("CompoundExpression");
-        if (compoundExpression.isPresent()) {
-            JmmNode child = compoundExpression.get().getChildren().get(0);
-
-            if (child.getKind().equals("ThisLiteral")) { return true; }
-
-            Optional<Symbol> closest = symbolTable.getClosestSymbol(child, child.get("name"));
-            if (closest.isPresent()) {
-                return closest.get().getType().getName().equals(symbolTable.getClassName());
-            }
+        if (compoundExpression.isEmpty()){
+            return false;
         }
-        return false;
+        JmmNode child = compoundExpression.get().getChildren().get(0);
+        if (child.getKind().equals("ThisLiteral")) { return true; }
+        Optional<Symbol> closest = symbolTable.getClosestSymbol(child, child.get("name"));
+        return closest.map(symbol -> symbol.getType().getName().equals(symbolTable.getClassName())).orElse(false);
     }
 }

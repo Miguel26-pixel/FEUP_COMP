@@ -32,7 +32,7 @@ public class JmmMethodSignatureTest {
         Mockito.when(typeVar1.isArray()).thenReturn(false);
 
         Type typeVar2 = Mockito.mock(Type.class);
-        Mockito.when(typeVar2.getName()).thenReturn("bool");
+        Mockito.when(typeVar2.getName()).thenReturn("boolean");
         Mockito.when(typeVar2.isArray()).thenReturn(false);
 
         Symbol var1Stub = Mockito.mock(Symbol.class);
@@ -54,7 +54,7 @@ public class JmmMethodSignatureTest {
         Mockito.when(typeVar1.isArray()).thenReturn(false);
 
         Type typeVar2 = Mockito.mock(Type.class);
-        Mockito.when(typeVar2.getName()).thenReturn("bool");
+        Mockito.when(typeVar2.getName()).thenReturn("boolean");
         Mockito.when(typeVar2.isArray()).thenReturn(false);
 
         Symbol var1Stub = Mockito.mock(Symbol.class);
@@ -72,7 +72,7 @@ public class JmmMethodSignatureTest {
         Symbol var2 = parameters.get(1);
 
         assertEquals(var1.getType().getName(), "int");
-        assertEquals(var2.getType().getName(), "bool");
+        assertEquals(var2.getType().getName(), "boolean");
         assertEquals(var1.getName(), "var1");
         assertEquals(var2.getName(), "var2");
     }
@@ -84,7 +84,7 @@ public class JmmMethodSignatureTest {
         Mockito.when(typeVar1.isArray()).thenReturn(false);
 
         Type typeVar2 = Mockito.mock(Type.class);
-        Mockito.when(typeVar2.getName()).thenReturn("bool");
+        Mockito.when(typeVar2.getName()).thenReturn("boolean");
         Mockito.when(typeVar2.isArray()).thenReturn(false);
 
         Symbol var1Stub = Mockito.mock(Symbol.class);

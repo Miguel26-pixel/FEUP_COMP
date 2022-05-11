@@ -48,7 +48,7 @@ public class JmmSymbolTable extends ReportCollectorTable implements SymbolTable 
     }
 
     @Override
-    public List<String> getMethodsTable() {
+    public List<String> getMethods() {
         return new ArrayList<>(this.methodsTable.getMethodSignatures().keySet());
     }
 

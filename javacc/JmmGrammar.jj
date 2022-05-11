@@ -107,7 +107,7 @@ Statement #void:
     )
     | (< IF > < OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement #Then < ELSE > Statement #Else) #If
     | (< WHILE > <OPEN_PARENTHESES > Expression < CLOSE_PARENTHESES > Statement #Do) #While
-    | < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS >
+    | < OPEN_CURLY_BRACKETS > (Statement)* < CLOSE_CURLY_BRACKETS > #EmptyStatement(0)
 ;
 
 Expression #void:
