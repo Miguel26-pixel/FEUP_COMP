@@ -1,7 +1,12 @@
 class BinOps {
     public int foo(){
-        int c;
-        c = 2;
-        return c;
+        int e;
+        e = 2;
+        int a;
+        a = e + 4;
+        int b;
+        b = 2 + 3 + e + 5 + 10;
+        boolean f;
+        return e;
     }
 }
