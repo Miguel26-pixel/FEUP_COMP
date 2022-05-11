@@ -1,8 +1,6 @@
 package pt.up.fe.comp.backend;
 
-import org.specs.comp.ollir.Element;
-import org.specs.comp.ollir.Method;
-import org.specs.comp.ollir.Type;
+import org.specs.comp.ollir.*;
 
 import java.nio.charset.StandardCharsets;
 
@@ -59,21 +57,68 @@ public class MethodDefinitionGenerator {
         }
 
         methodHeader.append(method.getMethodName()).append("(");
-
-        getParameters();
+        methodHeader.append(getParameters()).append(")");
 
         return methodHeader.toString();
     }
 
     private String getParameters() {
         StringBuilder methodParameters = new StringBuilder();
-        method.show();
 
         for (Element parameter: method.getParams()) {
-            parameter.show();
+            methodParameters.append(translateType(parameter.getType()));
         }
 
         return methodParameters.toString();
+    }
+
+    private String translateType(Type type) {
+        ElementType elementType = type.getTypeOfElement();
+
+        switch (elementType) {
+            case ARRAYREF:
+                return "[" + translateType(((ArrayType) type).getTypeOfElements());
+            case OBJECTREF:
+            case CLASS:
+                return "L" + getFullClassName(((ClassType) type).getName()) + ";";
+            default:
+                return translateType(elementType);
+        }
+    }
+
+    private String translateType(ElementType elementType) {
+        switch (elementType) {
+            case INT32:
+                return "I";
+            case BOOLEAN:
+                return "Z";
+            case STRING:
+                return "Ljava/lang/String;";
+            case THIS:
+                return "this";
+            case VOID:
+                return "V";
+            default:
+                return "";
+        }
+    }
+
+    private String getFullClassName(String className) {
+        ClassUnit ollirClass = method.getOllirClass();
+
+        if (ollirClass.isImportedClass(className)) {
+            for(String fullImport: ollirClass.getImports()) {
+                int lastSeparatorIndex = className.lastIndexOf(".");
+
+                if (lastSeparatorIndex < 0 && fullImport.equals(className)) {
+                    return className;
+                } else if (fullImport.substring(lastSeparatorIndex + 1).equals(className)) {
+                    return fullImport;
+                }
+            }
+        }
+
+        return className;
     }
 
     public void setMethod(Method method) {
