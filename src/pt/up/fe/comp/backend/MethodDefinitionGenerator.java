@@ -4,58 +4,60 @@ import org.specs.comp.ollir.Element;
 import org.specs.comp.ollir.Method;
 import org.specs.comp.ollir.Type;
 
+import java.nio.charset.StandardCharsets;
+
 public class MethodDefinitionGenerator {
     public static String getConstructorDefinition(Method method, String superName) {
-        String constructorDefinition = ".method ";
+        StringBuilder constructorDefinition = new StringBuilder(".method ");
 
         if (method.getMethodAccessModifier().toString().equals("DEFAULT")) {
-            constructorDefinition += "public ";
+            constructorDefinition.append("public ");
         } else {
-            constructorDefinition += method.getMethodAccessModifier().toString().toLowerCase() + " ";
+            constructorDefinition.append(method.getMethodAccessModifier().toString().toLowerCase()).append(" ");
         }
 
-        constructorDefinition += "<init>()V\n";
+        constructorDefinition.append("<init>()V\n");
 
-        constructorDefinition += "\taload_0\n";
+        constructorDefinition.append("\taload_0\n");
 
         if (superName == null) {
             superName = "java/lang/Object";
         }
 
-        constructorDefinition += "\tinvokenonvirtual " + superName + "/<init>()V\n";
-        constructorDefinition += "\treturn\n";
-        constructorDefinition += ".end method\n";
+        constructorDefinition.append("\tinvokenonvirtual ").append(superName).append("/<init>()V\n");
+        constructorDefinition.append("\treturn\n");
+        constructorDefinition.append(".end method\n");
 
-        return constructorDefinition;
+        return constructorDefinition.toString();
     }
 
     public static String getMethodDefinition(Method method) {
-        String methodDefinition = "";
+        StringBuilder methodDefinition = new StringBuilder();
 
-        methodDefinition += getMethodHeader(method);
+        methodDefinition.append(getMethodHeader(method));
 
-        return methodDefinition;
+        return methodDefinition.toString();
     }
 
     private static String getMethodHeader(Method method) {
-        String methodHeader = ".method ";
+        StringBuilder methodHeader = new StringBuilder(".method ");
 
         if (method.isFinalMethod()) {
-            methodHeader += "final ";
+            methodHeader.append("final ");
         }
 
         if (method.isStaticMethod()) {
-            methodHeader += "static ";
+            methodHeader.append("static ");
         }
 
         if (method.getMethodAccessModifier().toString().equals("DEFAULT")) {
-            methodHeader += "public ";
+            methodHeader.append("public ");
         } else {
-            methodHeader += method.getMethodAccessModifier().toString().toLowerCase() + " ";
+            methodHeader.append(method.getMethodAccessModifier().toString().toLowerCase()).append(" ");
         }
 
-        methodHeader += method.getMethodName() + "(";
+        methodHeader.append(method.getMethodName()).append("(");
 
-        return methodHeader;
+        return methodHeader.toString();
     }
 }

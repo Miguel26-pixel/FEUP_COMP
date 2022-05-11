@@ -12,42 +12,42 @@ import java.util.Collections;
 public class JmmBackend implements JasminBackend {
     @Override
     public JasminResult toJasmin(OllirResult ollirResult) {
-        String jasminCode = "";
+        StringBuilder jasminCode = new StringBuilder();
 
         ClassUnit ollirClass = ollirResult.getOllirClass();
-        jasminCode += getClassDirective(ollirClass) + "\n";
-        jasminCode += getSuperDirective(ollirClass) + "\n";
-        jasminCode += "\n";
+        jasminCode.append(getClassDirective(ollirClass)).append("\n");
+        jasminCode.append(getSuperDirective(ollirClass)).append("\n");
+        jasminCode.append("\n");
 
-        jasminCode += getMethodsDefinitions(ollirClass);
+        jasminCode.append(getMethodsDefinitions(ollirClass));
 
-        return new JasminResult(ollirResult, jasminCode, Collections.emptyList());
+        return new JasminResult(ollirResult, jasminCode.toString(), Collections.emptyList());
     }
 
     private String getClassDirective(ClassUnit ollirClass) {
-        String classDirective = ".class ";
+        StringBuilder classDirective = new StringBuilder(".class ");
 
         if (ollirClass.isFinalClass()) {
-            classDirective += "final ";
+            classDirective.append("final ");
         }
 
         if (ollirClass.isStaticClass()) {
-            classDirective += "static ";
+            classDirective.append("static ");
         }
 
         if (ollirClass.getClassAccessModifier().toString().equals("DEFAULT")) {
-            classDirective += "public ";
+            classDirective.append("public ");
         } else {
-            classDirective += ollirClass.getClassAccessModifier().toString() + " ";
+            classDirective.append(ollirClass.getClassAccessModifier().toString()).append(" ");
         }
 
         if (ollirClass.getPackage() != null) {
-            classDirective += ollirClass.getPackage() + "/";
+            classDirective.append(ollirClass.getPackage()).append("/");
         }
 
-        classDirective += ollirClass.getClassName();
+        classDirective.append(ollirClass.getClassName());
 
-        return classDirective;
+        return classDirective.toString();
     }
 
     private String getSuperDirective(ClassUnit ollirClass) {
@@ -55,18 +55,18 @@ public class JmmBackend implements JasminBackend {
     }
 
     private String getMethodsDefinitions(ClassUnit ollirClass) {
-        String methodDefinitions = "";
+        StringBuilder methodDefinitions = new StringBuilder();
 
         for(Method method: ollirClass.getMethods()) {
             if (method.isConstructMethod()) {
-                methodDefinitions += MethodDefinitionGenerator.getConstructorDefinition(method, ollirClass.getSuperClass());
+                methodDefinitions.append(MethodDefinitionGenerator.getConstructorDefinition(method, ollirClass.getSuperClass()));
             } else {
-                methodDefinitions += MethodDefinitionGenerator.getMethodDefinition(method);
+                methodDefinitions.append(MethodDefinitionGenerator.getMethodDefinition(method));
             }
 
-            methodDefinitions += "\n";
+            methodDefinitions.append("\n");
         }
 
-        return methodDefinitions;
+        return methodDefinitions.toString();
     }
 }
