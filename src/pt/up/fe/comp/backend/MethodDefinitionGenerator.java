@@ -42,18 +42,18 @@ public class MethodDefinitionGenerator {
     private static String getMethodHeader(Method method) {
         StringBuilder methodHeader = new StringBuilder(".method ");
 
+        if (method.getMethodAccessModifier().toString().equals("DEFAULT")) {
+            methodHeader.append("public ");
+        } else {
+            methodHeader.append(method.getMethodAccessModifier().toString().toLowerCase()).append(" ");
+        }
+
         if (method.isFinalMethod()) {
             methodHeader.append("final ");
         }
 
         if (method.isStaticMethod()) {
             methodHeader.append("static ");
-        }
-
-        if (method.getMethodAccessModifier().toString().equals("DEFAULT")) {
-            methodHeader.append("public ");
-        } else {
-            methodHeader.append(method.getMethodAccessModifier().toString().toLowerCase()).append(" ");
         }
 
         methodHeader.append(method.getMethodName()).append("(");
