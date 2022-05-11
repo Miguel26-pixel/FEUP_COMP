@@ -34,7 +34,9 @@ public class MethodDefinitionGenerator {
     public String getMethodDefinition() {
         StringBuilder methodDefinition = new StringBuilder();
 
-        methodDefinition.append(getMethodHeader());
+        methodDefinition.append(getMethodHeader()).append("\n");
+
+        methodDefinition.append(".end method\n");
 
         return methodDefinition.toString();
     }
