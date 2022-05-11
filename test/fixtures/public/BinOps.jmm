@@ -1,12 +1,12 @@
 class BinOps {
-    public int foo(){
+    int field;
+    public int foo(int n){
         int e;
-        e = 2;
-        int a;
-        a = e + 4;
-        int b;
-        b = 2 + 3 + e + 5 + 10;
+        e = n + 1 + 10;
         boolean f;
+        f = true && false || true;
+        BinOps binOps;
+        binOps = this;
         return e;
     }
 }

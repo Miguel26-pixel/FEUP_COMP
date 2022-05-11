@@ -32,6 +32,8 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, String> {
         addVisit("CompoundExpression", this::visitCompoundExpression);
         addVisit("Identifier", this::visitIdentifier);
         addVisit("IntLiteral", this::visitIntLiteral);
+        addVisit("BooleanLiteral", this::visitBooleanLiteral);
+        addVisit("ThisLiteral", this::visitThisLiteral);
         setDefaultVisit((node, dummy) -> null);
     }
 
@@ -117,21 +119,6 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, String> {
         return null;
     }
 
-    private String visitCompoundExpression(JmmNode node, SubstituteVariable dummy) {
-        if (!node.getChildren().get(0).getKind().equals("Identifier")) {
-            return null;
-        }
-        var compoundType = node.getChildren().get(1).getKind();
-        if (compoundType.equals("MethodCall")) {
-            var className = node.getChildren().get(0).get("name");
-            var methodName = node.getChildren().get(1).getChildren().get(0).get("name");
-            // assume no arguments for now
-            ollirCode.append(OllirUtils.invokestatic(className, methodName, new ArrayList<>())).append("\n");
-            return null;
-        }
-        return null;
-    }
-
     private String visitBinOp(JmmNode node, SubstituteVariable substituteVariable) {
         String operation = node.get("op");
         if (operation.equals("assign")) {
@@ -209,9 +196,37 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, String> {
         return "";
     }
 
+    private String visitCompoundExpression(JmmNode node, SubstituteVariable dummy) {
+        if (!node.getChildren().get(0).getKind().equals("Identifier")) {
+            return null;
+        }
+        var compoundType = node.getChildren().get(1).getKind();
+        if (compoundType.equals("MethodCall")) {
+            var className = node.getChildren().get(0).get("name");
+            var methodName = node.getChildren().get(1).getChildren().get(0).get("name");
+            // assume no arguments for now
+            ollirCode.append(OllirUtils.invokestatic(className, methodName, new ArrayList<>())).append("\n");
+            return null;
+        }
+        return null;
+    }
+
     String visitIntLiteral(JmmNode node, SubstituteVariable substituteVariable) {
         substituteVariable.setValue(node.get("value") + ".i32");
         substituteVariable.setVariableType(new Type("int", false));
+        return "";
+    }
+
+    private String visitBooleanLiteral(JmmNode node, SubstituteVariable substituteVariable) {
+        substituteVariable.setValue(node.get("value") + ".bool");
+        substituteVariable.setVariableType(new Type("boolean", false));
+        return "";
+    }
+
+    private String visitThisLiteral(JmmNode node, SubstituteVariable substituteVariable) {
+        Type classType = new Type(symbolTable.getClassName(), false);
+        substituteVariable.setValue("$0.this." + getOllirType(classType));
+        substituteVariable.setVariableType(classType);
         return "";
     }
 
