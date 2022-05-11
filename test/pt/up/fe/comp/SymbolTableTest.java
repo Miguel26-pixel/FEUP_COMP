@@ -5,6 +5,8 @@ import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.analysis.table.Type;
+import pt.up.fe.comp.jmm.ast.JmmNode;
+import pt.up.fe.comp.semantic.tables.JmmSymbolTable;
 
 import java.util.List;
 
@@ -26,7 +28,7 @@ public class SymbolTableTest {
     public void testMethodDeclaration() {
         JmmSemanticsResult result = TestUtils.analyse("class test{public Integer f1(int p1){return 0;}}");
 
-        assertTrue(result.getSymbolTable().getMethodsTable().contains("f1"));
+        assertTrue(result.getSymbolTable().getMethods().contains("f1"));
 
         assertEquals(result.getSymbolTable().getReturnType("f1").getName(), "Integer");
         assertFalse(result.getSymbolTable().getReturnType("f1").isArray());
@@ -42,7 +44,7 @@ public class SymbolTableTest {
     public void testMainMethodDeclaration() {
         JmmSemanticsResult result = TestUtils.analyse("class test{public static void main(String[] args){}}");
 
-        assertTrue(result.getSymbolTable().getMethodsTable().contains("main"));
+        assertTrue(result.getSymbolTable().getMethods().contains("main"));
 
         assertEquals(result.getSymbolTable().getReturnType("main").getName(), "void");
         assertFalse(result.getSymbolTable().getReturnType("main").isArray());
@@ -56,9 +58,9 @@ public class SymbolTableTest {
 
     @Test
     public void testMixedMethodDeclaration() {
-        JmmSemanticsResult result = TestUtils.analyse("class test{public static void main(String[] args){} public String f2(bool p1){return true;}}");
+        JmmSemanticsResult result = TestUtils.analyse("class test{public static void main(String[] args){} public String f2(boolean p1){return true;}}");
 
-        assertTrue(result.getSymbolTable().getMethodsTable().contains("main"));
+        assertTrue(result.getSymbolTable().getMethods().contains("main"));
 
         assertEquals(result.getSymbolTable().getReturnType("main").getName(), "void");
         assertFalse(result.getSymbolTable().getReturnType("main").isArray());
@@ -69,7 +71,7 @@ public class SymbolTableTest {
         assertEquals(result.getSymbolTable().getParameters("main").get(0).getType().getName(), "String");
         assertTrue(result.getSymbolTable().getParameters("main").get(0).getType().isArray());
 
-        assertTrue(result.getSymbolTable().getMethodsTable().contains("f2"));
+        assertTrue(result.getSymbolTable().getMethods().contains("f2"));
 
         assertEquals(result.getSymbolTable().getReturnType("f2").getName(), "String");
         assertFalse(result.getSymbolTable().getReturnType("f2").isArray());
@@ -77,7 +79,7 @@ public class SymbolTableTest {
         assertEquals(result.getSymbolTable().getParameters("f2").size(), 1);
 
         assertEquals(result.getSymbolTable().getParameters("f2").get(0).getName(), "p1");
-        assertEquals(result.getSymbolTable().getParameters("f2").get(0).getType().getName(), "bool");
+        assertEquals(result.getSymbolTable().getParameters("f2").get(0).getType().getName(), "boolean");
         assertFalse(result.getSymbolTable().getParameters("f2").get(0).getType().isArray());
     }
 
@@ -124,4 +126,68 @@ public class SymbolTableTest {
         assertEquals(mainLocalVariables.size(), 1);
         assertTrue(mainLocalVariables.contains(new Symbol(new Type("int", false), "c")));
     }
+
+    @Test
+    public void testGetClosestSymbolPresentInMethod() {
+        JmmSemanticsResult result = TestUtils.analyse(
+                "class test {" +
+                        "String c;" +
+                        "public int foo() {int a; String b; int[] c; c = new int[3]; c[2] = 5; return 0;}" +
+                        "}"
+        );
+        JmmNode node = findArrayElement(result.getRootNode(), "c");
+        JmmSymbolTable symbolTable = (JmmSymbolTable) result.getSymbolTable();
+        var closestSymbol = symbolTable.getClosestSymbol(node, "c");
+        assertTrue(closestSymbol.isPresent());
+        assertEquals("c", closestSymbol.get().getName());
+        assertEquals(closestSymbol.get().getType(), new Type("int", true));
+    }
+
+    @Test
+    public void testGetClosestSymbolNotPresent1() {
+        JmmSemanticsResult result = TestUtils.analyse(
+                "class test {" +
+                        "String c;" +
+                        "public int foo() {int a; String b; d[2] = 5; return 0;}" +
+                        "}"
+        );
+        JmmNode node = findArrayElement(result.getRootNode(), "d");
+        JmmSymbolTable symbolTable = (JmmSymbolTable) result.getSymbolTable();
+        var closestSymbol = symbolTable.getClosestSymbol(node, "d");
+        assertTrue(closestSymbol.isEmpty());
+    }
+
+    @Test
+    public void testGetClosestSymbolPresentAsClassField() {
+        JmmSemanticsResult result = TestUtils.analyse(
+                "class test {" +
+                        "int[] c;" +
+                        "public int foo() {int a; c = new int[3]; String b; c[3] = c + a + 2; return 0;}" +
+                        "}"
+        );
+        JmmNode node = findArrayElement(result.getRootNode(), "c");
+        JmmSymbolTable symbolTable = (JmmSymbolTable) result.getSymbolTable();
+        var closestSymbol = symbolTable.getClosestSymbol(node, "c");
+        assertTrue(closestSymbol.isPresent());
+        assertEquals("c", closestSymbol.get().getName());
+        assertEquals(closestSymbol.get().getType(), new Type("int", true));
+    }
+
+    private JmmNode findArrayElement(JmmNode node, String name) {
+        if (node.getKind().equals("ArrayElement")) {
+            JmmNode identifier = node.getChildren().get(0);
+            if (identifier.get("name").equals(name)) {
+                return identifier;
+            }
+        }
+        for (var child : node.getChildren()) {
+            var identifier = findArrayElement(child, name);
+            if (identifier != null) {
+                return identifier;
+            }
+        }
+        return null;
+    }
+
+
 }

@@ -5,7 +5,15 @@ import java.util.Optional;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class Report {
+/**
+ * 
+ * Represents a single message generated during the compilation process.
+ * 
+ * <p>
+ * Implementation of Comparable interface is a contribution of João Costa (up201909699).
+ *
+ */
+public class Report implements Comparable<Report> {
 
     private final ReportType type;
     private final Stage stage;
@@ -68,6 +76,11 @@ public class Report {
                 // .excludeFieldsWithoutExposeAnnotation()
                 .create();
         return gson.toJson(this, Report.class);
+    }
+
+    @Override
+    public int compareTo(Report rep) {
+        return Integer.compare(getLine(), rep.getLine());
     }
 
     @Override

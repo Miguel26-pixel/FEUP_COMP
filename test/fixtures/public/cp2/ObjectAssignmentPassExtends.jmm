@@ -1,0 +1,21 @@
+import B;
+
+class A extends B {
+	
+	public static void main(String[] args) {
+	
+	}
+	
+	public A foo() {
+		A a;
+		B b;
+		
+		a = new A();
+		b = new B();
+		
+		// A extends B
+		b = a;
+		
+		return a;
+	}
+}

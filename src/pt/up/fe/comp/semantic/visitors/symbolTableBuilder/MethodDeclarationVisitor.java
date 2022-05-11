@@ -1,13 +1,10 @@
-package pt.up.fe.comp.semantic.visitors;
+package pt.up.fe.comp.semantic.visitors.symbolTableBuilder;
 
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
-import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
-import pt.up.fe.comp.jmm.report.Report;
-import pt.up.fe.comp.jmm.report.ReportType;
-import pt.up.fe.comp.jmm.report.Stage;
 import pt.up.fe.comp.semantic.types.JmmMethodSignature;
+import pt.up.fe.comp.semantic.visitors.ReportCollectorJmmNodeVisitor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,8 +57,7 @@ public class MethodDeclarationVisitor extends ReportCollectorJmmNodeVisitor<Map<
 
     private Boolean visitMainMethodDeclaration(JmmNode methodDeclaration, Map<String, JmmMethodSignature> methods) {
         if (methods.containsKey("main")) {
-            int line = parseInt(methodDeclaration.get("line"));
-            this.reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, line, "Duplicate main method found on line " + line));
+            addSemanticErrorReport(methodDeclaration, "Duplicate main method");
             return false;
         }
         for (JmmNode child : methodDeclaration.getChildren()) {

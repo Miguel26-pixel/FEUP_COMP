@@ -54,6 +54,7 @@ public class SimpleParser implements JmmParser {
             var exception = TestUtils.getException(e, ParseException.class);
             assert exception != null;
             Token t = exception.getToken();
+            assert t != null;
             int line = t.getBeginLine();
             int column = t.getBeginColumn();
             String message = exception.getMessage();

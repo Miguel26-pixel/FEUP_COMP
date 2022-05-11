@@ -1,7 +1,7 @@
 package pt.up.fe.comp.semantic.tables;
 
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
-import pt.up.fe.comp.semantic.visitors.ImportDeclarationVisitor;
+import pt.up.fe.comp.semantic.visitors.symbolTableBuilder.ImportDeclarationVisitor;
 
 import java.util.ArrayList;
 import java.util.List;

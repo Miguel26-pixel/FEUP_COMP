@@ -73,6 +73,7 @@ public class JasminResult implements ReportsProvider {
         return this.jasminCode;
     }
 
+    @Override
     public List<Report> getReports() {
         return this.reports;
     }
@@ -121,6 +122,22 @@ public class JasminResult implements ReportsProvider {
      * @return the output that is printed by the Jasmin program
      */
     public String run(List<String> args, List<String> classpath, String input) {
+        return runWithFullOutput(args, classpath, input).getOutput();
+    }
+
+    /**
+     * Compiles and runs the current Jasmin code.
+     * 
+     * @param args
+     *            arguments for the Jasmin program
+     * @param classpath
+     *            additional paths for the classpath
+     * @param input
+     *            input to give to the program that will run
+     * 
+     * @return the output that is printed by the Jasmin program
+     */
+    public ProcessOutputAsString runWithFullOutput(List<String> args, List<String> classpath, String input) {
         // Compile
         var classFile = compile();
 
@@ -168,7 +185,7 @@ public class JasminResult implements ReportsProvider {
         var processedOutput = new ProcessOutputAsString(output.getReturnValue(), output.getStdOut(),
                 output.getStdErr());
 
-        return processedOutput.getOutput();
+        return processedOutput;
     }
 
     public String run(List<String> args, List<String> classpath) {
@@ -201,5 +218,37 @@ public class JasminResult implements ReportsProvider {
 
     public String run(List<String> args, String input) {
         return run(args, Arrays.asList(TestUtils.getLibsClasspath()), input);
+    }
+
+    public ProcessOutputAsString runWithFullOutput(List<String> args, List<String> classpath) {
+        return runWithFullOutput(args, classpath, null);
+    }
+
+    /**
+     * Compiles and runs the current Jasmin code.
+     * 
+     * @param args
+     *            arguments for the Jasmin program
+     * @return the output that is printed by the Jasmin program
+     */
+    public ProcessOutputAsString runWithFullOutput(List<String> args) {
+        return runWithFullOutput(args, Arrays.asList(TestUtils.getLibsClasspath()));
+    }
+
+    /**
+     * Compiles and runs the current Jasmin code.
+     * 
+     * @return the output that is printed by the Jasmin program
+     */
+    public ProcessOutputAsString runWithFullOutput() {
+        return runWithFullOutput(Collections.emptyList());
+    }
+
+    public ProcessOutputAsString runWithFullOutput(String input) {
+        return runWithFullOutput(Collections.emptyList(), Arrays.asList(TestUtils.getLibsClasspath()), input);
+    }
+
+    public ProcessOutputAsString runWithFullOutput(List<String> args, String input) {
+        return runWithFullOutput(args, Arrays.asList(TestUtils.getLibsClasspath()), input);
     }
 }
