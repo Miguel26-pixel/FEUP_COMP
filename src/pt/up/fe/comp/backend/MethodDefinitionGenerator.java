@@ -7,7 +7,9 @@ import org.specs.comp.ollir.Type;
 import java.nio.charset.StandardCharsets;
 
 public class MethodDefinitionGenerator {
-    public static String getConstructorDefinition(Method method, String superName) {
+    private Method method;
+
+    public String getConstructorDefinition(String superName) {
         StringBuilder constructorDefinition = new StringBuilder(".method ");
 
         if (method.getMethodAccessModifier().toString().equals("DEFAULT")) {
@@ -31,15 +33,15 @@ public class MethodDefinitionGenerator {
         return constructorDefinition.toString();
     }
 
-    public static String getMethodDefinition(Method method) {
+    public String getMethodDefinition() {
         StringBuilder methodDefinition = new StringBuilder();
 
-        methodDefinition.append(getMethodHeader(method));
+        methodDefinition.append(getMethodHeader());
 
         return methodDefinition.toString();
     }
 
-    private static String getMethodHeader(Method method) {
+    private String getMethodHeader() {
         StringBuilder methodHeader = new StringBuilder(".method ");
 
         if (method.getMethodAccessModifier().toString().equals("DEFAULT")) {
@@ -58,12 +60,12 @@ public class MethodDefinitionGenerator {
 
         methodHeader.append(method.getMethodName()).append("(");
 
-        getParameters(method);
+        getParameters();
 
         return methodHeader.toString();
     }
 
-    private static String getParameters(Method method) {
+    private String getParameters() {
         StringBuilder methodParameters = new StringBuilder();
         method.show();
 
@@ -72,5 +74,9 @@ public class MethodDefinitionGenerator {
         }
 
         return methodParameters.toString();
+    }
+
+    public void setMethod(Method method) {
+        this.method = method;
     }
 }

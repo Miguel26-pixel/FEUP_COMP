@@ -56,12 +56,15 @@ public class JmmBackend implements JasminBackend {
 
     private String getMethodsDefinitions(ClassUnit ollirClass) {
         StringBuilder methodDefinitions = new StringBuilder();
+        MethodDefinitionGenerator mdg = new MethodDefinitionGenerator();
 
         for(Method method: ollirClass.getMethods()) {
+            mdg.setMethod(method);
+
             if (method.isConstructMethod()) {
-                methodDefinitions.append(MethodDefinitionGenerator.getConstructorDefinition(method, ollirClass.getSuperClass()));
+                methodDefinitions.append(mdg.getConstructorDefinition(ollirClass.getSuperClass()));
             } else {
-                methodDefinitions.append(MethodDefinitionGenerator.getMethodDefinition(method));
+                methodDefinitions.append(mdg.getMethodDefinition());
             }
 
             methodDefinitions.append("\n");
