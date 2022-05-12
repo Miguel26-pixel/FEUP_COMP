@@ -41,7 +41,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         for (var child : node.getChildren()) {
             visit(child, dummy);
         }
-        return null;
+        return new Type("", false);
     }
 
     public Type visitIntLiteral(JmmNode node, Type dummy) { return new Type("int",false); }
@@ -51,7 +51,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
     public Type visitThisLiteral(JmmNode node, Type type) { return new Type(symbolTable.getClassName(), false); }
 
     public Type visitIdentifier(JmmNode node, Type dummy) {
-        if (node.getAncestor("MethodBody").isEmpty() && node.getAncestor("Return").isEmpty()) { return null; }
+        if (node.getAncestor("MethodBody").isEmpty() && node.getAncestor("Return").isEmpty()) { return new Type("", false); }
 
         if (node.getJmmParent().getKind().equals("MethodCall")) {
             var ownClassMethodCall = MethodCallVisitor.isThisMethodCall(node.getJmmParent(), symbolTable);
