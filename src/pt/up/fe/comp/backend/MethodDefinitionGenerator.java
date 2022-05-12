@@ -2,8 +2,6 @@ package pt.up.fe.comp.backend;
 
 import org.specs.comp.ollir.*;
 
-import java.nio.charset.StandardCharsets;
-
 public class MethodDefinitionGenerator {
     private Method method;
 
