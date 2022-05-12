@@ -1,6 +1,7 @@
 package pt.up.fe.comp.backend;
 
 import org.specs.comp.ollir.ClassUnit;
+import org.specs.comp.ollir.Field;
 import org.specs.comp.ollir.Method;
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
@@ -52,6 +53,30 @@ public class JmmBackend implements JasminBackend {
 
     private String getSuperDirective(ClassUnit ollirClass) {
         return ollirClass.getSuperClass() != null ? ".super " + ollirClass.getSuperClass() : ".super java/lang/Object";
+    }
+
+    private String getFieldDefinitions(ClassUnit ollirClass) {
+        StringBuilder fieldDefinitions = new StringBuilder();
+
+        for (Field field: ollirClass.getFields()) {
+            if (field.getFieldAccessModifier().toString().equals("DEFAULT")) {
+                fieldDefinitions.append("public ");
+            } else {
+                fieldDefinitions.append(field.getFieldAccessModifier().toString()).append(" ");
+            }
+
+            if (field.isFinalField()) {
+                fieldDefinitions.append("final ");
+            }
+
+            if (field.isStaticField()) {
+                fieldDefinitions.append("static ");
+            }
+
+            //fieldDefinitions.append()
+        }
+
+        return fieldDefinitions.toString();
     }
 
     private String getMethodsDefinitions(ClassUnit ollirClass) {
