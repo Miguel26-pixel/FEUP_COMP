@@ -66,7 +66,7 @@ public class MethodDefinitionGenerator {
         StringBuilder methodParameters = new StringBuilder();
 
         for (Element parameter: method.getParams()) {
-            methodParameters.append(JmmBackend.translateType(method.getOllirClass(), parameter.getType()));
+            methodParameters.append(JasminUtils.translateType(method.getOllirClass(), parameter.getType()));
         }
 
         return methodParameters.toString();
