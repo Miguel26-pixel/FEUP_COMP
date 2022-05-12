@@ -13,7 +13,7 @@ public class JmmOptimizer implements JmmOptimization {
 
     @Override
     public OllirResult toOllir(JmmSemanticsResult semanticsResult) {
-        OllirEmitter ollirEmitter = new OllirEmitter(ollirCode, (JmmSymbolTable) semanticsResult.getSymbolTable());
+        OllirEmitter ollirEmitter = new OllirEmitter(ollirCode, (JmmSymbolTable) semanticsResult.getSymbolTable(), 4);
         ollirEmitter.visit(semanticsResult.getRootNode());
         return new OllirResult(semanticsResult, ollirCode.toString(), Collections.emptyList());
     }

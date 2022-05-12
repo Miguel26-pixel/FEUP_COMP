@@ -1,12 +1,10 @@
 class BinOps {
     int field;
+    int[] a;
     public int foo(int n){
-        int e;
-        e = n + 1 + 10;
-        boolean f;
-        f = true && false || true;
-        BinOps binOps;
-        binOps = this;
-        return e;
+        a[0] = 0;
+        int b;
+        b = 1 + 2 + 3 + 4 + 5;
+        return 0;
     }
 }
