@@ -34,6 +34,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         addVisit("BinOp", this::visitBinOp);
         addVisit("CompoundExpression", this::visitCompoundExpression);
         addVisit("Indexation", this::visitIndexation);
+        addVisit("AttributeGet", this::visitAttributeGet);
         addVisit("ArrayElement", this::visitArrayElement);
         addVisit("Identifier", this::visitIdentifier);
         addVisit("IntLiteral", this::visitIntLiteral);
@@ -230,7 +231,6 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
     }
 
     private boolean visitIndexation(JmmNode node, SubstituteVariable accessedVariable) {
-        String variableName = accessedVariable.getVariableName();
         Type elementType = new Type(accessedVariable.getVariableType().getName(), false);
 
         // Visit indexation
@@ -247,8 +247,38 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         startNewLine();
         SubstituteVariable indexVariable = createTemporaryVariable(node);
         ollirCode.append(createTemporaryAssign(indexVariable.getVariableName(), getOllirType(elementType),
-                variableName + "[" + positionTemporaryVariable.getSubstitute() + "]." + getOllirType(elementType)));
+                accessedVariable.getValue() + "[" + positionTemporaryVariable.getSubstitute() + "]." + getOllirType(elementType)));
         accessedVariable.setValue(indexVariable.getVariableName());
+        accessedVariable.setVariableType(elementType);
+
+        return true;
+    }
+
+    private Boolean visitAttributeGet(JmmNode node, SubstituteVariable accessedVariable) {
+        // Handle the length case
+        if (node.getJmmChild(0).getOptional("name").isPresent()
+                && node.getJmmChild(0).get("name").equals("length")) {
+            SubstituteVariable lengthHolder = createTemporaryVariable(node);
+            Type type = new Type(accessedVariable.getVariableType().getName(), false);
+            startNewLine();
+            ollirCode.append(createTemporaryAssign(lengthHolder.getVariableName(), getOllirType(type),
+                    arrayLength(accessedVariable.getValue(), getOllirType(type))));
+            accessedVariable.setValue(lengthHolder.getVariableName());
+            accessedVariable.setVariableType(type);
+            return true;
+        }
+
+        // Visit attribute
+        SubstituteVariable attributeChild = createTemporaryVariable(node);
+        visit(node.getJmmChild(0), attributeChild);
+        Type elementType = attributeChild.getVariableType();
+
+        // Store attribute variable in temporary variable
+        startNewLine();
+        SubstituteVariable attributeVariable = createTemporaryVariable(node);
+        ollirCode.append(createTemporaryAssign(attributeVariable.getVariableName(), getOllirType(elementType),
+                getField(accessedVariable.getValue(), attributeChild.getVariableName(), getOllirType(elementType))));
+        accessedVariable.setValue(attributeVariable.getVariableName());
         accessedVariable.setVariableType(elementType);
 
         return true;
@@ -256,9 +286,21 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
 
     private Boolean visitIdentifier(JmmNode node, SubstituteVariable substituteVariable) {
         String variableName = node.get("name");
+        Symbol symbol = symbolTable.getClosestSymbol(node, variableName).get();
+        substituteVariable.setVariableType(symbol.getType());
+
         var closestMethod = getClosestMethod(node);
         if (closestMethod.isEmpty()){
             return false;
+        }
+
+        if (symbolTable.getFields().stream().anyMatch(s -> s.getName().equals(variableName))) {
+            SubstituteVariable temporaryHolder = createTemporaryVariable(node);
+            startNewLine();
+            ollirCode.append(createTemporaryAssign(temporaryHolder.getVariableName(), getOllirType(symbol),
+                    getField("this", variableName, symbolTable.getClassName())));
+            substituteVariable.setValue(temporaryHolder.getVariableName());
+            return true;
         }
 
         var methodName = getMethodName(closestMethod.get());
@@ -272,10 +314,8 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
             parameterNumber += 1;
         }
 
-        Symbol symbol = symbolTable.getClosestSymbol(node, variableName).get();
         substituteVariable.setVariableName(variableName);
         substituteVariable.setValue((isParameter ? "$" + parameterNumber + "." : "") + variableName);
-        substituteVariable.setVariableType(symbol.getType());
         return true;
     }
 
@@ -303,7 +343,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
 
     private Boolean visitThisLiteral(JmmNode node, SubstituteVariable substituteVariable) {
         Type classType = new Type(symbolTable.getClassName(), false);
-        substituteVariable.setValue("$0.this." + getOllirType(classType));
+        substituteVariable.setValue(node.getAncestor("CompoundExpression").isEmpty() ? "$0.this" : "this");
         substituteVariable.setVariableType(classType);
         return true;
     }

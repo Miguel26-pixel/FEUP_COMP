@@ -30,7 +30,7 @@ public class SubstituteVariable {
     }
 
     public String getValue() {
-        return variableValue;
+        return variableValue != null ? variableValue : variableName;
     }
 
     public void setValue(String variableValue) {

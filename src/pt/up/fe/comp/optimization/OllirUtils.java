@@ -53,4 +53,8 @@ public class OllirUtils {
         return "getfield(" + className + ", " + field + "." + ollirType + ")." + ollirType;
     }
 
+    public static String arrayLength(String variableName, String elementOllirType) {
+        return "arraylength(" + variableName + ".array." + elementOllirType + ")." + elementOllirType;
+    }
+
 }
