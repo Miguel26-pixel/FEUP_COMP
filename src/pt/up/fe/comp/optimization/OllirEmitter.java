@@ -33,6 +33,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         addVisit("MethodBody", this::visitAllChildren);
         addVisit("BinOp", this::visitBinOp);
         addVisit("CompoundExpression", this::visitCompoundExpression);
+        addVisit("Indexation", this::visitIndexation);
         addVisit("ArrayElement", this::visitArrayElement);
         addVisit("Identifier", this::visitIdentifier);
         addVisit("IntLiteral", this::visitIntLiteral);
@@ -228,6 +229,31 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         return true;
     }
 
+    private boolean visitIndexation(JmmNode node, SubstituteVariable accessedVariable) {
+        String variableName = accessedVariable.getVariableName();
+        Type elementType = new Type(accessedVariable.getVariableType().getName(), false);
+
+        // Visit indexation
+        SubstituteVariable positionChild = createTemporaryVariable(node);
+        visit(node.getJmmChild(0), positionChild);
+
+        // Hold indexation child in variable
+        startNewLine();
+        SubstituteVariable positionTemporaryVariable = createTemporaryVariable(node);
+        ollirCode.append(createTemporaryAssign(positionTemporaryVariable.getVariableName(),
+                getOllirType(elementType), positionChild.getSubstitute()));
+
+        // Store indexed variable in temporary variable
+        startNewLine();
+        SubstituteVariable indexVariable = createTemporaryVariable(node);
+        ollirCode.append(createTemporaryAssign(indexVariable.getVariableName(), getOllirType(elementType),
+                variableName + "[" + positionTemporaryVariable.getSubstitute() + "]." + getOllirType(elementType)));
+        accessedVariable.setValue(indexVariable.getVariableName());
+        accessedVariable.setVariableType(elementType);
+
+        return true;
+    }
+
     private Boolean visitIdentifier(JmmNode node, SubstituteVariable substituteVariable) {
         String variableName = node.get("name");
         var closestMethod = getClosestMethod(node);
@@ -253,19 +279,14 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         return true;
     }
 
-    private Boolean visitCompoundExpression(JmmNode node, SubstituteVariable dummy) {
-        if (!node.getChildren().get(0).getKind().equals("Identifier")) {
-            return false;
+    private Boolean visitCompoundExpression(JmmNode node, SubstituteVariable temporaryVariable) {
+        if (temporaryVariable == null) {
+            temporaryVariable = createTemporaryVariable(node);
         }
-        var compoundType = node.getChildren().get(1).getKind();
-        if (compoundType.equals("MethodCall")) {
-            var className = node.getChildren().get(0).get("name");
-            var methodName = node.getChildren().get(1).getChildren().get(0).get("name");
-            // assume no arguments for now
-            ollirCode.append(OllirUtils.invokestatic(className, methodName, new ArrayList<>())).append("\n");
-            return null;
+        for (var child : node.getChildren()) {
+            visit(child, temporaryVariable);
         }
-        return null;
+        return true;
     }
 
     private Boolean visitIntLiteral(JmmNode node, SubstituteVariable substituteVariable) {

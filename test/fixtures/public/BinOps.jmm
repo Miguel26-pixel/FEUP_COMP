@@ -2,9 +2,9 @@ class BinOps {
     int field;
     int[] a;
     public int foo(int n){
-        a[0] = 0;
+        a[0] = 1;
         int b;
-        b = 1 + 2 + 3 + 4 + 5;
+        b = 5 + 6 * (2 + a[0]) - 5;
         return 0;
     }
 }
