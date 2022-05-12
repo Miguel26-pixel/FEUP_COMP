@@ -73,8 +73,8 @@ public class JmmBackend implements JasminBackend {
                 fieldDefinitions.append("static ");
             }
 
-            fieldDefinitions.append(JasminUtils.translateType(ollirClass, field.getFieldType())).append(" ");
-            fieldDefinitions.append(field.getFieldName());
+            fieldDefinitions.append(field.getFieldName()).append(" ");
+            fieldDefinitions.append(JasminUtils.translateType(ollirClass, field.getFieldType()));
 
             fieldDefinitions.append("\n");
         }
