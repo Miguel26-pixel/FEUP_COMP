@@ -56,9 +56,11 @@ public class JmmBackend implements JasminBackend {
     }
 
     private String getFieldDefinitions(ClassUnit ollirClass) {
-        StringBuilder fieldDefinitions = new StringBuilder(".field ");
+        StringBuilder fieldDefinitions = new StringBuilder();
 
         for (Field field: ollirClass.getFields()) {
+            fieldDefinitions.append(".field ");
+
             if (field.getFieldAccessModifier().toString().equals("DEFAULT")) {
                 fieldDefinitions.append("public ");
             } else {
