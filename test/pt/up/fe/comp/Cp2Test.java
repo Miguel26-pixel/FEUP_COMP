@@ -13,12 +13,27 @@
 
 package pt.up.fe.comp;
 
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.function.Consumer;
 
 import org.junit.Test;
+import org.specs.comp.ollir.AssignInstruction;
+import org.specs.comp.ollir.BinaryOpInstruction;
+import org.specs.comp.ollir.CallInstruction;
+import org.specs.comp.ollir.CallType;
+import org.specs.comp.ollir.ClassUnit;
+import org.specs.comp.ollir.ElementType;
+import org.specs.comp.ollir.Method;
+import org.specs.comp.ollir.ReturnInstruction;
 
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.specs.util.SpecsIo;
@@ -50,7 +65,8 @@ public class Cp2Test {
         testOllirToJasmin(resource, null);
     }
 
-    public static void testJmmCompilation(String resource, String expectedOutput) {
+    public static void testJmmCompilation(String resource, Consumer<ClassUnit> ollirTester, String executionOutput) {
+
         // If AstToJasmin pipeline, generate Jasmin
         if (TestUtils.hasAstToJasminClass()) {
 
@@ -63,8 +79,8 @@ public class Cp2Test {
                     runOutput.getReturnValue());
             System.out.println("\n Result: " + runOutput.getOutput());
 
-            if (expectedOutput != null) {
-                assertEquals(expectedOutput, runOutput.getOutput());
+            if (executionOutput != null) {
+                assertEquals(executionOutput, runOutput.getOutput());
             }
 
             return;
@@ -77,6 +93,10 @@ public class Cp2Test {
 
     public static void testJmmCompilation(String resource) {
         testJmmCompilation(resource, null);
+    }
+
+    public static void testJmmCompilation(String resource, Consumer<ClassUnit> ollirTester) {
+        testJmmCompilation(resource, ollirTester, null);
     }
 
     @Test
@@ -208,35 +228,24 @@ public class Cp2Test {
     }
 
     @Test
-    public void test_RemainingFiles() {
-        var result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cp2/OllirBasic.jmm"));
-        TestUtils.noErrors(result);
-        result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cp2/OllirArithmetic.jmm"));
-        TestUtils.noErrors(result);
-        result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cp2/OllirMethodInvocation.jmm"));
-        TestUtils.noErrors(result);
-        result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cp2/OllirAssignment.jmm"));
-        TestUtils.noErrors(result);
-    }
-
-    /*@Test
     public void test_2_01_CompileBasic() {
-        testJmmCompilation("fixtures/public/cp2/CompileBasic.jmm");
+        testJmmCompilation("fixtures/public/cp2/CompileBasic.jmm", this::ollirTest_2_01_CompileBasic);
     }
 
     @Test
     public void test_2_02_CompileArithmetic() {
-        testJmmCompilation("fixtures/public/cp2/CompileArithmetic.jmm");
+        testJmmCompilation("fixtures/public/cp2/CompileArithmetic.jmm", this::ollirTest_2_02_CompileArithmetic);
     }
 
     @Test
     public void test_2_03_CompileMethodInvocation() {
-        testJmmCompilation("fixtures/public/cp2/CompileMethodInvocation.jmm");
+        testJmmCompilation("fixtures/public/cp2/CompileMethodInvocation.jmm",
+                this::ollirTest_2_03_CompileMethodInvocation);
     }
 
     @Test
     public void test_2_04_CompileAssignment() {
-        testJmmCompilation("fixtures/public/cp2/CompileAssignment.jmm");
+        testJmmCompilation("fixtures/public/cp2/CompileAssignment.jmm", this::ollirTest_2_04_CompileAssignment);
     }
 
     @Test
@@ -257,5 +266,115 @@ public class Cp2Test {
     @Test
     public void test_3_04_OllirToJasminFields() {
         testOllirToJasmin("fixtures/public/cp2/OllirToJasminFields.ollir");
-    }*/
+    }
+
+    public void ollirTest_2_01_CompileBasic(ClassUnit classUnit) {
+        // Test name of the class and super
+        assertEquals("Class name not what was expected", "SymbolTable", classUnit.getClassName());
+        assertEquals("Super class name not what was expected", "Quicksort", classUnit.getSuperClass());
+
+        // Test fields
+        assertEquals("Class should have two fields", 2, classUnit.getNumFields());
+        var fieldNames = new HashSet<>(Arrays.asList("intField", "boolField"));
+        assertThat(fieldNames, hasItem(classUnit.getField(0).getFieldName()));
+        assertThat(fieldNames, hasItem(classUnit.getField(1).getFieldName()));
+
+        // Test method 1
+        Method method1 = classUnit.getMethods().stream()
+                .filter(method -> method.getMethodName().equals("method1"))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull("Could not find method1", method1);
+
+        var retInst1 = method1.getInstructions().stream()
+                .filter(inst -> inst instanceof ReturnInstruction)
+                .findFirst();
+        assertTrue("Could not find a return instruction in method1", retInst1.isPresent());
+
+        // Test method 2
+        Method method2 = classUnit.getMethods().stream()
+                .filter(method -> method.getMethodName().equals("method2"))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull("Could not find method2'", method2);
+
+        var retInst2 = method2.getInstructions().stream()
+                .filter(inst -> inst instanceof ReturnInstruction)
+                .findFirst();
+        assertTrue("Could not find a return instruction in method2", retInst2.isPresent());
+    }
+
+    public void ollirTest_2_02_CompileArithmetic(ClassUnit classUnit) {
+        // Test name of the class
+        assertEquals("Class name not what was expected", "Test", classUnit.getClassName());
+
+        // Test foo
+        var methodName = "foo";
+        Method methodFoo = classUnit.getMethods().stream()
+                .filter(method -> method.getMethodName().equals(methodName))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull("Could not find method " + methodName, methodFoo);
+
+        var binOpInst = methodFoo.getInstructions().stream()
+                .filter(inst -> inst instanceof BinaryOpInstruction)
+                .findFirst();
+        assertTrue("Could not find a binary op instruction in method " + methodName, binOpInst.isPresent());
+
+        var retInst = methodFoo.getInstructions().stream()
+                .filter(inst -> inst instanceof ReturnInstruction)
+                .findFirst();
+        assertTrue("Could not find a return instruction in method " + methodName, retInst.isPresent());
+
+    }
+
+    public void ollirTest_2_03_CompileMethodInvocation(ClassUnit classUnit) {
+        // Test name of the class
+        assertEquals("Class name not what was expected", "Test", classUnit.getClassName());
+
+        // Test foo
+        var methodName = "foo";
+        Method methodFoo = classUnit.getMethods().stream()
+                .filter(method -> method.getMethodName().equals(methodName))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull("Could not find method " + methodName, methodFoo);
+
+        var callInst = methodFoo.getInstructions().stream()
+                .filter(inst -> inst instanceof CallInstruction)
+                .map(CallInstruction.class::cast)
+                .findFirst();
+        assertTrue("Could not find a call instruction in method " + methodName, callInst.isPresent());
+
+        assertEquals("Invocation type not what was expected", CallType.invokestatic,
+                callInst.get().getInvocationType());
+    }
+
+    public void ollirTest_2_04_CompileAssignment(ClassUnit classUnit) {
+        // Test name of the class
+        assertEquals("Class name not what was expected", "Test", classUnit.getClassName());
+
+        // Test foo
+        var methodName = "foo";
+        Method methodFoo = classUnit.getMethods().stream()
+                .filter(method -> method.getMethodName().equals(methodName))
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull("Could not find method " + methodName, methodFoo);
+
+        var assignInst = methodFoo.getInstructions().stream()
+                .filter(inst -> inst instanceof AssignInstruction)
+                .map(AssignInstruction.class::cast)
+                .findFirst();
+        assertTrue("Could not find an assign instruction in method " + methodName, assignInst.isPresent());
+
+        assertEquals("Assignment does not have the expected type", ElementType.INT32,
+                assignInst.get().getTypeOfAssign().getTypeOfElement());
+    }
+
 }
