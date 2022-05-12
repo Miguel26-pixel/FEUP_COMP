@@ -36,6 +36,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         addVisit("CompoundExpression", this::visitCompoundExpression);
         addVisit("Indexation", this::visitIndexation);
         addVisit("AttributeGet", this::visitAttributeGet);
+        addVisit("MethodCall", this::visitMethodCall);
         addVisit("ArrayElement", this::visitArrayElement);
         addVisit("Identifier", this::visitIdentifier);
         addVisit("IntLiteral", this::visitIntLiteral);
@@ -93,7 +94,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         ollirCode.append(".construct ").append(className).append("().V {");
         indentationLevel++;
         startNewLine();
-        ollirCode.append(invokespecial("this", "<init>", new ArrayList<>())).append(";");
+        ollirCode.append(invoke("invokespecial", "this", "<init>", new ArrayList<>(), "V")).append(";");
         indentationLevel--;
         startNewLine();
         ollirCode.append("}");
@@ -281,6 +282,32 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         accessedVariable.setValue(attributeVariable.getVariableName());
         accessedVariable.setVariableType(elementType);
 
+        return true;
+    }
+
+    private Boolean visitMethodCall(JmmNode node, SubstituteVariable accessedVariable) {
+        // Visit arguments
+        var arguments = new ArrayList<SubstituteVariable>();
+        for (var arg : node.getJmmChild(1).getChildren()){
+            SubstituteVariable methodArgument = createTemporaryVariable(node);
+            visit(arg, methodArgument);
+            arguments.add(methodArgument);
+        }
+
+        // Write method call
+        startNewLine();
+        String methodName = node.getJmmChild(0).get("name");
+        Type methodType = symbolTable.getReturnType(methodName) != null ?
+                symbolTable.getReturnType(methodName) : new Type("void", false);
+        String ollirMethodType = getOllirType(methodType);
+        SubstituteVariable methodCallHolder = createTemporaryVariable(node);
+        boolean isVirtualCall = accessedVariable.getValue().equals("this")
+                || symbolTable.getClosestSymbol(node, accessedVariable.getValue()).isPresent();
+        ollirCode.append(createTemporaryAssign(methodCallHolder.getVariableName(), ollirMethodType,
+                invoke(isVirtualCall ? "invokevirtual" : "invokestatic", accessedVariable.getValue(), node.getJmmChild(0).get("name"),
+                arguments.stream().map(SubstituteVariable::getSubstitute).collect(Collectors.toList()), ollirMethodType)));
+        accessedVariable.setValue(methodCallHolder.getVariableName());
+        accessedVariable.setVariableType(methodType);
         return true;
     }
 

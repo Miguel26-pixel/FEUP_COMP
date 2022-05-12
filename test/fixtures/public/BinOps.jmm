@@ -1,12 +1,10 @@
 class BinOps {
-    int field;
-    int[] a;
+    public int bar(int a, int b){
+        return a + b - a;
+    }
     public int foo(int n){
         int z;
-        z = field;
-        int b;
-        int[] c;
-        b = c.length;
-        return 0;
+        z = this.bar(10 + 20, 3);
+        return z;
     }
 }

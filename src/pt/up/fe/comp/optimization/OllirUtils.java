@@ -25,24 +25,17 @@ public class OllirUtils {
         return getOllirType(symbol.getType());
     }
 
-    private static String invoke(String invokeFunction, String className, String methodName, List<String> arguments) {
+    public static String invoke(String invokeFunction, String className, String methodName, List<String> arguments, String ollirMethodType) {
         StringBuilder stringBuilder = new StringBuilder(invokeFunction + "(" + className + ", " + "\"" + methodName + "\"");
         if (!arguments.isEmpty()) {
+            stringBuilder.append(", ");
             for (var arg : arguments) {
                 stringBuilder.append(arg).append(", ");
             }
             stringBuilder.delete(stringBuilder.lastIndexOf(","), stringBuilder.length());
         }
-        stringBuilder.append(").V");
+        stringBuilder.append(").").append(ollirMethodType);
         return stringBuilder.toString();
-    }
-
-    public static String invokespecial(String className, String methodName, List<String> arguments) {
-        return invoke("invokespecial", className, methodName, arguments);
-    }
-
-    public static String invokestatic(String className, String methodName, List<String> arguments) {
-        return invoke("invokestatic", className, methodName, arguments);
     }
 
     public static String putField(String className, String variableName, String value) {
