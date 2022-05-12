@@ -66,59 +66,10 @@ public class MethodDefinitionGenerator {
         StringBuilder methodParameters = new StringBuilder();
 
         for (Element parameter: method.getParams()) {
-            methodParameters.append(translateType(parameter.getType()));
+            methodParameters.append(JmmBackend.translateType(method.getOllirClass(), parameter.getType()));
         }
 
         return methodParameters.toString();
-    }
-
-    private String translateType(Type type) {
-        ElementType elementType = type.getTypeOfElement();
-
-        switch (elementType) {
-            case ARRAYREF:
-                return "[" + translateType(((ArrayType) type).getTypeOfElements());
-            case OBJECTREF:
-            case CLASS:
-                return "L" + getFullClassName(((ClassType) type).getName()) + ";";
-            default:
-                return translateType(elementType);
-        }
-    }
-
-    private String translateType(ElementType elementType) {
-        switch (elementType) {
-            case INT32:
-                return "I";
-            case BOOLEAN:
-                return "Z";
-            case STRING:
-                return "Ljava/lang/String;";
-            case THIS:
-                return "this";
-            case VOID:
-                return "V";
-            default:
-                return "";
-        }
-    }
-
-    private String getFullClassName(String className) {
-        ClassUnit ollirClass = method.getOllirClass();
-
-        if (ollirClass.isImportedClass(className)) {
-            for(String fullImport: ollirClass.getImports()) {
-                int lastSeparatorIndex = className.lastIndexOf(".");
-
-                if (lastSeparatorIndex < 0 && fullImport.equals(className)) {
-                    return className;
-                } else if (fullImport.substring(lastSeparatorIndex + 1).equals(className)) {
-                    return fullImport;
-                }
-            }
-        }
-
-        return className;
     }
 
     public void setMethod(Method method) {
