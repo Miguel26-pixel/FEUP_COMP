@@ -31,6 +31,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         addVisit("RegularMethod", this::visitMethod);
         addVisit("MainMethod", this::visitMethod);
         addVisit("MethodBody", this::visitAllChildren);
+        addVisit("Return", this::visitReturn);
         addVisit("BinOp", this::visitBinOp);
         addVisit("CompoundExpression", this::visitCompoundExpression);
         addVisit("Indexation", this::visitIndexation);
@@ -135,9 +136,8 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         ollirCode.append(").").append(getOllirType(returnType)).append(" {");
         indentationLevel++;
         for (var child : node.getChildren()) {
-            if (child.getKind().equals("MethodBody")) {
+            if (child.getKind().equals("MethodBody") || child.getKind().equals("Return")){
                 visit(child);
-                break;
             }
         }
         indentationLevel--;
@@ -345,6 +345,15 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         Type classType = new Type(symbolTable.getClassName(), false);
         substituteVariable.setValue(node.getAncestor("CompoundExpression").isEmpty() ? "$0.this" : "this");
         substituteVariable.setVariableType(classType);
+        return true;
+    }
+
+    private Boolean visitReturn(JmmNode node, SubstituteVariable dummy) {
+        SubstituteVariable temp = createTemporaryVariable(node);
+        visit(node.getJmmChild(0), temp);
+        startNewLine();
+        ollirCode.append("ret.").append(getOllirType(temp.getVariableType())).append(" ")
+            .append(temp.getSubstitute()).append(";");
         return true;
     }
 
