@@ -18,6 +18,8 @@ public class JmmBackend implements JasminBackend {
         jasminCode.append(getSuperDirective(ollirClass)).append("\n");
         jasminCode.append("\n");
 
+        jasminCode.append(getFieldDefinitions(ollirClass)).append("\n");
+
         jasminCode.append(getMethodsDefinitions(ollirClass));
 
         return new JasminResult(ollirResult, jasminCode.toString(), Collections.emptyList());
@@ -54,13 +56,13 @@ public class JmmBackend implements JasminBackend {
     }
 
     private String getFieldDefinitions(ClassUnit ollirClass) {
-        StringBuilder fieldDefinitions = new StringBuilder();
+        StringBuilder fieldDefinitions = new StringBuilder(".field ");
 
         for (Field field: ollirClass.getFields()) {
             if (field.getFieldAccessModifier().toString().equals("DEFAULT")) {
                 fieldDefinitions.append("public ");
             } else {
-                fieldDefinitions.append(field.getFieldAccessModifier().toString()).append(" ");
+                fieldDefinitions.append(field.getFieldAccessModifier().toString().toLowerCase()).append(" ");
             }
 
             if (field.isFinalField()) {
@@ -71,7 +73,10 @@ public class JmmBackend implements JasminBackend {
                 fieldDefinitions.append("static ");
             }
 
-            //fieldDefinitions.append()
+            fieldDefinitions.append(translateType(ollirClass, field.getFieldType())).append(" ");
+            fieldDefinitions.append(field.getFieldName());
+
+            fieldDefinitions.append("\n");
         }
 
         return fieldDefinitions.toString();
