@@ -92,7 +92,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
             return childType;
         }
 
-        addSemanticErrorReport(node, "Incompatible types. Not operation expects a boolean");
+        addSemanticErrorReport(node, "Incompatible types. Operation Not (!) expects a boolean");
         return new Type("", false);
     }
 
@@ -116,11 +116,12 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
 
         switch (node.get("op")) {
             case "assign":
-                if (!(firstChildType == null || secondChildType == null) &&
+                if (secondChildType != null &&
                         ((!firstChildType.getName().equals(secondChildType.getName()) && !isExtending(firstChildType,secondChildType)) ||
                         firstChildType.isArray() != secondChildType.isArray()) &&
                         !(isImported(firstChildType) && isImported(secondChildType))) {
-                    addSemanticErrorReport(node,"olaType of the assignee must be compatible with the assigned");
+                    addSemanticErrorReport(node,"Type of the assignee must be compatible with the assigned. Assign given - " +
+                            firstChildType.getName() + " = " + secondChildType.getName());
                 }
                 return new Type("", false);
 
@@ -129,16 +130,9 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
                         (!firstChildType.getName().equals("boolean") || firstChildType.isArray())) ||
                     (secondChildType != null &&
                         (!secondChildType.getName().equals("boolean") || secondChildType.isArray()))) {
-                    addSemanticErrorReport(node,"Types are not compatible with the operation");
-                }
-                return new Type("boolean", false);
-
-            case "lt":
-                if ((firstChildType != null &&
-                        (!firstChildType.getName().equals("int") || firstChildType.isArray())) ||
-                    (secondChildType != null &&
-                        (!secondChildType.getName().equals("int") || secondChildType.isArray()))) {
-                    addSemanticErrorReport(node,"Types are not compatible with the operation");
+                    addSemanticErrorReport(node,"Types are not compatible with the operation. Expected two operands of the type boolean. Types given - " +
+                            ((firstChildType == null) ? "null" : firstChildType.getName()) + " , " +
+                            ((secondChildType == null) ? "null" : secondChildType.getName()));
                 }
                 return new Type("boolean", false);
 
@@ -147,7 +141,12 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
                         (!firstChildType.getName().equals("int") || firstChildType.isArray())) ||
                     (secondChildType != null &&
                         (!secondChildType.getName().equals("int") || secondChildType.isArray()))) {
-                    addSemanticErrorReport(node,"Types are not compatible with the operation");
+                    addSemanticErrorReport(node,"Types are not compatible with the operation. Expected two operands of the type int. Types given - " +
+                            ((firstChildType == null) ? "null" : firstChildType.getName()) + " , " +
+                            ((secondChildType == null) ? "null" : secondChildType.getName()));
+                }
+                if (node.get("op").equals("lt")) {
+                    return new Type("boolean", false);
                 }
                 return new Type("int", false);
         }
@@ -158,7 +157,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         Type secondChildType = visit(node.getChildren().get(1), dummy);
 
         if (secondChildType != null && !secondChildType.getName().equals("int")) {
-            addSemanticErrorReport(node, "Array access index must be an expression of type integer");
+            addSemanticErrorReport(node, "Array access index must be an expression of type int. Type given - " + secondChildType.getName());
         }
         if (firstChildType == null) { return null; }
         return new Type(firstChildType.getName(), false);
@@ -184,7 +183,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
                 err = true;
             }
             if (childType != null && !childType.getName().equals("int")) {
-                addSemanticErrorReport(node, "Array access index must be an expression of type integer");
+                addSemanticErrorReport(node, "Array access index must be an expression of type int. Type given - " + childType.getName());
                 err = true;
             }
             if (err) {
@@ -231,7 +230,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
 
         if (childType != null) {
             if (!childType.getName().equals("int")) {
-                addSemanticErrorReport(node, "Array access index must be an expression of type integer");
+                addSemanticErrorReport(node, "Array access index must be an expression of type int. Type given - " + childType.getName());
             }
         }
 
@@ -247,7 +246,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
 
         if (condition != null) {
             if (!condition.getName().equals("boolean")) {
-                addSemanticErrorReport(node, "IF condition must be of type boolean");
+                addSemanticErrorReport(node, "IF condition must be of type boolean. Type given - " + condition.getName());
             }
         }
 
@@ -258,7 +257,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         Type condition = visit(node.getChildren().get(0), type);
         if (condition != null) {
             if (!condition.getName().equals("boolean")) {
-                addSemanticErrorReport(node, "WHILE condition must be of type boolean");
+                addSemanticErrorReport(node, "WHILE condition must be of type boolean. Type given - " + condition.getName());
             }
         }
 
@@ -276,10 +275,10 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
                 }
             }
         } else {
-            addSemanticErrorReport(node, "Invalid return");
+            addSemanticErrorReport(node, "Invalid return.");
         }
         if (retType != null && !(retType.getName().equals(ret.getName()) && retType.isArray() == ret.isArray())) {
-            addSemanticErrorReport(node, "Invalid return type");
+            addSemanticErrorReport(node, "Invalid return type. Expected type - " + retType.getName());
         }
         return ret;
     }
