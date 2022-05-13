@@ -44,13 +44,13 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         return new Type("", false);
     }
 
-    public Type visitIntLiteral(JmmNode node, Type dummy) { return new Type("int",false); }
+    private Type visitIntLiteral(JmmNode node, Type dummy) { return new Type("int",false); }
 
-    public Type visitBooleanLiteral(JmmNode node, Type dummy) { return new Type("boolean",false); }
+    private Type visitBooleanLiteral(JmmNode node, Type dummy) { return new Type("boolean",false); }
 
-    public Type visitThisLiteral(JmmNode node, Type type) { return new Type(symbolTable.getClassName(), false); }
+    private Type visitThisLiteral(JmmNode node, Type type) { return new Type(symbolTable.getClassName(), false); }
 
-    public Type visitIdentifier(JmmNode node, Type dummy) {
+    private Type visitIdentifier(JmmNode node, Type dummy) {
         if (node.getAncestor("MethodBody").isEmpty() && node.getAncestor("Return").isEmpty()) { return new Type("", false); }
 
         if (node.getJmmParent().getKind().equals("MethodCall")) {
@@ -86,7 +86,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         return new Type("", false);
     }
 
-    public Type visitUnaryOp(JmmNode node, Type dummy) {
+    private Type visitUnaryOp(JmmNode node, Type dummy) {
         Type childType = visit(node.getChildren().get(0), dummy);
 
         if (childType == null || (childType.getName().equals("boolean") && !childType.isArray())) {
@@ -111,7 +111,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         return false;
     }
 
-    public Type visitBinOp(JmmNode node, Type dummy) {
+    private Type visitBinOp(JmmNode node, Type dummy) {
         Type firstChildType = visit(node.getChildren().get(0), dummy);
         Type secondChildType = visit(node.getChildren().get(1), dummy);
 
@@ -153,7 +153,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         }
     }
 
-    public Type visitArrayElement(JmmNode node, Type dummy) {
+    private Type visitArrayElement(JmmNode node, Type dummy) {
         Type firstChildType = visit(node.getChildren().get(0), dummy);
         Type secondChildType = visit(node.getChildren().get(1), dummy);
 
@@ -164,7 +164,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         return new Type(firstChildType.getName(), false);
     }
 
-    public Type visitCompoundExpression(JmmNode node, Type dummy) {
+    private Type visitCompoundExpression(JmmNode node, Type dummy) {
         List<JmmNode> children = node.getChildren();
         Type type = dummy;
         for (JmmNode child : children) {
@@ -174,7 +174,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         return type;
     }
 
-    public Type visitIndexation(JmmNode node, Type type) {
+    private Type visitIndexation(JmmNode node, Type type) {
         boolean err = false;
         Type childType = visit(node.getChildren().get(0), type);
 
@@ -196,7 +196,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         return new Type(type.getName(),false);
     }
 
-    public Type visitMethodCall(JmmNode node, Type type) {
+    private Type visitMethodCall(JmmNode node, Type type) {
         Type childType = visit(node.getChildren().get(0), type);
         if (childType != null) {
             List<JmmNode> children = node.getChildren();
@@ -207,7 +207,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         return visit(node.getChildren().get(0), type);
     }
 
-    public Type visitAttributeGet(JmmNode node, Type type) {
+    private Type visitAttributeGet(JmmNode node, Type type) {
         if (type != null && type.getName().equals(symbolTable.getClassName())) {
             for (var field : symbolTable.getFields()) {
                 if (field.getName().equals(node.getChildren().get(0).get("name"))) {
@@ -226,7 +226,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         return new Type("", false);
     }
 
-    public Type visitNewArray(JmmNode node, Type type) {
+    private Type visitNewArray(JmmNode node, Type type) {
         Type childType = visit(node.getChildren().get(0), type);
 
         if (childType != null) {
@@ -238,11 +238,11 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         return new Type("int", true);
     }
 
-    public Type visitNewObject(JmmNode node, Type type) {
+    private Type visitNewObject(JmmNode node, Type type) {
         return new Type(node.get("class"), false);
     }
 
-    public Type visitIf(JmmNode node, Type type) {
+    private Type visitIf(JmmNode node, Type type) {
         Type condition = visit(node.getChildren().get(0), type);
 
         if (condition != null) {
@@ -254,7 +254,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         return new Type("", false);
     }
 
-    public Type visitWhile(JmmNode node, Type type) {
+    private Type visitWhile(JmmNode node, Type type) {
         Type condition = visit(node.getChildren().get(0), type);
         if (condition != null) {
             if (!condition.getName().equals("boolean")) {
@@ -265,7 +265,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         return new Type("", false);
     }
 
-    public Type visitReturn(JmmNode node, Type dummy) {
+    private Type visitReturn(JmmNode node, Type dummy) {
         Type retType = visit(node.getChildren().get(0),dummy);
         Optional<JmmNode> regularMethod = node.getAncestor("RegularMethod");
         Type ret = new Type("", false);
