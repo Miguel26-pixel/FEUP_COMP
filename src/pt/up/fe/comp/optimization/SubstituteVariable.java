@@ -38,7 +38,7 @@ public class SubstituteVariable {
     }
 
     public String getSubstitute() {
-        String ollirType = variableValue != null ? getOllirType(variableType) : "i32";
+        String ollirType = variableType != null ? getOllirType(variableType) : "i32";
         return getValue() != null ? getValue() + "." + ollirType : getVariableName() + "." + ollirType;
     }
 }

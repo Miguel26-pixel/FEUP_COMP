@@ -6,7 +6,6 @@ import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.semantic.tables.JmmSymbolTable;
 
-import javax.imageio.plugins.tiff.GeoTIFFTagSet;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -20,6 +19,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
     private final JmmSymbolTable symbolTable;
     private int temporaryVariableCounter = -1;
     private int ifCounter = -1;
+    private int loopCounter = -1;
     private int indentationLevel = 0;
     private final int numberOfSpaces;
 
@@ -35,6 +35,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         addVisit("MethodBody", this::visitAllChildren);
         addVisit("Return", this::visitReturn);
         addVisit("If", this::visitIf);
+        addVisit("While", this::visitWhile);
         addVisit("BinOp", this::visitBinOp);
         addVisit("UnaryOp", this::visitUnaryOp);
         addVisit("CompoundExpression", this::visitCompoundExpression);
@@ -105,16 +106,17 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         startNewLine();
         ollirCode.append("}");
 
-        for (var child : node.getChildren().stream().filter((n) -> n.getKind().equals("MainMethod")).collect(Collectors.toList())) {
-            startNewLine();
-            ollirCode.append(".method public static ");
-            visit(child);
-        }
         for (var child : node.getChildren().stream().filter((n) -> n.getKind().equals("RegularMethod")).collect(Collectors.toList())) {
             startNewLine();
             ollirCode.append(".method public ");
             visit(child);
         }
+        for (var child : node.getChildren().stream().filter((n) -> n.getKind().equals("MainMethod")).collect(Collectors.toList())) {
+            startNewLine();
+            ollirCode.append(".method public static ");
+            visit(child);
+        }
+
         indentationLevel--;
         startNewLine();
         ollirCode.append("}");
@@ -166,6 +168,8 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         for (var thenChild : node.getJmmChild(1).getChildren()){
             visit(thenChild);
         }
+        startNewLine();
+        ollirCode.append("goto EndIf").append(ifCounter).append(";");
         indentationLevel--;
         startNewLine();
         ollirCode.append("Else").append(ifCounter).append(":");
@@ -174,6 +178,29 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
             visit(elseChild);
         }
         indentationLevel--;
+        startNewLine();
+        ollirCode.append("EndIf").append(ifCounter).append(":");
+        return true;
+    }
+
+    private Boolean visitWhile(JmmNode node, SubstituteVariable dummy) {
+        loopCounter++;
+        startNewLine();
+        ollirCode.append("Loop").append(loopCounter).append(":");
+        indentationLevel++;
+        SubstituteVariable conditionHolder = createTemporaryVariable(node);
+        visit(node.getJmmChild(0), conditionHolder);
+        startNewLine();
+        ollirCode.append("if (!.bool ").append(conditionHolder.getSubstitute())
+                .append(") goto End").append(loopCounter).append(";");
+        for (var bodyChild : node.getJmmChild(1).getChildren()){
+            visit(bodyChild);
+        }
+        startNewLine();
+        ollirCode.append("goto Loop").append(loopCounter).append(";");
+        indentationLevel--;
+        startNewLine();
+        ollirCode.append("End").append(loopCounter).append(":");
         return true;
     }
 
@@ -240,6 +267,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
             startNewLine();
             ollirCode.append(createTemporaryAssign(substituteVariable.getVariableName(), getOllirType(childHolder.getVariableType()),
                     "!.bool " + childHolder.getSubstitute()));
+            substituteVariable.setVariableType(childHolder.getVariableType());
         }
         return true;
     }
