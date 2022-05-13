@@ -6,6 +6,7 @@ import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.semantic.tables.JmmSymbolTable;
 
+import javax.imageio.plugins.tiff.GeoTIFFTagSet;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -38,6 +39,8 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         addVisit("AttributeGet", this::visitAttributeGet);
         addVisit("MethodCall", this::visitMethodCall);
         addVisit("ArrayElement", this::visitArrayElement);
+        addVisit("NewArray", this::visitNewArray);
+        addVisit("NewObject", this::visitNewObject);
         addVisit("Identifier", this::visitIdentifier);
         addVisit("IntLiteral", this::visitIntLiteral);
         addVisit("BooleanLiteral", this::visitBooleanLiteral);
@@ -308,6 +311,38 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
                 arguments.stream().map(SubstituteVariable::getSubstitute).collect(Collectors.toList()), ollirMethodType)));
         accessedVariable.setValue(methodCallHolder.getVariableName());
         accessedVariable.setVariableType(methodType);
+        return true;
+    }
+
+    private Boolean visitNewArray(JmmNode node, SubstituteVariable substituteVariable) {
+        Type arrayType = new Type("int", true);
+        Type elementType = new Type("int", false);
+
+        // Visit indexation
+        SubstituteVariable positionChild = createTemporaryVariable(node);
+        visit(node.getJmmChild(0), positionChild);
+
+        // Hold indexation child in variable
+        startNewLine();
+        SubstituteVariable sizeHolder = createTemporaryVariable(node);
+        ollirCode.append(createTemporaryAssign(sizeHolder.getVariableName(),
+                getOllirType(elementType), positionChild.getSubstitute()));
+
+        // Create new array
+        startNewLine();
+        ollirCode.append(createTemporaryAssign(substituteVariable.getVariableName(), getOllirType(arrayType),
+                "new(array, " + sizeHolder.getSubstitute() + ")." + getOllirType(arrayType)));
+        substituteVariable.setVariableType(arrayType);
+
+        return true;
+    }
+
+    private Boolean visitNewObject(JmmNode node, SubstituteVariable substituteVariable) {
+        startNewLine();
+        String className = node.get("class");
+        ollirCode.append(createTemporaryAssign(substituteVariable.getVariableName(), className,
+                "new(" + className + ")." + className));
+        substituteVariable.setVariableType(new Type(className, false));
         return true;
     }
 
