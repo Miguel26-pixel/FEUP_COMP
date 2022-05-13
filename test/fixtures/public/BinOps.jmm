@@ -2,18 +2,8 @@ import Nando;
 
 class BinOps {
     public int ola() {
-        Nando nando;
-        nando = new Nando();
+        boolean a;
+        a = !(2 < 3);
         return 0;
-    }
-    public int bar(int a, int b){
-        return a + b - a;
-    }
-    public int foo(int n){
-        int[] nice;
-        nice = new int[2];
-        int z;
-        z = this.bar(10 + 20, 3);
-        return z;
     }
 }

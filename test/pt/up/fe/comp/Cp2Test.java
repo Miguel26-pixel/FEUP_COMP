@@ -219,7 +219,7 @@ public class Cp2Test {
         TestUtils.noErrors(result);
     }
 
-    /*@Test
+    @Test
     public void test_2_01_CompileBasic() {
         testJmmCompilation("fixtures/public/cp2/CompileBasic.jmm");
     }
@@ -257,5 +257,5 @@ public class Cp2Test {
     @Test
     public void test_3_04_OllirToJasminFields() {
         testOllirToJasmin("fixtures/public/cp2/OllirToJasminFields.ollir");
-    }*/
+    }
 }
