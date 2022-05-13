@@ -3,6 +3,18 @@ package pt.up.fe.comp.backend;
 import org.specs.comp.ollir.*;
 
 public class JasminUtils {
+    public static String getMethodDescriptor(Method method) {
+        StringBuilder descriptor = new StringBuilder("(");
+
+        for (Element parameter: method.getParams()) {
+            descriptor.append(JasminUtils.translateType(method.getOllirClass(), parameter.getType()));
+        }
+
+        descriptor.append(")").append(translateType(method.getOllirClass(), method.getReturnType()));
+
+        return descriptor.toString();
+    }
+
     public static String translateType(ClassUnit ollirClass, Type type) {
         ElementType elementType = type.getTypeOfElement();
 

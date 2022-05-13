@@ -56,20 +56,9 @@ public class MethodDefinitionGenerator {
             methodHeader.append("static ");
         }
 
-        methodHeader.append(method.getMethodName()).append("(");
-        methodHeader.append(getParameters()).append(")");
+        methodHeader.append(method.getMethodName()).append(JasminUtils.getMethodDescriptor(method));
 
         return methodHeader.toString();
-    }
-
-    private String getParameters() {
-        StringBuilder methodParameters = new StringBuilder();
-
-        for (Element parameter: method.getParams()) {
-            methodParameters.append(JasminUtils.translateType(method.getOllirClass(), parameter.getType()));
-        }
-
-        return methodParameters.toString();
     }
 
     public void setMethod(Method method) {
