@@ -72,11 +72,12 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
             if (child.isPresent()) {
                 return child.get().getType();
             }
-
-            for (var imp: symbolTable.getImports()) {
-                String classImported = imp.substring(imp.lastIndexOf('.') + 1);
-                if (classImported.equals(node.get("name"))) {
-                    return new Type(classImported, false);
+            if (node.getAncestor("CompoundExpression").isPresent()) {
+                for (var imp : symbolTable.getImports()) {
+                    String classImported = imp.substring(imp.lastIndexOf('.') + 1);
+                    if (classImported.equals(node.get("name"))) {
+                        return new Type(classImported, false);
+                    }
                 }
             }
         }
