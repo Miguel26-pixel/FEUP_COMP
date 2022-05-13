@@ -19,6 +19,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
     private final StringBuilder ollirCode;
     private final JmmSymbolTable symbolTable;
     private int temporaryVariableCounter = -1;
+    private int ifCounter = -1;
     private int indentationLevel = 0;
     private final int numberOfSpaces;
 
@@ -33,6 +34,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         addVisit("MainMethod", this::visitMethod);
         addVisit("MethodBody", this::visitAllChildren);
         addVisit("Return", this::visitReturn);
+        addVisit("If", this::visitIf);
         addVisit("BinOp", this::visitBinOp);
         addVisit("UnaryOp", this::visitUnaryOp);
         addVisit("CompoundExpression", this::visitCompoundExpression);
@@ -149,6 +151,30 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         startNewLine();
         ollirCode.append("}");
         return null;
+    }
+
+    private Boolean visitIf(JmmNode node, SubstituteVariable dummy) {
+        ifCounter++;
+        SubstituteVariable conditionHolder = createTemporaryVariable(node);
+        visit(node.getJmmChild(0), conditionHolder);
+        startNewLine();
+        ollirCode.append("if (!.bool ").append(conditionHolder.getSubstitute())
+                .append(") goto Else").append(ifCounter).append(";");
+        startNewLine();
+        ollirCode.append("Then").append(ifCounter).append(":");
+        indentationLevel++;
+        for (var thenChild : node.getJmmChild(1).getChildren()){
+            visit(thenChild);
+        }
+        indentationLevel--;
+        startNewLine();
+        ollirCode.append("Else").append(ifCounter).append(":");
+        indentationLevel++;
+        for (var elseChild : node.getJmmChild(2).getChildren()){
+            visit(elseChild);
+        }
+        indentationLevel--;
+        return true;
     }
 
     private Boolean visitBinOp(JmmNode node, SubstituteVariable substituteVariable) {

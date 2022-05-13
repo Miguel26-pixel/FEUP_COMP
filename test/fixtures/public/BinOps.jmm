@@ -4,6 +4,14 @@ class BinOps {
     public int ola() {
         boolean a;
         a = !(2 < 3);
+        if (a){
+            if (3 < 5){
+                Nando.sayGoodbye();
+            } else {}
+            Nando.sayHello();
+        } else {
+            a = true;
+        }
         return 0;
     }
 }
