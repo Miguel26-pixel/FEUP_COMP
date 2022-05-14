@@ -21,6 +21,7 @@ public class InstructionTranslator {
 
     public String translateInstruction(CallInstruction instruction, Method ancestorMethod) {
         StringBuilder jasminInstruction = new StringBuilder();
+        StringBuilder parametersDescriptor = new StringBuilder();
         Element caller = instruction.getFirstArg();
         LiteralElement methodName = (LiteralElement) instruction.getSecondArg();
 
@@ -30,12 +31,18 @@ public class InstructionTranslator {
             case invokestatic:
             case invokevirtual:
             case invokespecial:
+
+                for (Element element: instruction.getListOfOperands()) {
+                    jasminInstruction.append("\t").append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
+                    parametersDescriptor.append(JasminUtils.translateType(ancestorMethod.getOllirClass(), element.getType()));
+                }
+
                 if (callType == CallType.invokestatic) {
                     jasminInstruction.append("invokestatic ");
                 } else if (callType == CallType.invokevirtual){
                     jasminInstruction.append("invokevirtual ");
                 } if (callType == CallType.invokespecial) {
-                    jasminInstruction.append("invokespecial ");
+                jasminInstruction.append("invokespecial ");
             }
 
                 ClassType classType = (ClassType) instruction.getFirstArg().getType();
@@ -43,9 +50,6 @@ public class InstructionTranslator {
                 jasminInstruction.append(JasminUtils.getFullClassName(ancestorMethod.getOllirClass(), classType.getName())).append(".").append(JasminUtils.trimLiteral(methodName.getLiteral()));
                 jasminInstruction.append("(");
 
-                for (Element element: instruction.getListOfOperands()) {
-                    jasminInstruction.append(JasminUtils.translateType(ancestorMethod.getOllirClass(), element.getType()));
-                }
 
                 jasminInstruction.append(")").append(JasminUtils.translateType(ancestorMethod.getOllirClass(), instruction.getReturnType()));
             case NEW:
@@ -68,6 +72,7 @@ public class InstructionTranslator {
 
             switch (literalElement.getType().getTypeOfElement()) {
                 case INT32:
+                    System.out.println(literalElement.getLiteral());
                     return "ldc " + JasminUtils.trimLiteral(literalElement.getLiteral());
                 case BOOLEAN:
                     String literal = JasminUtils.trimLiteral(literalElement.getLiteral());
