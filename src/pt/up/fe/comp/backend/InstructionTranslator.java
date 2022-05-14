@@ -4,12 +4,12 @@ import freemarker.core.ast.Case;
 import org.specs.comp.ollir.*;
 
 public class InstructionTranslator {
-    public String translateInstruction(Instruction instruction, Method ancestorMethod) {
+    public String translateInstruction(Instruction instruction, Method ancestorMethod, int indentationDepth) {
         InstructionType instructionType = instruction.getInstType();
 
         switch (instructionType) {
             case CALL:
-                return translateInstruction((CallInstruction) instruction, ancestorMethod);
+                return translateInstruction((CallInstruction) instruction, ancestorMethod, indentationDepth);
             default:
                 return "";
         }
@@ -19,10 +19,10 @@ public class InstructionTranslator {
         return "";
     }
 
-    public String translateInstruction(CallInstruction instruction, Method ancestorMethod) {
+    public String translateInstruction(CallInstruction instruction, Method ancestorMethod, int indentationDepth) {
         StringBuilder jasminInstruction = new StringBuilder();
         StringBuilder parametersDescriptor = new StringBuilder();
-        Element caller = instruction.getFirstArg();
+        Operand caller = (Operand) instruction.getFirstArg();
         LiteralElement methodName = (LiteralElement) instruction.getSecondArg();
 
         CallType callType = instruction.getInvocationType();
@@ -33,22 +33,28 @@ public class InstructionTranslator {
             case invokespecial:
 
                 for (Element element: instruction.getListOfOperands()) {
-                    jasminInstruction.append("\t").append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
+                    jasminInstruction.append(getIndentation(indentationDepth)).append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
                     parametersDescriptor.append(JasminUtils.translateType(ancestorMethod.getOllirClass(), element.getType()));
                 }
 
+                jasminInstruction.append(getIndentation(indentationDepth));
+
                 if (callType == CallType.invokestatic) {
-                    jasminInstruction.append("invokestatic ");
-                } else if (callType == CallType.invokevirtual){
-                    jasminInstruction.append("invokevirtual ");
-                } if (callType == CallType.invokespecial) {
-                jasminInstruction.append("invokespecial ");
-            }
+                    jasminInstruction.append("invokestatic ").append(caller.getName());
+                } else {
+                    if (callType == CallType.invokevirtual){
+                        jasminInstruction.append("invokevirtual ");
+                    } else {
+                        jasminInstruction.append("invokespecial ");
+                    }
 
-                ClassType classType = (ClassType) instruction.getFirstArg().getType();
+                    ClassType classType = (ClassType) instruction.getFirstArg().getType();
+                    jasminInstruction.append(JasminUtils.getFullClassName(ancestorMethod.getOllirClass(), classType.getName()));
+                }
 
-                jasminInstruction.append(JasminUtils.getFullClassName(ancestorMethod.getOllirClass(), classType.getName())).append(".").append(JasminUtils.trimLiteral(methodName.getLiteral()));
-                jasminInstruction.append("(");
+
+                jasminInstruction.append(".").append(JasminUtils.trimLiteral(methodName.getLiteral()));
+                jasminInstruction.append("(").append(parametersDescriptor);
 
 
                 jasminInstruction.append(")").append(JasminUtils.translateType(ancestorMethod.getOllirClass(), instruction.getReturnType()));
@@ -72,7 +78,6 @@ public class InstructionTranslator {
 
             switch (literalElement.getType().getTypeOfElement()) {
                 case INT32:
-                    System.out.println(literalElement.getLiteral());
                     return "ldc " + JasminUtils.trimLiteral(literalElement.getLiteral());
                 case BOOLEAN:
                     String literal = JasminUtils.trimLiteral(literalElement.getLiteral());
@@ -98,5 +103,9 @@ public class InstructionTranslator {
                     return "";
             }
         }
+    }
+
+    private String getIndentation(int indentationDepth) {
+        return "\t".repeat(indentationDepth);
     }
 }
