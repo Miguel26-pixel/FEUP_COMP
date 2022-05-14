@@ -51,6 +51,6 @@ public class JasminUtils {
     }
 
     public static String trimLiteral(String literal) {
-        return literal.substring(1, literal.length() - 1);
+        return literal.length() == 1 ? literal : literal.substring(1, literal.length() - 1);
     }
 }
