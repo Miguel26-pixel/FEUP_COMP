@@ -60,8 +60,11 @@ public class InstructionTranslator {
 
 
                 jasminInstruction.append(")").append(JasminUtils.translateType(ancestorMethod.getOllirClass(), instruction.getReturnType()));
+                break;
             case NEW:
+                break;
             case arraylength:
+                break;
         }
         return jasminInstruction.toString();
     }
