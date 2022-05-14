@@ -3,18 +3,6 @@ package pt.up.fe.comp.backend;
 import org.specs.comp.ollir.*;
 
 public class JasminUtils {
-    public static String getMethodDescriptor(Method method) {
-        StringBuilder descriptor = new StringBuilder("(");
-
-        for (Element parameter: method.getParams()) {
-            descriptor.append(JasminUtils.translateType(method.getOllirClass(), parameter.getType()));
-        }
-
-        descriptor.append(")").append(translateType(method.getOllirClass(), method.getReturnType()));
-
-        return descriptor.toString();
-    }
-
     public static String translateType(ClassUnit ollirClass, Type type) {
         ElementType elementType = type.getTypeOfElement();
 
@@ -46,7 +34,7 @@ public class JasminUtils {
         }
     }
 
-    private static String getFullClassName(ClassUnit ollirClass, String className) {
+    public static String getFullClassName(ClassUnit ollirClass, String className) {
         if (ollirClass.isImportedClass(className)) {
             for(String fullImport: ollirClass.getImports()) {
                 int lastSeparatorIndex = className.lastIndexOf(".");
@@ -60,5 +48,9 @@ public class JasminUtils {
         }
 
         return className;
+    }
+
+    public static String trimLiteral(String literal) {
+        return literal.substring(1, literal.length() - 1);
     }
 }
