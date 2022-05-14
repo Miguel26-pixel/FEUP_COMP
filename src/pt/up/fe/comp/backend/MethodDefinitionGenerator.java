@@ -34,7 +34,9 @@ public class MethodDefinitionGenerator {
 
         methodDefinition.append(getMethodHeader()).append("\n");
 
+        method.buildVarTable();
         InstructionTranslator instructionTranslator = new InstructionTranslator();
+
         for (Instruction instruction: method.getInstructions()) {
             methodDefinition.append("\t").append(instructionTranslator.translateInstruction(instruction, method)).append("\n");
         }
