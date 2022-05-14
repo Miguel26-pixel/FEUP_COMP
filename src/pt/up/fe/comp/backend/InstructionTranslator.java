@@ -10,6 +10,8 @@ public class InstructionTranslator {
         switch (instructionType) {
             case CALL:
                 return translateInstruction((CallInstruction) instruction, ancestorMethod, indentationDepth);
+            case RETURN:
+                return translateInstruction((ReturnInstruction) instruction, indentationDepth);
             default:
                 return "";
         }
@@ -68,8 +70,24 @@ public class InstructionTranslator {
         return "";
     }
 
-    public String translateInstruction(ReturnInstruction instruction) {
-        return "return";
+    public String translateInstruction(ReturnInstruction instruction, int indentationLevel) {
+        StringBuilder jasminInstruction = new StringBuilder(getIndentation(indentationLevel));
+        switch (instruction.getOperand().getType().getTypeOfElement()) {
+            case BOOLEAN:
+            case INT32:
+                jasminInstruction.append("ireturn");
+                break;
+            case OBJECTREF:
+            case CLASS:
+            case STRING:
+                jasminInstruction.append("areturn");
+                break;
+            case VOID:
+                jasminInstruction.append("return");
+                break;
+        }
+
+        return jasminInstruction.toString();
     }
 
     private String getCorrespondingLoad(Element element, Method ancestorMethod) {
