@@ -36,7 +36,7 @@ public class MethodDefinitionGenerator {
 
         InstructionTranslator instructionTranslator = new InstructionTranslator();
         for (Instruction instruction: method.getInstructions()) {
-            methodDefinition.append("\t").append(instructionTranslator.translateInstruction(instruction, method.getOllirClass())).append("\n");
+            methodDefinition.append("\t").append(instructionTranslator.translateInstruction(instruction, method)).append("\n");
         }
 
         methodDefinition.append(".end method\n");
