@@ -1,5 +1,6 @@
 package pt.up.fe.comp.backend;
 
+import freemarker.core.ast.Case;
 import org.specs.comp.ollir.*;
 
 public class InstructionTranslator {
@@ -59,5 +60,38 @@ public class InstructionTranslator {
 
     public String translateInstruction(ReturnInstruction instruction) {
         return "return";
+    }
+
+    private String getCorrespondingLoad(Element element, Method ancestorMethod) {
+        if (element.isLiteral()) {
+            LiteralElement literalElement = (LiteralElement) element;
+
+            switch (literalElement.getType().getTypeOfElement()) {
+                case INT32:
+                    return "ldc " + JasminUtils.trimLiteral(literalElement.getLiteral());
+                case BOOLEAN:
+                    String literal = JasminUtils.trimLiteral(literalElement.getLiteral());
+                    return literal.equals("true") ? "ldc 1" : "ldc 0";
+                default:
+                    return "";
+            }
+        } else {
+            Operand operand = (Operand) element;
+
+            Descriptor operandDescriptor = ancestorMethod.getVarTable().get(operand.getName());
+
+            switch (operand.getType().getTypeOfElement()) {
+                case INT32:
+                case BOOLEAN:
+                    return "iload " + operandDescriptor.getVirtualReg();
+                case CLASS:
+                case OBJECTREF:
+                case THIS:
+                case STRING:
+                    return "aload " + operandDescriptor.getVirtualReg();
+                default:
+                    return "";
+            }
+        }
     }
 }
