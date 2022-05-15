@@ -3,16 +3,16 @@ package pt.up.fe.comp.backend;
 import org.specs.comp.ollir.*;
 
 public class InstructionTranslator {
-    public String translateInstruction(Instruction instruction, Method ancestorMethod, int indentationDepth) {
+    public String translateInstruction(Instruction instruction, Method ancestorMethod, int indentationLevel) {
         InstructionType instructionType = instruction.getInstType();
 
         switch (instructionType) {
             case CALL:
-                return translateInstruction((CallInstruction) instruction, ancestorMethod, indentationDepth);
+                return translateInstruction((CallInstruction) instruction, ancestorMethod, indentationLevel);
             case RETURN:
-                return translateInstruction((ReturnInstruction) instruction, indentationDepth);
+                return translateInstruction((ReturnInstruction) instruction, indentationLevel);
             case PUTFIELD:
-                return translateInstruction((PutFieldInstruction) instruction, ancestorMethod, indentationDepth);
+                return translateInstruction((PutFieldInstruction) instruction, ancestorMethod, indentationLevel);
             default:
                 return "";
         }
@@ -42,7 +42,7 @@ public class InstructionTranslator {
         return "";
     }
 
-    public String translateInstruction(CallInstruction instruction, Method ancestorMethod, int indentationDepth) {
+    public String translateInstruction(CallInstruction instruction, Method ancestorMethod, int indentationLevel) {
         StringBuilder jasminInstruction = new StringBuilder();
         StringBuilder parametersDescriptor = new StringBuilder();
         Operand caller = (Operand) instruction.getFirstArg();
@@ -56,11 +56,11 @@ public class InstructionTranslator {
             case invokespecial:
 
                 for (Element element: instruction.getListOfOperands()) {
-                    jasminInstruction.append(getIndentation(indentationDepth)).append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
+                    jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
                     parametersDescriptor.append(JasminUtils.translateType(ancestorMethod.getOllirClass(), element.getType()));
                 }
 
-                jasminInstruction.append(getIndentation(indentationDepth));
+                jasminInstruction.append(getIndentation(indentationLevel));
 
                 if (callType == CallType.invokestatic) {
                     jasminInstruction.append("invokestatic ").append(caller.getName());
@@ -148,7 +148,7 @@ public class InstructionTranslator {
         }
     }
 
-    private String getIndentation(int indentationDepth) {
-        return "\t".repeat(indentationDepth);
+    private String getIndentation(int indentationLevel) {
+        return "\t".repeat(indentationLevel);
     }
 }
