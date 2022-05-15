@@ -17,6 +17,8 @@ public class InstructionTranslator {
                 return translateInstruction((GetFieldInstruction) instruction, ancestorMethod, indentationLevel);
             case ASSIGN:
                 return translateInstruction((AssignInstruction) instruction, ancestorMethod, indentationLevel);
+            case BINARYOPER:
+                return translateInstruction((BinaryOpInstruction) instruction, ancestorMethod, indentationLevel);
             default:
                 return "";
         }
@@ -115,7 +117,47 @@ public class InstructionTranslator {
         return jasminInstruction.toString();
     }
 
-    public String translateInstruction(BinaryOpInstruction instruction) {
+    public String translateInstruction(BinaryOpInstruction instruction, Method ancestorMethod, int indentationLevel) {
+        Element first = instruction.getLeftOperand();
+        Element second = instruction.getRightOperand();
+        Operation operation = instruction.getOperation();
+        OperationType operationType = operation.getOpType();
+
+        switch (operationType) {
+            case ADD:
+            case ADDI32:
+            case SUB:
+            case SUBI32:
+            case MUL:
+            case MULI32:
+            case DIV:
+            case DIVI32:
+                if (first.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement() || second.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement()) {
+                    return "UNMATCHING TYPES";
+                }
+
+                if (operation.getTypeInfo().getTypeOfElement() != ElementType.INT32) {
+                    return "INCORRECT TYPE";
+                }
+
+                StringBuilder jasminInstruction = new StringBuilder();
+
+                jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
+                jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(second, ancestorMethod)).append("\n");
+                jasminInstruction.append(getIndentation(indentationLevel));
+
+                if (operationType == OperationType.ADD || operationType == OperationType.ADDI32) {
+                    jasminInstruction.append("iadd");
+                } else if (operationType == OperationType.SUB || operationType == OperationType.SUBI32) {
+                    jasminInstruction.append("isub");
+                } else if (operationType == OperationType.MUL || operationType == OperationType.MULI32) {
+                    jasminInstruction.append("imul");
+                } else {
+                    jasminInstruction.append("idiv");
+                }
+
+                return jasminInstruction.toString();
+        }
         return "";
     }
 
