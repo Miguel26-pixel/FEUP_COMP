@@ -19,9 +19,15 @@ public class InstructionTranslator {
                 return translateInstruction((AssignInstruction) instruction, ancestorMethod, indentationLevel);
             case BINARYOPER:
                 return translateInstruction((BinaryOpInstruction) instruction, ancestorMethod, indentationLevel);
+            case NOPER:
+                return translateInstruction((SingleOpInstruction) instruction, ancestorMethod, indentationLevel);
             default:
                 return "";
         }
+    }
+
+    public String translateInstruction(SingleOpInstruction instruction, Method ancestorMethod, int indentationLevel) {
+        return getIndentation(indentationLevel) + getCorrespondingLoad(instruction.getSingleOperand(), ancestorMethod);
     }
 
     public String translateInstruction(GetFieldInstruction instruction, Method ancestorMethod, int indentationLevel) {
