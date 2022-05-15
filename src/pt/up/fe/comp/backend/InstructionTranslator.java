@@ -64,7 +64,7 @@ public class InstructionTranslator {
 
         Instruction rhs = instruction.getRhs();
 
-        return translateInstruction(rhs, ancestorMethod, indentationLevel) + "\n" + getCorrespondingStore(destination, ancestorMethod);
+        return translateInstruction(rhs, ancestorMethod, indentationLevel) + "\n" + getIndentation(indentationLevel) + getCorrespondingStore(destination, ancestorMethod);
     }
 
     public String translateInstruction(CallInstruction instruction, Method ancestorMethod, int indentationLevel) {
