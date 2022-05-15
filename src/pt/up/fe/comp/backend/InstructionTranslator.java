@@ -11,9 +11,31 @@ public class InstructionTranslator {
                 return translateInstruction((CallInstruction) instruction, ancestorMethod, indentationDepth);
             case RETURN:
                 return translateInstruction((ReturnInstruction) instruction, indentationDepth);
+            case PUTFIELD:
+                return translateInstruction((PutFieldInstruction) instruction, ancestorMethod, indentationDepth);
             default:
                 return "";
         }
+    }
+
+    public String translateInstruction(PutFieldInstruction instruction, Method ancestorMethod, int indentationLevel) {
+        Element destinationObject = instruction.getFirstOperand();
+        Element destinationField = instruction.getSecondOperand();
+
+        if (destinationObject.isLiteral() || destinationField.isLiteral()) {
+            return "THERE ARE NO FIELD LITERALS";
+        }
+
+        StringBuilder jasminInstruction = new StringBuilder();
+        Element newFieldValue = instruction.getThirdOperand();
+
+        jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(newFieldValue, ancestorMethod)).append("\n");
+        jasminInstruction.append(getIndentation(indentationLevel)).append("putfield ");
+
+        jasminInstruction.append(((Operand) destinationObject).getName()).append("/").append(((Operand) destinationField).getName());
+        jasminInstruction.append(" ").append(JasminUtils.translateType(ancestorMethod.getOllirClass(), destinationField.getType()));
+
+        return jasminInstruction.toString();
     }
 
     public String translateInstruction(AssignInstruction instruction) {
