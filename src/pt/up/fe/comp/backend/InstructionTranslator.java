@@ -163,6 +163,29 @@ public class InstructionTranslator {
         }
     }
 
+    private String getCorrespondingStore(Element element, Method ancestorMethod) {
+        if (element.isLiteral()) {
+            return "UNABLE TO STORE TO A LITERAL";
+        } else {
+            Operand operand = (Operand) element;
+
+            Descriptor operandDescriptor = ancestorMethod.getVarTable().get(operand.getName());
+
+            switch (operand.getType().getTypeOfElement()) {
+                case INT32:
+                case BOOLEAN:
+                    return "istore " + operandDescriptor.getVirtualReg();
+                case CLASS:
+                case OBJECTREF:
+                case THIS:
+                case STRING:
+                    return "astore " + operandDescriptor.getVirtualReg();
+                default:
+                    return "";
+            }
+        }
+    }
+
     private String getIndentation(int indentationLevel) {
         return "\t".repeat(indentationLevel);
     }
