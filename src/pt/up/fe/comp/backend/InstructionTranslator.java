@@ -15,6 +15,8 @@ public class InstructionTranslator {
                 return translateInstruction((PutFieldInstruction) instruction, ancestorMethod, indentationLevel);
             case GETFIELD:
                 return translateInstruction((GetFieldInstruction) instruction, ancestorMethod, indentationLevel);
+            case ASSIGN:
+                return translateInstruction((AssignInstruction) instruction, ancestorMethod, indentationLevel);
             default:
                 return "";
         }
@@ -53,8 +55,16 @@ public class InstructionTranslator {
         return jasminInstruction.toString();
     }
 
-    public String translateInstruction(AssignInstruction instruction) {
-        return "";
+    public String translateInstruction(AssignInstruction instruction, Method ancestorMethod, int indentationLevel) {
+        Element destination = instruction.getDest();
+
+        if (destination.isLiteral()) {
+            return "UNABLE TO STORE TO A LITERAL";
+        }
+
+        Instruction rhs = instruction.getRhs();
+
+        return translateInstruction(rhs, ancestorMethod, indentationLevel) + "\n" + getCorrespondingStore(destination, ancestorMethod);
     }
 
     public String translateInstruction(CallInstruction instruction, Method ancestorMethod, int indentationLevel) {
