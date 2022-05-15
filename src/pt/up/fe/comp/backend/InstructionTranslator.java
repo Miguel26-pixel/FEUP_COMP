@@ -13,9 +13,24 @@ public class InstructionTranslator {
                 return translateInstruction((ReturnInstruction) instruction, indentationLevel);
             case PUTFIELD:
                 return translateInstruction((PutFieldInstruction) instruction, ancestorMethod, indentationLevel);
+            case GETFIELD:
+                return translateInstruction((GetFieldInstruction) instruction, ancestorMethod, indentationLevel);
             default:
                 return "";
         }
+    }
+
+    public String translateInstruction(GetFieldInstruction instruction, Method ancestorMethod, int indentationLevel) {
+        Element destinationObject = instruction.getFirstOperand();
+        Element destinationField = instruction.getSecondOperand();
+
+        if (destinationObject.isLiteral() || destinationField.isLiteral()) {
+            return "THERE ARE NO FIELD LITERALS";
+        }
+
+        return getIndentation(indentationLevel) + getCorrespondingLoad(destinationObject, ancestorMethod) + "\n" +
+                getIndentation(indentationLevel) + "getfield " +
+                JasminUtils.translateType(ancestorMethod.getOllirClass(), destinationField.getType()) + " " + ((Operand) destinationField).getName();
     }
 
     public String translateInstruction(PutFieldInstruction instruction, Method ancestorMethod, int indentationLevel) {
