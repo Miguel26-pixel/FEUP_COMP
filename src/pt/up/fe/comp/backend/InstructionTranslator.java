@@ -1,6 +1,5 @@
 package pt.up.fe.comp.backend;
 
-import freemarker.core.ast.Case;
 import org.specs.comp.ollir.*;
 
 public class InstructionTranslator {
@@ -99,6 +98,7 @@ public class InstructionTranslator {
 
             switch (literalElement.getType().getTypeOfElement()) {
                 case INT32:
+                case STRING:
                     return "ldc " + JasminUtils.trimLiteral(literalElement.getLiteral());
                 case BOOLEAN:
                     String literal = JasminUtils.trimLiteral(literalElement.getLiteral());
