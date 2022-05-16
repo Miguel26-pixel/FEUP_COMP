@@ -19,11 +19,24 @@ public class InstructionTranslator {
                 return translateInstruction((AssignInstruction) instruction, ancestorMethod, indentationLevel);
             case BINARYOPER:
                 return translateInstruction((BinaryOpInstruction) instruction, ancestorMethod, indentationLevel);
+            case UNARYOPER:
+                return translateInstruction((UnaryOpInstruction) instruction, ancestorMethod, indentationLevel);
             case NOPER:
                 return translateInstruction((SingleOpInstruction) instruction, ancestorMethod, indentationLevel);
             default:
                 return "";
         }
+    }
+
+    public String translateInstruction(UnaryOpInstruction instruction, Method ancestorMethod, int indentationLevel) {
+        OperationType operationType = instruction.getOperation().getOpType();
+
+        if (operationType == OperationType.NOT) {
+            return "";
+        } else if (operationType == OperationType.NOTB) {
+            return "";
+        }
+        return "";
     }
 
     public String translateInstruction(SingleOpInstruction instruction, Method ancestorMethod, int indentationLevel) {
