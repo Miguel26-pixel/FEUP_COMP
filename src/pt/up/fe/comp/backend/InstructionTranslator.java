@@ -65,9 +65,20 @@ public class InstructionTranslator {
             return "THERE ARE NO FIELD LITERALS";
         }
 
-        return getIndentation(indentationLevel) + getCorrespondingLoad(destinationObject, ancestorMethod) + "\n" +
-                getIndentation(indentationLevel) + "getfield " +
-                JasminUtils.translateType(ancestorMethod.getOllirClass(), destinationField.getType()) + " " + ((Operand) destinationField).getName();
+        StringBuilder jasminInstruction = new StringBuilder();
+
+        instruction.show();
+
+        if (destinationObject.getType().getTypeOfElement() == ElementType.OBJECTREF || destinationObject.getType().getTypeOfElement() == ElementType.THIS) {
+            jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(destinationObject, ancestorMethod)).append("\n");
+            jasminInstruction.append(getIndentation(indentationLevel)).append("getfield ");
+        } else {
+            jasminInstruction.append(getIndentation(indentationLevel)).append("getstatic ");
+        }
+
+        jasminInstruction.append(JasminUtils.translateType(ancestorMethod.getOllirClass(), destinationField.getType())).append(" ").append(((Operand) destinationField).getName());
+
+        return jasminInstruction.toString();
     }
 
     public String translateInstruction(PutFieldInstruction instruction, Method ancestorMethod, int indentationLevel) {
@@ -81,8 +92,13 @@ public class InstructionTranslator {
         StringBuilder jasminInstruction = new StringBuilder();
         Element newFieldValue = instruction.getThirdOperand();
 
-        jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(newFieldValue, ancestorMethod)).append("\n");
-        jasminInstruction.append(getIndentation(indentationLevel)).append("putfield ");
+        if (destinationObject.getType().getTypeOfElement() == ElementType.OBJECTREF || destinationObject.getType().getTypeOfElement() == ElementType.THIS) {
+            jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(newFieldValue, ancestorMethod)).append("\n");
+            jasminInstruction.append(getIndentation(indentationLevel)).append("putfield ");
+        } else {
+            jasminInstruction.append(getIndentation(indentationLevel)).append("putstatic ");
+        }
+
 
         jasminInstruction.append(((Operand) destinationObject).getName()).append("/").append(((Operand) destinationField).getName());
         jasminInstruction.append(" ").append(JasminUtils.translateType(ancestorMethod.getOllirClass(), destinationField.getType()));
