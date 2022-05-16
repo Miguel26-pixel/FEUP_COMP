@@ -45,13 +45,17 @@ public class SubstituteVariable {
         this.variableValue = variableValue;
     }
 
-    public String getSubstitute() {
+    public String getSubstituteWithType() {
         String ollirType = variableType != null ? getOllirType(variableType) : "i32";
-        return getValue() != null ? getValue() + "." + ollirType : getVariableName() + "." + ollirType;
+        return getSubstitute() + "." + ollirType;
+    }
+
+    public String getSubstitute() {
+        return getValue() != null ? getValue() : getVariableName();
     }
 
     public String getInvokeString(JmmNode node, JmmSymbolTable symbolTable) {
-        String invokeClass = getValue() != null ? getValue() : getVariableName();
+        String invokeClass = getSubstitute();
         return symbolTable.isLocalVariableOrSymbol(node, invokeClass)
                 ? invokeClass + "." + getOllirType(getVariableType()) : invokeClass;
     }

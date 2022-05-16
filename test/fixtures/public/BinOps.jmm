@@ -9,8 +9,10 @@ class BinOps {
         helloHistory = Nando.getHelloHistory(countAllNights);
         Nando.getMad();
         helloHistory[0] = 0;
-        int helloComputation;
-        helloComputation = helloHistory[0] + 2 * helloHistory.length - 2 + arr[1] * cof;
-        return new Nando().sayHello(helloComputation);
+        int helloTrials;
+        helloTrials = helloHistory[0] + 2 * helloHistory.length - 2 + arr[1] * cof;
+        int nights;
+        nights = Nando.getHome().getBedroom().getNightCounter();
+        return new Nando().sayHello(helloTrials + nights);
     }
 }

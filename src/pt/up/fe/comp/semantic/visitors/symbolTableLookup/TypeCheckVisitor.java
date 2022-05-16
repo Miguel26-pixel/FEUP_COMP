@@ -197,12 +197,9 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
     }
 
     private Type visitMethodCall(JmmNode node, Type type) {
-        Type childType = visit(node.getChildren().get(0), type);
-        if (childType != null) {
-            List<JmmNode> children = node.getChildren();
-            for (int i = 1 ; i < children.size(); i++) {
-                visit(children.get(i),type);
-            }
+        List<JmmNode> children = node.getChildren();
+        for (int i = 1 ; i < children.size(); i++) {
+            visit(children.get(i),type);
         }
         return visit(node.getChildren().get(0), type);
     }
@@ -288,10 +285,12 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         Optional<JmmNode> methodCall = node.getAncestor("MethodCall");
         List<JmmNode> args = node.getChildren();
         if (methodCall.isPresent()) {
+            Type targetType = visit(methodCall.get().getChildren().get(0));
+            boolean externTarget = targetType == null;
             List<Symbol> params = symbolTable.getParameters(methodCall.get().getChildren().get(0).get("name"));
-            if (params.size() != args.size()) {
+            if (!externTarget && params.size() != args.size()) {
                 addSemanticErrorReport(node, "Invalid number of arguments");
-            } else {
+            } else if (!externTarget){
                 for (int i = 0; i < args.size(); i++) {
                     Type paramType = params.get(i).getType();
                     Type argType = visit(args.get(i), dummy);
@@ -299,6 +298,10 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
                         addSemanticErrorReport(node, "Invalid Argument of type " + argType.getName() +
                                 ". Expected argument of type " + paramType.getName());
                     }
+                }
+            } else {
+                for (JmmNode arg : args) {
+                    visit(arg, dummy);
                 }
             }
         } else {
