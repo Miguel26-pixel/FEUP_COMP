@@ -213,12 +213,10 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
 
         String operation = node.get("op");
         if (operation.equals("assign")) {
-            String variableName = t1.getVariableName();
-            boolean isArray = symbolTable.getClosestSymbol(node, variableName).get().getType().isArray();
             String ollirType = getOllirType(t1.getVariableType());
-            if (!isArray && symbolTable.getFields().stream().anyMatch(s -> s.getName().equals(variableName))){
+            if (symbolTable.getFields().stream().anyMatch(s -> s.getName().equals(t1.getVariableName()))){
                 startNewLine();
-                ollirCode.append(OllirUtils.putField("this", t1.getSubstitute(), t2.getSubstitute()));
+                ollirCode.append(OllirUtils.putField("this", t1.getSubstitute(), t2.getSubstitute())).append(";");
             } else {
                 startNewLine();
                 ollirCode.append(t1.getSubstitute()).append(" :=.").append(ollirType)
@@ -285,23 +283,24 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         substituteVariable.setVariableName(variableName);
         Type elementType = new Type(symbol.getType().getName(), false);
 
-        // Hold indexation child in variable
+        // Hold indexation in variable
         startNewLine();
         SubstituteVariable positionTemporaryVariable = createTemporaryVariable(node);
+        SubstituteVariable indexationVariable = createTemporaryVariable(node);
         ollirCode.append(createTemporaryAssign(positionTemporaryVariable.getVariableName(),
                 getOllirType(elementType), positionChild.getSubstitute()));
-
         boolean isClassField = symbolTable.getFields().stream().anyMatch(s -> s.getName().equals(variableName));
         if (isClassField) {
             SubstituteVariable referenceHolder = createTemporaryVariable(node);
             startNewLine();
             ollirCode.append(createTemporaryAssign(referenceHolder.getVariableName(), getOllirType(elementType),
                     getField("this", variableName, getOllirType(elementType))));
-            substituteVariable.setValue(referenceHolder.getVariableName() + "[" + positionTemporaryVariable.getSubstitute() + "]");
+            substituteVariable.setVariableName(referenceHolder.getVariableName() + "[" + positionTemporaryVariable.getSubstitute() + "]");
         } else {
-            substituteVariable.setValue(variableName + "[" + positionTemporaryVariable.getSubstitute() + "]");
+            substituteVariable.setVariableName(variableName + "[" + positionTemporaryVariable.getSubstitute() + "]");
         }
         substituteVariable.setVariableType(elementType);
+
         return true;
     }
 
@@ -442,11 +441,14 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
             return false;
         }
 
-        if (symbolTable.getFields().stream().anyMatch(s -> s.getName().equals(variableName))) {
+        boolean isIdentifierAssign = node.getAncestor("BinOp").isPresent()
+                && node.getAncestor("BinOp").get().get("op").equals("assign")
+                && node.getAncestor("BinOp").get().getJmmChild(0).get("name").equals(variableName);
+        if (!isIdentifierAssign && symbolTable.getFields().stream().anyMatch(s -> s.getName().equals(variableName))) {
             SubstituteVariable temporaryHolder = createTemporaryVariable(node);
             startNewLine();
             ollirCode.append(createTemporaryAssign(temporaryHolder.getVariableName(), getOllirType(symbol),
-                    getField("this", variableName, symbolTable.getClassName())));
+                    getField("this", variableName, getOllirType(symbol.getType()))));
             substituteVariable.setValue(temporaryHolder.getVariableName());
             return true;
         }

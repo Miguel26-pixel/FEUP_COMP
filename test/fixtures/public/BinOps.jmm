@@ -1,11 +1,13 @@
 import Nando;
 
 class BinOps {
+    boolean countAllNights;
+    int[] helloHistory;
+
     public int getHelloComputation() {
-        boolean countAllNights;
         countAllNights = true;
-        int[] helloHistory;
         helloHistory = Nando.getHelloHistory(countAllNights);
+        helloHistory[0] = 0;
         int helloSize;
         int firstHello;
         firstHello = helloHistory[0];
