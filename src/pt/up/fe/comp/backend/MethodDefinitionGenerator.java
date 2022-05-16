@@ -12,9 +12,10 @@ public class MethodDefinitionGenerator {
             method.setMethodName("<init>");
         }
 
-        methodDefinition.append(getMethodHeader());
+        methodDefinition.append(getMethodHeader()).append("\n");
 
-        methodDefinition.append("\n");
+        methodDefinition.append("\t.limit stack 99\n");
+        methodDefinition.append("\t.limit locals 99\n");
 
         method.buildVarTable();
         InstructionTranslator instructionTranslator = new InstructionTranslator();
