@@ -271,7 +271,6 @@ public class InstructionTranslator {
 
     public String translateInstruction(ReturnInstruction instruction, Method ancestorMethod, int indentationLevel) {
         StringBuilder jasminInstruction = new StringBuilder();
-        instruction.show();
         ElementType returnType = instruction.getReturnType().getTypeOfElement();
 
         switch (returnType) {
