@@ -247,7 +247,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
 
         if (condition != null) {
             if (!condition.getName().equals("boolean")) {
-                addSemanticErrorReport(node, "IF condition must be of type boolean. Type given - " + condition.getName());
+                addSemanticErrorReport(node, "If condition must be of type boolean. Given type " + condition.getName());
             }
         }
 
@@ -258,7 +258,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         Type condition = visit(node.getChildren().get(0), type);
         if (condition != null) {
             if (!condition.getName().equals("boolean")) {
-                addSemanticErrorReport(node, "WHILE condition must be of type boolean. Type given - " + condition.getName());
+                addSemanticErrorReport(node, "WHILE condition must be of type boolean. Given type " + condition.getName());
             }
         }
 
@@ -279,7 +279,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
             addSemanticErrorReport(node, "Invalid return.");
         }
         if (retType != null && !(retType.getName().equals(ret.getName()) && retType.isArray() == ret.isArray())) {
-            addSemanticErrorReport(node, "Invalid return type. Expected type - " + retType.getName());
+            addSemanticErrorReport(node, "Invalid return type. Expected type " + ret.getName());
         }
         return ret;
     }

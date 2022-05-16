@@ -4,16 +4,13 @@ class BinOps {
     boolean countAllNights;
     int[] helloHistory;
 
-    public int getHelloComputation() {
+    public int getHelloComputation(int cof, int[] arr) {
         countAllNights = true;
         helloHistory = Nando.getHelloHistory(countAllNights);
+        Nando.getMad();
         helloHistory[0] = 0;
-        int helloSize;
-        int firstHello;
-        firstHello = helloHistory[0];
-        helloSize = helloHistory.length;
         int helloComputation;
-        helloComputation = firstHello + 2 * helloSize;
-        return helloComputation;
+        helloComputation = helloHistory[0] + 2 * helloHistory.length - 2 + arr[1] * cof;
+        return new Nando().sayHello(helloComputation);
     }
 }

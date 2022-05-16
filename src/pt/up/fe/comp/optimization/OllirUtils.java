@@ -25,6 +25,16 @@ public class OllirUtils {
         return getOllirType(symbol.getType());
     }
 
+    public static String getSafeVariableName(String variableName) {
+        final String[] reserved = {"ret", "putfield", "getstatic", "invokespecial", "invokestatic", "invokevirtual"};
+        for (var r : reserved) {
+            if (variableName.equals(r)){
+                return variableName + "_";
+            }
+        }
+        return variableName;
+    }
+
     public static String invoke(String invokeFunction, String className, String methodName, List<String> arguments, String ollirMethodType) {
         StringBuilder stringBuilder = new StringBuilder(invokeFunction + "(" + className + ", " + "\"" + methodName + "\"");
         if (!arguments.isEmpty()) {

@@ -100,6 +100,19 @@ public class JmmSymbolTable extends ReportCollectorTable implements SymbolTable 
         return method;
     }
 
+    public boolean isLocalVariableOrSymbol(JmmNode node, String name) {
+        var closestSymbol = getClosestSymbol(node, name);
+        if (closestSymbol.isEmpty()) {
+            return !this.importsTable.getImports().contains(name) && !name.equals("this");
+        }
+        for (Symbol symbol : classSignature.getFields()) {
+            if (symbol.getName().equals(name)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static String getMethodName(JmmNode method) {
         return method.getKind().equals("RegularMethod") ?
                 method.getChildren().get(1).get("name") : "main";

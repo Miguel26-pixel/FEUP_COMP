@@ -1,6 +1,8 @@
 package pt.up.fe.comp.optimization;
 
 import pt.up.fe.comp.jmm.analysis.table.Type;
+import pt.up.fe.comp.jmm.ast.JmmNode;
+import pt.up.fe.comp.semantic.tables.JmmSymbolTable;
 
 import static pt.up.fe.comp.optimization.OllirUtils.getOllirType;
 
@@ -29,6 +31,12 @@ public class SubstituteVariable {
         this.variableName = variableName;
     }
 
+    public void setVariableTypeIfNotPresent(Type variableType) {
+        if (this.variableType == null) {
+            this.variableType = variableType;
+        }
+    }
+
     public String getValue() {
         return variableValue != null ? variableValue : variableName;
     }
@@ -40,5 +48,11 @@ public class SubstituteVariable {
     public String getSubstitute() {
         String ollirType = variableType != null ? getOllirType(variableType) : "i32";
         return getValue() != null ? getValue() + "." + ollirType : getVariableName() + "." + ollirType;
+    }
+
+    public String getInvokeString(JmmNode node, JmmSymbolTable symbolTable) {
+        String invokeClass = getValue() != null ? getValue() : getVariableName();
+        return symbolTable.isLocalVariableOrSymbol(node, invokeClass)
+                ? invokeClass + "." + getOllirType(getVariableType()) : invokeClass;
     }
 }
