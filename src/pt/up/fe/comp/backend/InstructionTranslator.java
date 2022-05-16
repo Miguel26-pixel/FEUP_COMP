@@ -10,7 +10,7 @@ public class InstructionTranslator {
             case CALL:
                 return translateInstruction((CallInstruction) instruction, ancestorMethod, indentationLevel);
             case RETURN:
-                return translateInstruction((ReturnInstruction) instruction, indentationLevel);
+                return translateInstruction((ReturnInstruction) instruction, ancestorMethod, indentationLevel);
             case PUTFIELD:
                 return translateInstruction((PutFieldInstruction) instruction, ancestorMethod, indentationLevel);
             case GETFIELD:
@@ -269,20 +269,28 @@ public class InstructionTranslator {
         return "";
     }
 
-    public String translateInstruction(ReturnInstruction instruction, int indentationLevel) {
-        StringBuilder jasminInstruction = new StringBuilder(getIndentation(indentationLevel));
-        switch (instruction.getOperand().getType().getTypeOfElement()) {
+    public String translateInstruction(ReturnInstruction instruction, Method ancestorMethod, int indentationLevel) {
+        StringBuilder jasminInstruction = new StringBuilder();
+        ElementType returnType = instruction.getOperand().getType().getTypeOfElement();
+
+        switch (returnType) {
             case BOOLEAN:
             case INT32:
-                jasminInstruction.append("ireturn");
-                break;
             case OBJECTREF:
             case CLASS:
             case STRING:
-                jasminInstruction.append("areturn");
+                jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(instruction.getOperand(), ancestorMethod)).append("\n");
+
+                jasminInstruction.append(getIndentation(indentationLevel));
+                if (returnType == ElementType.BOOLEAN || returnType == ElementType.INT32) {
+                    jasminInstruction.append("ireturn");
+                } else {
+                    jasminInstruction.append("areturn");
+                }
+
                 break;
             case VOID:
-                jasminInstruction.append("return");
+                jasminInstruction.append(getIndentation(indentationLevel)).append("return");
                 break;
         }
 
