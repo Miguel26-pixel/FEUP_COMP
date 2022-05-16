@@ -135,6 +135,10 @@ public class InstructionTranslator {
         switch (callType) {
             case invokestatic:
             case invokevirtual:
+                if (callType == CallType.invokevirtual) {
+                    jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(caller, ancestorMethod)).append("\n");
+                }
+
                 for (Element element: instruction.getListOfOperands()) {
                     jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
                     parametersDescriptor.append(JasminUtils.translateType(ancestorMethod.getOllirClass(), element.getType()));
@@ -175,8 +179,14 @@ public class InstructionTranslator {
 
                 jasminInstruction.append("invokespecial ");
 
-                ClassType classType = (ClassType) instruction.getFirstArg().getType();
-                jasminInstruction.append(JasminUtils.getFullClassName(ancestorMethod.getOllirClass(), classType.getName()));
+                if (ancestorMethod.isConstructMethod()) {
+                    if (caller.getName().equals("this")) {
+                        jasminInstruction.append(ancestorMethod.getOllirClass().getSuperClass());
+                    }
+                } else {
+                    ClassType classType = (ClassType) instruction.getFirstArg().getType();
+                    jasminInstruction.append(JasminUtils.getFullClassName(ancestorMethod.getOllirClass(), classType.getName()));
+                }
 
 
                 jasminInstruction.append(".").append(JasminUtils.trimLiteral(methodName.getLiteral()));

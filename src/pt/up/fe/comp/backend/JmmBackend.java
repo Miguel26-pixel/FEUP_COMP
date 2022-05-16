@@ -52,7 +52,10 @@ public class JmmBackend implements JasminBackend {
     }
 
     private String getSuperDirective(ClassUnit ollirClass) {
-        return ollirClass.getSuperClass() != null ? ".super " + ollirClass.getSuperClass() : ".super java/lang/Object";
+        if (ollirClass.getSuperClass() == null) {
+            ollirClass.setSuperClass("java/lang/Object");
+        }
+        return ".super " + ollirClass.getSuperClass();
     }
 
     private String getFieldDefinitions(ClassUnit ollirClass) {
