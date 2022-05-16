@@ -36,12 +36,31 @@ public class OllirUtils {
             parser.ClassUnit();
 
             // get Class instance representing the OLLIR file loaded
-            return parser.getMyClass();
+            var classUnit = parser.getMyClass();
 
+            // Automatically build var tables
+            classUnit.buildVarTables();
+
+            return classUnit;
             // TODO: Falta análise semântica no ollir, como forçar literais booleans a true/false,
             // toda semântica que lhes pedimos mais verificações de tipos e imports nas declaracoes
         } catch (ParseException e) {
+            // // Get cause
+            // // Throwable currentException = e;
+            // String causeMessage = e.getMessage();
+            // if (e.getCause() != null) {
+            // causeMessage = e.getCause().getMessage();
+            // }
+            // // while (currentException != null) {
+            // // causeMessage = currentException.getMessage();
+            // // currentException = currentException.getCause();
+            // // }
+            //
+            // throw new RuntimeException(
+            // "Error on line " + e.currentToken.beginLine + ": " + causeMessage, e);
+
             throw new RuntimeException("Exception while parsing OLLIR code:\n" + code, e);
+
         }
 
     }

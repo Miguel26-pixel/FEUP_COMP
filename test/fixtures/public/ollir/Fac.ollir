@@ -1,3 +1,5 @@
+import io;
+
 Fac {
 	.construct Fac().V {
 		invokespecial(this, "<init>").V;
@@ -15,10 +17,10 @@ Fac {
 			ret.i32 num_aux.i32;
 	}
 	
-	.method public static main(args.array.String).V {
+	.method public static main(args.array.Fac, c1.Fac).V {
 		aux1.Fac :=.Fac new(Fac).Fac;
 		invokespecial(aux1.Fac,"<init>").V;
 		aux2.i32 :=.i32 invokevirtual(aux1.Fac,"compFac",10.i32).i32;
-		invokestatic(io, "println", aux2.i3).V;
+		invokestatic(io, "println", aux2.i32).V;
 	}
 }
