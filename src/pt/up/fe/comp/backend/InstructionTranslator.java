@@ -67,8 +67,6 @@ public class InstructionTranslator {
 
         StringBuilder jasminInstruction = new StringBuilder();
 
-        instruction.show();
-
         if (destinationObject.getType().getTypeOfElement() == ElementType.OBJECTREF || destinationObject.getType().getTypeOfElement() == ElementType.THIS) {
             jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(destinationObject, ancestorMethod)).append("\n");
             jasminInstruction.append(getIndentation(indentationLevel)).append("getfield ");
