@@ -177,6 +177,7 @@ public class InstructionTranslator {
         Element second = instruction.getRightOperand();
         Operation operation = instruction.getOperation();
         OperationType operationType = operation.getOpType();
+        StringBuilder jasminInstruction = new StringBuilder();
 
         switch (operationType) {
             case ADD:
@@ -187,6 +188,7 @@ public class InstructionTranslator {
             case MULI32:
             case DIV:
             case DIVI32:
+            case LTH:
                 if (first.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement() || second.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement()) {
                     return "UNMATCHING TYPES";
                 }
@@ -194,8 +196,6 @@ public class InstructionTranslator {
                 if (operation.getTypeInfo().getTypeOfElement() != ElementType.INT32) {
                     return "INCORRECT TYPE";
                 }
-
-                StringBuilder jasminInstruction = new StringBuilder();
 
                 jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
                 jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(second, ancestorMethod)).append("\n");
@@ -207,8 +207,31 @@ public class InstructionTranslator {
                     jasminInstruction.append("isub");
                 } else if (operationType == OperationType.MUL || operationType == OperationType.MULI32) {
                     jasminInstruction.append("imul");
-                } else {
+                } else if (operationType == OperationType.DIV || operationType == OperationType.DIVI32){
                     jasminInstruction.append("idiv");
+                } else {
+                    jasminInstruction.append("if_cmplt");
+                }
+
+                return jasminInstruction.toString();
+            case AND:
+            case OR:
+                if (first.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement() || second.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement()) {
+                    return "UNMATCHING TYPES";
+                }
+
+                if (operation.getTypeInfo().getTypeOfElement() != ElementType.BOOLEAN) {
+                    return "INCORRECT TYPE";
+                }
+
+                jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
+                jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(second, ancestorMethod)).append("\n");
+                jasminInstruction.append(getIndentation(indentationLevel));
+
+                if (operationType == OperationType.AND) {
+                    jasminInstruction.append("iand");
+                } else {
+                    jasminInstruction.append("ior");
                 }
 
                 return jasminInstruction.toString();
