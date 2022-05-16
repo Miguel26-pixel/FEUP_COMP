@@ -18,9 +18,17 @@ public class MethodDefinitionGenerator {
 
         method.buildVarTable();
         InstructionTranslator instructionTranslator = new InstructionTranslator();
+        boolean hasReturn = false;
 
         for (Instruction instruction: method.getInstructions()) {
+            if (!hasReturn && instruction.getInstType() == InstructionType.RETURN) {
+                hasReturn = true;
+            }
             methodDefinition.append(instructionTranslator.translateInstruction(instruction, method, 1)).append("\n");
+        }
+
+        if (!hasReturn) {
+            methodDefinition.append("\t").append("return").append("\n");
         }
 
         methodDefinition.append(".end method\n");

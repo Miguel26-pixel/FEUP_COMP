@@ -140,11 +140,10 @@ public class InstructionTranslator {
                 jasminInstruction.append("(").append(parametersDescriptor);
 
 
-                jasminInstruction.append(")").append(JasminUtils.translateType(ancestorMethod.getOllirClass(), instruction.getReturnType())).append("\n");
-                jasminInstruction.append(getIndentation(indentationLevel));
+                jasminInstruction.append(")").append(JasminUtils.translateType(ancestorMethod.getOllirClass(), instruction.getReturnType()));
 
                 if (!ancestorMethod.isConstructMethod()) {
-                    jasminInstruction.append(getCorrespondingStore(instruction.getFirstArg(), ancestorMethod));
+                    jasminInstruction.append("\n").append(getIndentation(indentationLevel)).append(getCorrespondingStore(instruction.getFirstArg(), ancestorMethod));
                 }
                 break;
             case NEW:
