@@ -47,7 +47,7 @@ public class OllirUtils {
     }
 
     public static String arrayLength(String variableName, String elementOllirType) {
-        return "arraylength(" + variableName + ".array." + elementOllirType + ")." + elementOllirType;
+        return "arraylength(" + variableName + ".array." + elementOllirType + ").i32";
     }
 
 }

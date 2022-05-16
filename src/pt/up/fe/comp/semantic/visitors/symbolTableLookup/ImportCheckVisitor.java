@@ -34,7 +34,7 @@ public class ImportCheckVisitor extends ReportCollectorJmmNodeVisitor<Type, Type
                     return new Type(classImported, false);
                 }
             }
-            addSemanticErrorReport(node, "Class " + className + " does not exists");
+            addSemanticErrorReport(node, "Class " + className + " does not exist");
         }
         return new Type("", false);
     }

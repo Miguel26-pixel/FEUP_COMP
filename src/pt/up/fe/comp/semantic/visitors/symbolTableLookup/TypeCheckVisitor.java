@@ -313,7 +313,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
                 !type.getName().equals(symbolTable.getClassName()) &&
                 !type.getName().equals(symbolTable.getSuper()) &&
                 !isImported(type)) {
-            addSemanticErrorReport(node, "Class " + type.getName() + " does not exists");
+            addSemanticErrorReport(node, "Class " + type.getName() + " does not exist");
         }
         return new Type("", false);
     }
