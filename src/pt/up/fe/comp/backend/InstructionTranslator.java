@@ -29,14 +29,28 @@ public class InstructionTranslator {
     }
 
     public String translateInstruction(UnaryOpInstruction instruction, Method ancestorMethod, int indentationLevel) {
-        OperationType operationType = instruction.getOperation().getOpType();
+        Operation operation = instruction.getOperation();
+        OperationType operationType = operation.getOpType();
+        Element first = instruction.getOperand();
 
-        if (operationType == OperationType.NOT) {
-            return "";
-        } else if (operationType == OperationType.NOTB) {
-            return "";
+        if (operationType == OperationType.NOT || operationType == OperationType.NOTB) {
+            StringBuilder jasminInstruction = new StringBuilder();
+
+            if (first.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement()) {
+                return "UNMATCHING TYPES";
+            }
+
+            if (operation.getTypeInfo().getTypeOfElement() != ElementType.BOOLEAN) {
+                return "INCORRECT TYPE";
+            }
+
+            jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
+            jasminInstruction.append(getIndentation(indentationLevel)).append("ineg");
+
+            return jasminInstruction.toString();
         }
-        return "";
+
+        return "UNSUPPORTED UNARY OPERATION";
     }
 
     public String translateInstruction(SingleOpInstruction instruction, Method ancestorMethod, int indentationLevel) {
