@@ -5,34 +5,16 @@ import org.specs.comp.ollir.*;
 public class MethodDefinitionGenerator {
     private Method method;
 
-    public String getConstructorDefinition(String superName) {
-        StringBuilder constructorDefinition = new StringBuilder(".method ");
-
-        if (method.getMethodAccessModifier().toString().equals("DEFAULT")) {
-            constructorDefinition.append("public ");
-        } else {
-            constructorDefinition.append(method.getMethodAccessModifier().toString().toLowerCase()).append(" ");
-        }
-
-        constructorDefinition.append("<init>()V\n");
-
-        constructorDefinition.append("\taload_0\n");
-
-        if (superName == null) {
-            superName = "java/lang/Object";
-        }
-
-        constructorDefinition.append("\tinvokenonvirtual ").append(superName).append("/<init>()V\n");
-        constructorDefinition.append("\treturn\n");
-        constructorDefinition.append(".end method\n");
-
-        return constructorDefinition.toString();
-    }
-
     public String getMethodDefinition() {
         StringBuilder methodDefinition = new StringBuilder();
 
-        methodDefinition.append(getMethodHeader()).append("\n");
+        if (method.isConstructMethod()) {
+            method.setMethodName("<init>");
+        }
+
+        methodDefinition.append(getMethodHeader());
+
+        methodDefinition.append("\n");
 
         method.buildVarTable();
         InstructionTranslator instructionTranslator = new InstructionTranslator();
