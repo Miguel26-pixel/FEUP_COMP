@@ -41,17 +41,17 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         for (var child : node.getChildren()) {
             visit(child, dummy);
         }
-        return null;
+        return new Type("", false);
     }
 
-    public Type visitIntLiteral(JmmNode node, Type dummy) { return new Type("int",false); }
+    private Type visitIntLiteral(JmmNode node, Type dummy) { return new Type("int",false); }
 
-    public Type visitBooleanLiteral(JmmNode node, Type dummy) { return new Type("boolean",false); }
+    private Type visitBooleanLiteral(JmmNode node, Type dummy) { return new Type("boolean",false); }
 
-    public Type visitThisLiteral(JmmNode node, Type type) { return new Type(symbolTable.getClassName(), false); }
+    private Type visitThisLiteral(JmmNode node, Type type) { return new Type(symbolTable.getClassName(), false); }
 
-    public Type visitIdentifier(JmmNode node, Type dummy) {
-        if (node.getAncestor("MethodBody").isEmpty() && node.getAncestor("Return").isEmpty()) { return null; }
+    private Type visitIdentifier(JmmNode node, Type dummy) {
+        if (node.getAncestor("MethodBody").isEmpty() && node.getAncestor("Return").isEmpty()) { return new Type("", false); }
 
         if (node.getJmmParent().getKind().equals("MethodCall")) {
             var ownClassMethodCall = MethodCallVisitor.isThisMethodCall(node.getJmmParent(), symbolTable);
@@ -63,20 +63,21 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
                     }
                 }
             } else if (ownClassMethodCall && symbolTable.getSuper() != null) {
-                return new Type("extern",false);
+                return null;
             } else if (!ownClassMethodCall) {
-                return new Type("extern",false);
+                return null;
             }
         } else {
             Optional<Symbol> child = symbolTable.getClosestSymbol(node, node.get("name"));
             if (child.isPresent()) {
                 return child.get().getType();
             }
-
-            for (var imp: symbolTable.getImports()) {
-                String classImported = imp.substring(imp.lastIndexOf('.') + 1);
-                if (classImported.equals(node.get("name"))) {
-                    return new Type(classImported, false);
+            if (node.getAncestor("CompoundExpression").isPresent()) {
+                for (var imp : symbolTable.getImports()) {
+                    String classImported = imp.substring(imp.lastIndexOf('.') + 1);
+                    if (classImported.equals(node.get("name"))) {
+                        return new Type(classImported, false);
+                    }
                 }
             }
         }
@@ -85,14 +86,14 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         return new Type("", false);
     }
 
-    public Type visitUnaryOp(JmmNode node, Type dummy) {
+    private Type visitUnaryOp(JmmNode node, Type dummy) {
         Type childType = visit(node.getChildren().get(0), dummy);
 
-        if ((childType.getName().equals("boolean") && !childType.isArray()) || childType.getName().equals("extern")) {
+        if (childType == null || (childType.getName().equals("boolean") && !childType.isArray())) {
             return childType;
         }
 
-        addSemanticErrorReport(node, "Incompatible types. Not operation expects a boolean");
+        addSemanticErrorReport(node, "Incompatible types. Operation Not (!) expects a boolean");
         return new Type("", false);
     }
 
@@ -110,93 +111,94 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         return false;
     }
 
-    public Type visitBinOp(JmmNode node, Type dummy) {
+    private Type visitBinOp(JmmNode node, Type dummy) {
         Type firstChildType = visit(node.getChildren().get(0), dummy);
         Type secondChildType = visit(node.getChildren().get(1), dummy);
 
         switch (node.get("op")) {
             case "assign":
-                if (((!firstChildType.getName().equals(secondChildType.getName()) && !isExtending(firstChildType,secondChildType)) ||
+                if (secondChildType != null &&
+                        ((!firstChildType.getName().equals(secondChildType.getName()) && !isExtending(firstChildType,secondChildType)) ||
                         firstChildType.isArray() != secondChildType.isArray()) &&
-                        !(firstChildType.getName().equals("extern") || secondChildType.getName().equals("extern")) &&
                         !(isImported(firstChildType) && isImported(secondChildType))) {
-                    addSemanticErrorReport(node,"olaType of the assignee must be compatible with the assigned");
+                    addSemanticErrorReport(node,"Type of the assignee must be compatible with the assigned. Assign given - " +
+                            firstChildType.getName() + " = " + secondChildType.getName());
                 }
                 return new Type("", false);
 
             case "and": case "or":
-                if ((!firstChildType.getName().equals("extern") &&
+                if ((firstChildType != null &&
                         (!firstChildType.getName().equals("boolean") || firstChildType.isArray())) ||
-                    (!secondChildType.getName().equals("extern") &&
+                    (secondChildType != null &&
                         (!secondChildType.getName().equals("boolean") || secondChildType.isArray()))) {
-                    addSemanticErrorReport(node,"Types are not compatible with the operation");
-                }
-                return new Type("boolean", false);
-
-            case "lt":
-                if ((!firstChildType.getName().equals("extern") &&
-                        (!firstChildType.getName().equals("int") || firstChildType.isArray())) ||
-                    (!secondChildType.getName().equals("extern") &&
-                        (!secondChildType.getName().equals("int") || secondChildType.isArray()))) {
-                    addSemanticErrorReport(node,"Types are not compatible with the operation");
+                    addSemanticErrorReport(node,"Types are not compatible with the operation. Expected two operands of the type boolean. Types given - " +
+                            ((firstChildType == null) ? "null" : firstChildType.getName()) + " , " +
+                            ((secondChildType == null) ? "null" : secondChildType.getName()));
                 }
                 return new Type("boolean", false);
 
             default:
-                if ((!firstChildType.getName().equals("extern") &&
+                if ((firstChildType != null &&
                         (!firstChildType.getName().equals("int") || firstChildType.isArray())) ||
-                    (!secondChildType.getName().equals("extern") &&
+                    (secondChildType != null &&
                         (!secondChildType.getName().equals("int") || secondChildType.isArray()))) {
-                    addSemanticErrorReport(node,"Types are not compatible with the operation");
+                    addSemanticErrorReport(node,"Types are not compatible with the operation. Expected two operands of the type int. Types given - " +
+                            ((firstChildType == null) ? "null" : firstChildType.getName()) + " , " +
+                            ((secondChildType == null) ? "null" : secondChildType.getName()));
+                }
+                if (node.get("op").equals("lt")) {
+                    return new Type("boolean", false);
                 }
                 return new Type("int", false);
         }
     }
 
-    public Type visitArrayElement(JmmNode node, Type dummy) {
+    private Type visitArrayElement(JmmNode node, Type dummy) {
         Type firstChildType = visit(node.getChildren().get(0), dummy);
         Type secondChildType = visit(node.getChildren().get(1), dummy);
 
-        if (!secondChildType.getName().equals("int")) {
-            addSemanticErrorReport(node, "Array access index must be an expression of type integer");
+        if (secondChildType != null && !secondChildType.getName().equals("int")) {
+            addSemanticErrorReport(node, "Array access index must be an expression of type int. Type given - " + secondChildType.getName());
         }
+        if (firstChildType == null) { return null; }
         return new Type(firstChildType.getName(), false);
     }
 
-    public Type visitCompoundExpression(JmmNode node, Type dummy) {
+    private Type visitCompoundExpression(JmmNode node, Type dummy) {
         List<JmmNode> children = node.getChildren();
         Type type = dummy;
         for (JmmNode child : children) {
             type = visit(child, type);
-            if (type.getName().isEmpty()) { break; }
+            if (type != null && type.getName().isEmpty()) { break; }
         }
         return type;
     }
 
-    public Type visitIndexation(JmmNode node, Type type) {
+    private Type visitIndexation(JmmNode node, Type type) {
         boolean err = false;
         Type childType = visit(node.getChildren().get(0), type);
 
-        if (!type.getName().equals("extern")) {
+        if (type != null) {
             if (!type.isArray()) {
                 addSemanticErrorReport(node, "Array access is not done over an array");
                 err = true;
             }
-            if (!childType.getName().equals("int")) {
-                addSemanticErrorReport(node, "Array access index must be an expression of type integer");
+            if (childType != null && !childType.getName().equals("int")) {
+                addSemanticErrorReport(node, "Array access index must be an expression of type int. Type given - " + childType.getName());
                 err = true;
             }
             if (err) {
                 return new Type("", false);
             }
+        } else {
+            return null;
         }
-
-        return new Type(type.getName(),false); //only work for 1d array
+        return new Type(type.getName(),false);
     }
 
-    public Type visitMethodCall(JmmNode node, Type type) {
+    private Type visitMethodCall(JmmNode node, Type type) {
         Type childType = visit(node.getChildren().get(0), type);
-        if (!childType.getName().equals("extern")) {
+        if (childType != null) {
             List<JmmNode> children = node.getChildren();
             for (int i = 1 ; i < children.size(); i++) {
                 visit(children.get(i),type);
@@ -205,8 +207,8 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         return visit(node.getChildren().get(0), type);
     }
 
-    public Type visitAttributeGet(JmmNode node, Type type) {
-        if (type.getName().equals(symbolTable.getClassName())) {
+    private Type visitAttributeGet(JmmNode node, Type type) {
+        if (type != null && type.getName().equals(symbolTable.getClassName())) {
             for (var field : symbolTable.getFields()) {
                 if (field.getName().equals(node.getChildren().get(0).get("name"))) {
                     return field.getType();
@@ -216,54 +218,54 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
                 addSemanticErrorReport(node, "Attribute " + node.getChildren().get(0).get("name") +
                         " of class " + type.getName() + " does not exist");
             } else {
-                return new Type("extern", false);
+                return null;
             }
         } else {
-            return new Type("extern", false);
+            return null;
         }
         return new Type("", false);
     }
 
-    public Type visitNewArray(JmmNode node, Type type) {
+    private Type visitNewArray(JmmNode node, Type type) {
         Type childType = visit(node.getChildren().get(0), type);
 
-        if (!childType.getName().equals("extern")) {
+        if (childType != null) {
             if (!childType.getName().equals("int")) {
-                addSemanticErrorReport(node, "Array access index must be an expression of type integer");
+                addSemanticErrorReport(node, "Array access index must be an expression of type int. Type given - " + childType.getName());
             }
         }
 
         return new Type("int", true);
     }
 
-    public Type visitNewObject(JmmNode node, Type type) {
+    private Type visitNewObject(JmmNode node, Type type) {
         return new Type(node.get("class"), false);
     }
 
-    public Type visitIf(JmmNode node, Type type) {
+    private Type visitIf(JmmNode node, Type type) {
         Type condition = visit(node.getChildren().get(0), type);
 
-        if (!condition.getName().equals("extern")) {
+        if (condition != null) {
             if (!condition.getName().equals("boolean")) {
-                addSemanticErrorReport(node, "IF condition must be of type boolean");
+                addSemanticErrorReport(node, "IF condition must be of type boolean. Type given - " + condition.getName());
             }
         }
 
         return new Type("", false);
     }
 
-    public Type visitWhile(JmmNode node, Type type) {
+    private Type visitWhile(JmmNode node, Type type) {
         Type condition = visit(node.getChildren().get(0), type);
-        if (!condition.getName().equals("extern")) {
+        if (condition != null) {
             if (!condition.getName().equals("boolean")) {
-                addSemanticErrorReport(node, "WHILE condition must be of type boolean");
+                addSemanticErrorReport(node, "WHILE condition must be of type boolean. Type given - " + condition.getName());
             }
         }
 
         return new Type("", false);
     }
 
-    public Type visitReturn(JmmNode node, Type dummy) {
+    private Type visitReturn(JmmNode node, Type dummy) {
         Type retType = visit(node.getChildren().get(0),dummy);
         Optional<JmmNode> regularMethod = node.getAncestor("RegularMethod");
         Type ret = new Type("", false);
@@ -274,10 +276,10 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
                 }
             }
         } else {
-            addSemanticErrorReport(node, "Invalid return");
+            addSemanticErrorReport(node, "Invalid return.");
         }
-        if (!(retType.getName().equals(ret.getName()) && retType.isArray() == ret.isArray()) && !retType.getName().equals("extern")) {
-            addSemanticErrorReport(node, "Invalid return type");
+        if (retType != null && !(retType.getName().equals(ret.getName()) && retType.isArray() == ret.isArray())) {
+            addSemanticErrorReport(node, "Invalid return type. Expected type - " + retType.getName());
         }
         return ret;
     }
@@ -293,7 +295,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
                 for (int i = 0; i < args.size(); i++) {
                     Type paramType = params.get(i).getType();
                     Type argType = visit(args.get(i), dummy);
-                    if (!argType.getName().equals("extern") && !argType.getName().equals(paramType.getName())) {
+                    if (argType != null && !argType.getName().equals(paramType.getName())) {
                         addSemanticErrorReport(node, "Invalid Argument of type " + argType.getName() +
                                 ". Expected argument of type " + paramType.getName());
                     }

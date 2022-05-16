@@ -1,8 +1,7 @@
 import io;
-import foo.Bar;
-import comp.Table;
+import Quicksort;
 
-class SymbolTable extends Table {
+class SymbolTable extends Quicksort {
 
 	int intField;
 	boolean boolField;
@@ -10,13 +9,12 @@ class SymbolTable extends Table {
 	public int method1() {
 		int intLocal1;
 		boolean boolLocal1;
-		Bar barLocal1;
 
 		return 0;
 	}
 	
-	public Bar method2(int intParam1, boolean boolParam1, Bar barParam1) {
-		return barParam1;
+	public boolean method2(int intParam1, boolean boolParam1) {
+		return boolParam1;
 	}	
 
 

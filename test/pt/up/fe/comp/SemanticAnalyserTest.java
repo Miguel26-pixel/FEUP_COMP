@@ -182,5 +182,7 @@ public class SemanticAnalyserTest {
         TestUtils.mustFail(result.getReports());
         result = TestUtils.analyse("class dummy {public int foo(){ boolean b; int a; while (a * 2) { a = a + 1; } return 0; }}");
         TestUtils.mustFail(result.getReports());
+        result = TestUtils.analyse("import Some; class dummy { public int foo(){ Some = new Some(); return 0; } }");
+        TestUtils.mustFail(result.getReports());
     }
 }
