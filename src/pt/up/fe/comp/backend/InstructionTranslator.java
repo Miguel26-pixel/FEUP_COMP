@@ -116,6 +116,12 @@ public class InstructionTranslator {
                 jasminInstruction.append(")").append(JasminUtils.translateType(ancestorMethod.getOllirClass(), instruction.getReturnType()));
                 break;
             case invokespecial:
+                if (ancestorMethod.isConstructMethod()) {
+                    if (caller.getName().equals("this")) {
+                        jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(caller, ancestorMethod)).append("\n");
+                    }
+                }
+
                 for (Element element: instruction.getListOfOperands()) {
                     jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
                     parametersDescriptor.append(JasminUtils.translateType(ancestorMethod.getOllirClass(), element.getType()));
@@ -135,7 +141,11 @@ public class InstructionTranslator {
 
 
                 jasminInstruction.append(")").append(JasminUtils.translateType(ancestorMethod.getOllirClass(), instruction.getReturnType())).append("\n");
-                jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingStore(instruction.getFirstArg(), ancestorMethod));
+                jasminInstruction.append(getIndentation(indentationLevel));
+
+                if (!ancestorMethod.isConstructMethod()) {
+                    jasminInstruction.append(getCorrespondingStore(instruction.getFirstArg(), ancestorMethod));
+                }
                 break;
             case NEW:
                 ElementType elementType = caller.getType().getTypeOfElement();
