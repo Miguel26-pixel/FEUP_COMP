@@ -72,6 +72,12 @@ public class InstructionTranslator {
 
         Instruction rhs = instruction.getRhs();
 
+        if (rhs.getInstType() == InstructionType.CALL) {
+            if (((CallInstruction) rhs).getInvocationType() == CallType.NEW) {
+                return translateInstruction(rhs, ancestorMethod, indentationLevel);
+            }
+        }
+
         return translateInstruction(rhs, ancestorMethod, indentationLevel) + "\n" + getIndentation(indentationLevel) + getCorrespondingStore(destination, ancestorMethod);
     }
 
@@ -86,8 +92,6 @@ public class InstructionTranslator {
         switch (callType) {
             case invokestatic:
             case invokevirtual:
-            case invokespecial:
-
                 for (Element element: instruction.getListOfOperands()) {
                     jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
                     parametersDescriptor.append(JasminUtils.translateType(ancestorMethod.getOllirClass(), element.getType()));
@@ -98,11 +102,7 @@ public class InstructionTranslator {
                 if (callType == CallType.invokestatic) {
                     jasminInstruction.append("invokestatic ").append(caller.getName());
                 } else {
-                    if (callType == CallType.invokevirtual){
-                        jasminInstruction.append("invokevirtual ");
-                    } else {
-                        jasminInstruction.append("invokespecial ");
-                    }
+                    jasminInstruction.append("invokevirtual ");
 
                     ClassType classType = (ClassType) instruction.getFirstArg().getType();
                     jasminInstruction.append(JasminUtils.getFullClassName(ancestorMethod.getOllirClass(), classType.getName()));
@@ -115,7 +115,34 @@ public class InstructionTranslator {
 
                 jasminInstruction.append(")").append(JasminUtils.translateType(ancestorMethod.getOllirClass(), instruction.getReturnType()));
                 break;
+            case invokespecial:
+                for (Element element: instruction.getListOfOperands()) {
+                    jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
+                    parametersDescriptor.append(JasminUtils.translateType(ancestorMethod.getOllirClass(), element.getType()));
+                }
+
+                jasminInstruction.append(getIndentation(indentationLevel));
+
+
+                jasminInstruction.append("invokespecial ");
+
+                ClassType classType = (ClassType) instruction.getFirstArg().getType();
+                jasminInstruction.append(JasminUtils.getFullClassName(ancestorMethod.getOllirClass(), classType.getName()));
+
+
+                jasminInstruction.append(".").append(JasminUtils.trimLiteral(methodName.getLiteral()));
+                jasminInstruction.append("(").append(parametersDescriptor);
+
+
+                jasminInstruction.append(")").append(JasminUtils.translateType(ancestorMethod.getOllirClass(), instruction.getReturnType())).append("\n");
+                jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingStore(instruction.getFirstArg(), ancestorMethod));
+                break;
             case NEW:
+                ElementType elementType = caller.getType().getTypeOfElement();
+                if (elementType == ElementType.OBJECTREF || elementType == ElementType.CLASS) {
+                    jasminInstruction.append(getIndentation(indentationLevel)).append("new ").append(caller.getName()).append("\n");
+                    jasminInstruction.append(getIndentation(indentationLevel)).append("dup");
+                }
                 break;
             case arraylength:
                 break;
