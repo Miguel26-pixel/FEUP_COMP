@@ -197,12 +197,9 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
     }
 
     private Type visitMethodCall(JmmNode node, Type type) {
-        Type childType = visit(node.getChildren().get(0), type);
-        if (childType != null) {
-            List<JmmNode> children = node.getChildren();
-            for (int i = 1 ; i < children.size(); i++) {
-                visit(children.get(i),type);
-            }
+        List<JmmNode> children = node.getChildren();
+        for (int i = 1 ; i < children.size(); i++) {
+            visit(children.get(i),type);
         }
         return visit(node.getChildren().get(0), type);
     }
@@ -247,7 +244,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
 
         if (condition != null) {
             if (!condition.getName().equals("boolean")) {
-                addSemanticErrorReport(node, "IF condition must be of type boolean. Type given - " + condition.getName());
+                addSemanticErrorReport(node, "If condition must be of type boolean. Given type " + condition.getName());
             }
         }
 
@@ -258,7 +255,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         Type condition = visit(node.getChildren().get(0), type);
         if (condition != null) {
             if (!condition.getName().equals("boolean")) {
-                addSemanticErrorReport(node, "WHILE condition must be of type boolean. Type given - " + condition.getName());
+                addSemanticErrorReport(node, "WHILE condition must be of type boolean. Given type " + condition.getName());
             }
         }
 
@@ -279,7 +276,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
             addSemanticErrorReport(node, "Invalid return.");
         }
         if (retType != null && !(retType.getName().equals(ret.getName()) && retType.isArray() == ret.isArray())) {
-            addSemanticErrorReport(node, "Invalid return type. Expected type - " + retType.getName());
+            addSemanticErrorReport(node, "Invalid return type. Expected type " + ret.getName());
         }
         return ret;
     }
@@ -288,10 +285,12 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         Optional<JmmNode> methodCall = node.getAncestor("MethodCall");
         List<JmmNode> args = node.getChildren();
         if (methodCall.isPresent()) {
+            Type targetType = visit(methodCall.get().getChildren().get(0));
+            boolean externTarget = targetType == null;
             List<Symbol> params = symbolTable.getParameters(methodCall.get().getChildren().get(0).get("name"));
-            if (params.size() != args.size()) {
+            if (!externTarget && params.size() != args.size()) {
                 addSemanticErrorReport(node, "Invalid number of arguments");
-            } else {
+            } else if (!externTarget){
                 for (int i = 0; i < args.size(); i++) {
                     Type paramType = params.get(i).getType();
                     Type argType = visit(args.get(i), dummy);
@@ -299,6 +298,10 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
                         addSemanticErrorReport(node, "Invalid Argument of type " + argType.getName() +
                                 ". Expected argument of type " + paramType.getName());
                     }
+                }
+            } else {
+                for (JmmNode arg : args) {
+                    visit(arg, dummy);
                 }
             }
         } else {
@@ -313,7 +316,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
                 !type.getName().equals(symbolTable.getClassName()) &&
                 !type.getName().equals(symbolTable.getSuper()) &&
                 !isImported(type)) {
-            addSemanticErrorReport(node, "Class " + type.getName() + " does not exists");
+            addSemanticErrorReport(node, "Class " + type.getName() + " does not exist");
         }
         return new Type("", false);
     }

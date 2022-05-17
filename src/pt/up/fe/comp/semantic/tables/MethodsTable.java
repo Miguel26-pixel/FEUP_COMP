@@ -34,7 +34,7 @@ public class MethodsTable extends ReportCollectorTable {
         if (methodSignatures.containsKey(methodSignature)) {
             return methodSignatures.get(methodSignature).getReturnType();
         }
-        return new Type("NULL", false);
+        return null;
     }
 
     public List<Symbol> getParameters(String methodName) {

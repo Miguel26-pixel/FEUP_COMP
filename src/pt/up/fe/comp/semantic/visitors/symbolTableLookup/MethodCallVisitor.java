@@ -29,7 +29,8 @@ public class MethodCallVisitor extends SemanticJmmNodeVisitor {
         }
         JmmNode child = compoundExpression.get().getChildren().get(0);
         if (child.getKind().equals("ThisLiteral")) { return true; }
-        Optional<Symbol> closest = symbolTable.getClosestSymbol(child, child.get("name"));
+        Optional<Symbol> closest = symbolTable.getClosestSymbol(child,
+                child.getOptional("name").isPresent() ? child.get("name") : child.get("class"));
         return closest.map(symbol -> symbol.getType().getName().equals(symbolTable.getClassName())).orElse(false);
     }
 }

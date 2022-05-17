@@ -1,0 +1,9 @@
+class ExpressionTester {
+    public two(){
+        return 2;
+    }
+    public static void main(String[] args){
+        int a;
+        a = this.two() + 3;
+    }
+}
