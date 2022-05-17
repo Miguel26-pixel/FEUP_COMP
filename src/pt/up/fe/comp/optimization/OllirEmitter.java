@@ -7,6 +7,7 @@ import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.semantic.tables.JmmSymbolTable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -376,18 +377,9 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         // Write method call
         startNewLine();
         String methodName = node.getJmmChild(0).get("name");
-        Type methodType = new Type("void", false);
-        if (symbolTable.getReturnType(methodName) != null) {
-            methodType = symbolTable.getReturnType(methodName);
-        } else {
-            if (node.getJmmParent().getChildren().stream().anyMatch(c -> c.getKind().equals("Indexation"))) {
-                methodType = new Type("int", true);
-            } else if (node.getAncestor("BinOp").isPresent()
-                    && node.getAncestor("BinOp").get().get("op").equals("assign")) {
-                if (accessedVariable.getVariableType() != null) {
-                    methodType = accessedVariable.getVariableType();
-                }
-            }
+        Type methodType = symbolTable.getReturnType(methodName);
+        if (methodType == null) {
+            methodType = accessedVariable.getVariableType();
         }
         String ollirMethodType = getOllirType(methodType);
         SubstituteVariable methodCallHolder = createTemporaryVariable(node);
