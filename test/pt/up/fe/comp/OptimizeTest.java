@@ -17,9 +17,27 @@ import pt.up.fe.specs.util.SpecsIo;
 
 public class OptimizeTest {
 
+    private void testOptimize(String resourcePath) {
+        var result = TestUtils.optimize(SpecsIo.getResource(resourcePath));
+        System.out.println(result.getOllirCode());
+        TestUtils.noErrors(result.getReports());
+    }
+
+    @Test
+    public void testBinOps(){testOptimize("fixtures/public/BinOps.jmm");}
+
     @Test
     public void testHelloWorld() {
-        var result = TestUtils.optimize(SpecsIo.getResource("fixtures/public/HelloWorld.jmm"));
-        TestUtils.noErrors(result.getReports());
+        testOptimize("fixtures/public/HelloWorld.jmm");
+    }
+
+    @Test
+    public void testFac() {
+        testOptimize("fixtures/public/Fac.jmm");
+    }
+
+    @Test
+    public void testFindMaximum() {
+        testOptimize("fixtures/public/FindMaximum.jmm");
     }
 }
