@@ -70,11 +70,14 @@ public class InstructionTranslator {
         if (destinationObject.getType().getTypeOfElement() == ElementType.OBJECTREF || destinationObject.getType().getTypeOfElement() == ElementType.THIS) {
             jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(destinationObject, ancestorMethod)).append("\n");
             jasminInstruction.append(getIndentation(indentationLevel)).append("getfield ");
-        } else {
+        } else if (destinationObject.getType().getTypeOfElement() == ElementType.CLASS) {
             jasminInstruction.append(getIndentation(indentationLevel)).append("getstatic ");
         }
 
-        jasminInstruction.append(JasminUtils.translateType(ancestorMethod.getOllirClass(), destinationField.getType())).append(" ").append(((Operand) destinationField).getName());
+        ClassType classType = (ClassType) destinationObject.getType();
+
+        jasminInstruction.append(classType.getName()).append("/").append(((Operand) destinationField).getName());
+        jasminInstruction.append(" ").append(JasminUtils.translateType(ancestorMethod.getOllirClass(), destinationField.getType()));
 
         return jasminInstruction.toString();
     }
@@ -91,14 +94,15 @@ public class InstructionTranslator {
         Element newFieldValue = instruction.getThirdOperand();
 
         if (destinationObject.getType().getTypeOfElement() == ElementType.OBJECTREF || destinationObject.getType().getTypeOfElement() == ElementType.THIS) {
+            jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(destinationObject, ancestorMethod)).append("\n");
             jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(newFieldValue, ancestorMethod)).append("\n");
             jasminInstruction.append(getIndentation(indentationLevel)).append("putfield ");
         } else {
             jasminInstruction.append(getIndentation(indentationLevel)).append("putstatic ");
         }
+        ClassType classType = (ClassType) destinationObject.getType();
 
-
-        jasminInstruction.append(((Operand) destinationObject).getName()).append("/").append(((Operand) destinationField).getName());
+        jasminInstruction.append(classType.getName()).append("/").append(((Operand) destinationField).getName());
         jasminInstruction.append(" ").append(JasminUtils.translateType(ancestorMethod.getOllirClass(), destinationField.getType()));
 
         return jasminInstruction.toString();
