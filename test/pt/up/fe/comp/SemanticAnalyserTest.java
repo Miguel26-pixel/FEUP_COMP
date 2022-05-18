@@ -118,6 +118,7 @@ public class SemanticAnalyserTest {
     public void testSimpleTypeCheckCorrect() {
         JmmSemanticsResult result = TestUtils.analyse("class dummy {boolean a; public int foo(){ !a; return 0; }}");
         TestUtils.noErrors(result.getReports());
+
         result = TestUtils.analyse("class dummy {boolean a; public int foo(){ a = false; !a; return 0; }}");
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("class dummy {int a; public int foo(){ a = 2; return 0; }}");
@@ -160,6 +161,7 @@ public class SemanticAnalyserTest {
     public void testSimpleTypeCheckError() {
         JmmSemanticsResult result = TestUtils.analyse("class dummy {int a; public int foo(){ !a; return 0; }}"); //this.foo()[1];
         TestUtils.mustFail(result.getReports());
+
         result = TestUtils.analyse("class dummy {boolean a; public int foo(){ a = 2; !a; return 0; }}");
         TestUtils.mustFail(result.getReports());
         result = TestUtils.analyse("class dummy {int a; public int foo(){ a = true; return 0; }}");

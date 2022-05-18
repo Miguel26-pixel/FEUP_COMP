@@ -54,6 +54,7 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
         if (node.getAncestor("MethodBody").isEmpty() && node.getAncestor("Return").isEmpty()) { return new Type("", false); }
 
         if (node.getJmmParent().getKind().equals("MethodCall")) {
+
             var ownClassMethodCall = MethodCallVisitor.isThisMethodCall(node.getJmmParent(), symbolTable);
             if (ownClassMethodCall && symbolTable.getMethods().contains(node.get("name"))) {
                 List<String> methods = symbolTable.getMethods();

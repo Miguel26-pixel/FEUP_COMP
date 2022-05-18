@@ -5,8 +5,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Test;
+import pt.up.fe.comp.backend.JmmBackend;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
+import pt.up.fe.comp.jmm.jasmin.JasminResult;
+import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
+import pt.up.fe.comp.optimization.JmmOptimizer;
 import pt.up.fe.comp.parser.SimpleParser;
 import pt.up.fe.comp.semantic.JmmAnalyser;
 import pt.up.fe.specs.util.SpecsIo;
@@ -54,5 +59,19 @@ public class Launcher {
 
         // Check if there are semantic errors
         TestUtils.noErrors(analysisResult.getReports());
+
+        JmmOptimizer optimizer = new JmmOptimizer();
+
+        OllirResult ollirResult = optimizer.toOllir(analysisResult);
+
+        TestUtils.noErrors(ollirResult.getReports());
+
+        JmmBackend backend = new JmmBackend();
+
+        JasminResult jasminResult = backend.toJasmin(ollirResult);
+
+        TestUtils.noErrors(jasminResult.getReports());
+
+        File compilationResult = jasminResult.compile();
     }
 }
