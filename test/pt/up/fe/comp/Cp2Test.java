@@ -228,18 +228,6 @@ public class Cp2Test {
     }
 
     @Test
-    public void test_RemainingFiles() {
-        var result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cp2/OllirBasic.jmm"));
-        TestUtils.noErrors(result);
-        result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cp2/OllirArithmetic.jmm"));
-        TestUtils.noErrors(result);
-        result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cp2/OllirMethodInvocation.jmm"));
-        TestUtils.noErrors(result);
-        result = TestUtils.analyse(SpecsIo.getResource("fixtures/public/cp2/OllirAssignment.jmm"));
-        TestUtils.noErrors(result);
-    }
-
-    @Test
     public void test_2_01_CompileBasic() {
         testJmmCompilation("fixtures/public/cp2/CompileBasic.jmm", this::ollirTest_2_01_CompileBasic);
     }
@@ -332,8 +320,11 @@ public class Cp2Test {
         assertNotNull("Could not find method " + methodName, methodFoo);
 
         var binOpInst = methodFoo.getInstructions().stream()
-                .filter(inst -> inst instanceof BinaryOpInstruction)
+                .filter(inst -> inst instanceof AssignInstruction)
+                .map(instr -> (AssignInstruction)instr)
+                .filter(assign -> assign.getRhs() instanceof BinaryOpInstruction)
                 .findFirst();
+
         assertTrue("Could not find a binary op instruction in method " + methodName, binOpInst.isPresent());
 
         var retInst = methodFoo.getInstructions().stream()
@@ -388,4 +379,5 @@ public class Cp2Test {
         assertEquals("Assignment does not have the expected type", ElementType.INT32,
                 assignInst.get().getTypeOfAssign().getTypeOfElement());
     }
+
 }
