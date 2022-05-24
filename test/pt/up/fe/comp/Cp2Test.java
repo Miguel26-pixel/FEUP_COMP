@@ -89,6 +89,10 @@ public class Cp2Test {
         var result = TestUtils.optimize(SpecsIo.getResource(resource));
         var testName = new File(resource).getName();
         System.out.println(testName + ":\n" + result.getOllirCode());
+
+        if (ollirTester != null) {
+            ollirTester.accept(result.getOllirClass());
+        }
     }
 
     public static void testJmmCompilation(String resource) {
@@ -321,7 +325,7 @@ public class Cp2Test {
 
         var binOpInst = methodFoo.getInstructions().stream()
                 .filter(inst -> inst instanceof AssignInstruction)
-                .map(instr -> (AssignInstruction)instr)
+                .map(instr -> (AssignInstruction) instr)
                 .filter(assign -> assign.getRhs() instanceof BinaryOpInstruction)
                 .findFirst();
 
