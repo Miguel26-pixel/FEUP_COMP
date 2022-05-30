@@ -24,7 +24,9 @@ public class OptimizeTest {
     }
 
     @Test
-    public void testBinOps(){testOptimize("fixtures/public/BinOps.jmm");}
+    public void testBinOps() {
+        testOptimize("fixtures/public/BinOps.jmm");
+    }
 
     @Test
     public void testHelloWorld() {
@@ -39,5 +41,10 @@ public class OptimizeTest {
     @Test
     public void testFindMaximum() {
         testOptimize("fixtures/public/FindMaximum.jmm");
+    }
+
+    @Test
+    public void testQuickestSort() {
+        testOptimize("fixtures/public/QuickestSort.jmm");
     }
 }
