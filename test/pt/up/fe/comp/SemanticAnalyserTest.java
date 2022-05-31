@@ -11,6 +11,12 @@ public class SemanticAnalyserTest {
     }
 
     @Test
+    public void twoRegularMethods() {
+        JmmSemanticsResult result = TestUtils.analyse("class dummy {public int foo(int ola){return 0;} public int foo(int ola, int config){return 0;}}");
+        TestUtils.mustFail(result.getReports());
+    }
+
+    @Test
     public void testVariableExistenceCorrect() {
         JmmSemanticsResult result = TestUtils.analyse("class dummy {public int foo(int a){a = 0; return 0;}}");
         TestUtils.noErrors(result.getReports());
