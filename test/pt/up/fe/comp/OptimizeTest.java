@@ -24,27 +24,57 @@ public class OptimizeTest {
     }
 
     @Test
-    public void testBinOps() {
+    public void binOps() {
         testOptimize("fixtures/public/BinOps.jmm");
     }
 
     @Test
-    public void testHelloWorld() {
+    public void helloWorld() {
         testOptimize("fixtures/public/HelloWorld.jmm");
     }
 
     @Test
-    public void testFac() {
+    public void fac() {
         testOptimize("fixtures/public/Fac.jmm");
     }
 
     @Test
-    public void testFindMaximum() {
+    public void findMaximum() {
         testOptimize("fixtures/public/FindMaximum.jmm");
     }
 
     @Test
-    public void testQuickestSort() {
+    public void quickestSort() {
         testOptimize("fixtures/public/QuickestSort.jmm");
+    }
+
+    @Test
+    public void lazySort() {
+        testOptimize("fixtures/public/LazySort.jmm");
+    }
+
+    @Test
+    public void life() {
+        testOptimize("fixtures/public/Life.jmm");;
+    }
+
+    @Test
+    public void quickSort() {
+        testOptimize("fixtures/public/QuickSort.jmm");
+    }
+
+    @Test
+    public void simple() {
+        testOptimize("fixtures/public/Simple.jmm");
+    }
+
+    @Test
+    public void ticTacToe() {
+        testOptimize("fixtures/public/TicTacToe.jmm");
+    }
+
+    @Test
+    public void whileAndIf() {
+        testOptimize("fixtures/public/WhileAndIf.jmm");
     }
 }
