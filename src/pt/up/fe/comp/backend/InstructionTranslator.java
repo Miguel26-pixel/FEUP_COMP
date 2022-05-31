@@ -23,9 +23,35 @@ public class InstructionTranslator {
                 return translateInstruction((UnaryOpInstruction) instruction, ancestorMethod, indentationLevel);
             case NOPER:
                 return translateInstruction((SingleOpInstruction) instruction, ancestorMethod, indentationLevel);
+            case GOTO:
+                return translateInstruction((GotoInstruction) instruction, ancestorMethod, indentationLevel);
+            case BRANCH:
+                return translateInstruction((CondBranchInstruction) instruction, ancestorMethod, indentationLevel);
             default:
                 return "";
         }
+    }
+
+    public String translateInstruction(CondBranchInstruction instruction, Method ancestorMethod, int indentationLevel) {
+        try {
+            SingleOpCondInstruction singleOpCondInstruction = (SingleOpCondInstruction) instruction;
+            return translateInstruction(singleOpCondInstruction, ancestorMethod, indentationLevel);
+        } catch (ClassCastException e) {
+            OpCondInstruction opCondInstruction = (OpCondInstruction) instruction;
+            return translateInstruction(opCondInstruction, ancestorMethod, indentationLevel);
+        }
+    }
+
+    public String translateInstruction(SingleOpCondInstruction instruction, Method ancestorMethod, int indentationLevel) {
+        return "";
+    }
+
+    public String translateInstruction(OpCondInstruction instruction, Method ancestorMethod, int indentationLevel) {
+        return "";
+    }
+
+    public String translateInstruction(GotoInstruction instruction, Method ancestorMethod, int indentationLevel) {
+        return getIndentation(indentationLevel) + "goto " + instruction.getLabel();
     }
 
     public String translateInstruction(UnaryOpInstruction instruction, Method ancestorMethod, int indentationLevel) {
@@ -252,7 +278,7 @@ public class InstructionTranslator {
                 } else if (operationType == OperationType.DIV || operationType == OperationType.DIVI32){
                     jasminInstruction.append("idiv");
                 } else {
-                    jasminInstruction.append("if_cmplt");
+                    jasminInstruction.append("if_cmplt"); // needs fixing ASAP
                 }
 
                 return jasminInstruction.toString();
