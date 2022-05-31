@@ -58,6 +58,9 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
     }
 
     private String createTemporaryAssign(String variableName, String ollirType, String value) {
+        if (ollirType.equals("V")) {
+            return value + ";";
+        }
         return variableName + "." + ollirType + " :=." + ollirType + " " + value + ";";
     }
 
