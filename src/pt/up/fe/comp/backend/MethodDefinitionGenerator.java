@@ -2,6 +2,8 @@ package pt.up.fe.comp.backend;
 
 import org.specs.comp.ollir.*;
 
+import java.util.Map;
+
 public class MethodDefinitionGenerator {
     private Method method;
 
@@ -24,6 +26,12 @@ public class MethodDefinitionGenerator {
         for (Instruction instruction: method.getInstructions()) {
             if (!hasReturn && instruction.getInstType() == InstructionType.RETURN) {
                 hasReturn = true;
+            }
+
+            for (Map.Entry<String, Instruction> entry: method.getLabels().entrySet()) {
+                if (entry.getValue().equals(instruction)) {
+                    methodDefinition.append(entry.getKey()).append(":").append("\n");
+                }
             }
             methodDefinition.append(instructionTranslator.translateInstruction(instruction, method)).append("\n");
         }
