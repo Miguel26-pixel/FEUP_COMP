@@ -1,6 +1,12 @@
 package pt.up.fe.comp;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,12 +26,11 @@ import pt.up.fe.specs.util.SpecsSystem;
 
 public class Launcher {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         SpecsSystem.programStandardInit();
-
         SpecsLogs.info("Executing with args: " + Arrays.toString(args));
 
-        // read the input code
+        // Read the input code
         if (args.length != 1) {
             throw new RuntimeException("Expected a single argument, a path to an existing input file.");
         }
@@ -60,18 +65,42 @@ public class Launcher {
         // Check if there are semantic errors
         TestUtils.noErrors(analysisResult.getReports());
 
+        // Instantiate JmmOptimizer
         JmmOptimizer optimizer = new JmmOptimizer();
 
+        // Optimize at AST level
+        analysisResult = optimizer.optimize(analysisResult);
+
+        // Generate ollir code
         OllirResult ollirResult = optimizer.toOllir(analysisResult);
 
+        // Optimize at ollir level
+        ollirResult = optimizer.optimize(ollirResult);
+
+        // Check if there are no ollir errors
         TestUtils.noErrors(ollirResult.getReports());
 
+        // Save ollir file
+        try (FileWriter writer = new FileWriter(config.get("inputFile") + ".ollir")) {
+            writer.write(ollirResult.getOllirCode());
+        }
+
+        // Instantiate JmmBackend
         JmmBackend backend = new JmmBackend();
 
+        // Generate jasmin code
         JasminResult jasminResult = backend.toJasmin(ollirResult);
 
+        // Check if there are no jasmin errors
         TestUtils.noErrors(jasminResult.getReports());
 
+        // Save jasmin file
+        try (FileWriter writer = new FileWriter(config.get("inputFile") + ".j")) {
+            writer.write(ollirResult.getOllirCode());
+        }
+
+        // Save compiled file
         File compilationResult = jasminResult.compile();
+        Files.copy(compilationResult.toPath(), new File(config.get("inputFile") + ".j").toPath());
     }
 }
