@@ -25,7 +25,7 @@ public class MethodDefinitionGenerator {
             if (!hasReturn && instruction.getInstType() == InstructionType.RETURN) {
                 hasReturn = true;
             }
-            methodDefinition.append(instructionTranslator.translateInstruction(instruction, method, 1)).append("\n");
+            methodDefinition.append(instructionTranslator.translateInstruction(instruction, method)).append("\n");
         }
 
         if (!hasReturn) {

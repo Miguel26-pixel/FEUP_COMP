@@ -3,58 +3,60 @@ package pt.up.fe.comp.backend;
 import org.specs.comp.ollir.*;
 
 public class InstructionTranslator {
-    public String translateInstruction(Instruction instruction, Method ancestorMethod, int indentationLevel) {
+    private int indentationLevel = 1;
+
+    public String translateInstruction(Instruction instruction, Method ancestorMethod) {
         InstructionType instructionType = instruction.getInstType();
 
         switch (instructionType) {
             case CALL:
-                return translateInstruction((CallInstruction) instruction, ancestorMethod, indentationLevel);
+                return translateInstruction((CallInstruction) instruction, ancestorMethod);
             case RETURN:
-                return translateInstruction((ReturnInstruction) instruction, ancestorMethod, indentationLevel);
+                return translateInstruction((ReturnInstruction) instruction, ancestorMethod);
             case PUTFIELD:
-                return translateInstruction((PutFieldInstruction) instruction, ancestorMethod, indentationLevel);
+                return translateInstruction((PutFieldInstruction) instruction, ancestorMethod);
             case GETFIELD:
-                return translateInstruction((GetFieldInstruction) instruction, ancestorMethod, indentationLevel);
+                return translateInstruction((GetFieldInstruction) instruction, ancestorMethod);
             case ASSIGN:
-                return translateInstruction((AssignInstruction) instruction, ancestorMethod, indentationLevel);
+                return translateInstruction((AssignInstruction) instruction, ancestorMethod);
             case BINARYOPER:
-                return translateInstruction((BinaryOpInstruction) instruction, ancestorMethod, indentationLevel);
+                return translateInstruction((BinaryOpInstruction) instruction, ancestorMethod);
             case UNARYOPER:
-                return translateInstruction((UnaryOpInstruction) instruction, ancestorMethod, indentationLevel);
+                return translateInstruction((UnaryOpInstruction) instruction, ancestorMethod);
             case NOPER:
-                return translateInstruction((SingleOpInstruction) instruction, ancestorMethod, indentationLevel);
+                return translateInstruction((SingleOpInstruction) instruction, ancestorMethod);
             case GOTO:
-                return translateInstruction((GotoInstruction) instruction, ancestorMethod, indentationLevel);
+                return translateInstruction((GotoInstruction) instruction, ancestorMethod);
             case BRANCH:
-                return translateInstruction((CondBranchInstruction) instruction, ancestorMethod, indentationLevel);
+                return translateInstruction((CondBranchInstruction) instruction, ancestorMethod);
             default:
                 return "";
         }
     }
 
-    public String translateInstruction(CondBranchInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(CondBranchInstruction instruction, Method ancestorMethod) {
         try {
             SingleOpCondInstruction singleOpCondInstruction = (SingleOpCondInstruction) instruction;
-            return translateInstruction(singleOpCondInstruction, ancestorMethod, indentationLevel);
+            return translateInstruction(singleOpCondInstruction, ancestorMethod);
         } catch (ClassCastException e) {
             OpCondInstruction opCondInstruction = (OpCondInstruction) instruction;
-            return translateInstruction(opCondInstruction, ancestorMethod, indentationLevel);
+            return translateInstruction(opCondInstruction, ancestorMethod);
         }
     }
 
-    public String translateInstruction(SingleOpCondInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(SingleOpCondInstruction instruction, Method ancestorMethod) {
         return "";
     }
 
-    public String translateInstruction(OpCondInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(OpCondInstruction instruction, Method ancestorMethod) {
         return "";
     }
 
-    public String translateInstruction(GotoInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(GotoInstruction instruction, Method ancestorMethod) {
         return getIndentation(indentationLevel) + "goto " + instruction.getLabel();
     }
 
-    public String translateInstruction(UnaryOpInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(UnaryOpInstruction instruction, Method ancestorMethod) {
         Operation operation = instruction.getOperation();
         OperationType operationType = operation.getOpType();
         Element first = instruction.getOperand();
@@ -79,11 +81,11 @@ public class InstructionTranslator {
         return "UNSUPPORTED UNARY OPERATION";
     }
 
-    public String translateInstruction(SingleOpInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(SingleOpInstruction instruction, Method ancestorMethod) {
         return getIndentation(indentationLevel) + getCorrespondingLoad(instruction.getSingleOperand(), ancestorMethod);
     }
 
-    public String translateInstruction(GetFieldInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(GetFieldInstruction instruction, Method ancestorMethod) {
         Element destinationObject = instruction.getFirstOperand();
         Element destinationField = instruction.getSecondOperand();
 
@@ -108,7 +110,7 @@ public class InstructionTranslator {
         return jasminInstruction.toString();
     }
 
-    public String translateInstruction(PutFieldInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(PutFieldInstruction instruction, Method ancestorMethod) {
         Element destinationObject = instruction.getFirstOperand();
         Element destinationField = instruction.getSecondOperand();
 
@@ -134,7 +136,7 @@ public class InstructionTranslator {
         return jasminInstruction.toString();
     }
 
-    public String translateInstruction(AssignInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(AssignInstruction instruction, Method ancestorMethod) {
         Element destination = instruction.getDest();
 
         if (destination.isLiteral()) {
@@ -145,14 +147,14 @@ public class InstructionTranslator {
 
         if (rhs.getInstType() == InstructionType.CALL) {
             if (((CallInstruction) rhs).getInvocationType() == CallType.NEW) {
-                return translateInstruction(rhs, ancestorMethod, indentationLevel);
+                return translateInstruction(rhs, ancestorMethod);
             }
         }
 
-        return translateInstruction(rhs, ancestorMethod, indentationLevel) + "\n" + getIndentation(indentationLevel) + getCorrespondingStore(destination, ancestorMethod);
+        return translateInstruction(rhs, ancestorMethod) + "\n" + getIndentation(indentationLevel) + getCorrespondingStore(destination, ancestorMethod);
     }
 
-    public String translateInstruction(CallInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(CallInstruction instruction, Method ancestorMethod) {
         StringBuilder jasminInstruction = new StringBuilder();
         StringBuilder parametersDescriptor = new StringBuilder();
         Operand caller = (Operand) instruction.getFirstArg();
@@ -240,7 +242,7 @@ public class InstructionTranslator {
         return jasminInstruction.toString();
     }
 
-    public String translateInstruction(BinaryOpInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(BinaryOpInstruction instruction, Method ancestorMethod) {
         Element first = instruction.getLeftOperand();
         Element second = instruction.getRightOperand();
         Operation operation = instruction.getOperation();
@@ -307,7 +309,7 @@ public class InstructionTranslator {
         return "";
     }
 
-    public String translateInstruction(ReturnInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(ReturnInstruction instruction, Method ancestorMethod) {
         StringBuilder jasminInstruction = new StringBuilder();
         ElementType returnType = instruction.getReturnType().getTypeOfElement();
 
