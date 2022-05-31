@@ -36,21 +36,11 @@ public class InstructionTranslator {
     }
 
     public String translateInstruction(CondBranchInstruction instruction, Method ancestorMethod) {
-        try {
-            SingleOpCondInstruction singleOpCondInstruction = (SingleOpCondInstruction) instruction;
-            return translateInstruction(singleOpCondInstruction, ancestorMethod);
-        } catch (ClassCastException e) {
-            OpCondInstruction opCondInstruction = (OpCondInstruction) instruction;
-            return translateInstruction(opCondInstruction, ancestorMethod);
-        }
-    }
-
-    public String translateInstruction(SingleOpCondInstruction instruction, Method ancestorMethod) {
-        return "";
-    }
-
-    public String translateInstruction(OpCondInstruction instruction, Method ancestorMethod) {
-        return "";
+        StringBuilder jasminInstruction = new StringBuilder();
+        jasminInstruction.append(translateInstruction(instruction.getCondition(), ancestorMethod)).append("\n");
+        jasminInstruction.append(getIndentation()).append("ldc 1").append("\n");
+        jasminInstruction.append(getIndentation()).append("ifcmpeq ").append(instruction.getLabel());
+        return jasminInstruction.toString();
     }
 
     public String translateInstruction(GotoInstruction instruction, Method ancestorMethod) {
@@ -298,7 +288,9 @@ public class InstructionTranslator {
 
                 return jasminInstruction.toString();
             case AND:
+            case ANDB:
             case OR:
+            case ORB:
                 if (first.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement() || second.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement()) {
                     return "UNMATCHING TYPES";
                 }
