@@ -351,7 +351,7 @@ public class InstructionTranslator {
                     return getIndentation() + "ldc " + JasminUtils.trimLiteral(literalElement.getLiteral());
                 case BOOLEAN:
                     String literal = JasminUtils.trimLiteral(literalElement.getLiteral());
-                    return getIndentation() + (literal.equals("true") ? "ldc 1" : "ldc 0");
+                    return getIndentation() + (literal.equals("true") || literal.equals("1") ? "ldc 1" : "ldc 0");
                 default:
                     return "Literal";
             }
