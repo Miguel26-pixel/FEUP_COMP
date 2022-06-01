@@ -236,6 +236,8 @@ public class InstructionTranslator {
                 }
                 break;
             case arraylength:
+                jasminInstruction.append(getCorrespondingLoad(caller, ancestorMethod)).append("\n");
+                jasminInstruction.append(getIndentation()).append("arraylength");
                 break;
         }
         return jasminInstruction.toString();
