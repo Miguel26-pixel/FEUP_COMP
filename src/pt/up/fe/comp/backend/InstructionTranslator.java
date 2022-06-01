@@ -41,7 +41,7 @@ public class InstructionTranslator {
         StringBuilder jasminInstruction = new StringBuilder();
         jasminInstruction.append(translateInstruction(instruction.getCondition(), ancestorMethod)).append("\n");
         jasminInstruction.append(getIndentation()).append("ldc 1").append("\n");
-        jasminInstruction.append(getIndentation()).append("ifcmpeq ").append(instruction.getLabel());
+        jasminInstruction.append(getIndentation()).append("ifeq ").append(instruction.getLabel());
         return jasminInstruction.toString();
     }
 
@@ -273,19 +273,7 @@ public class InstructionTranslator {
                 } else if (operationType == OperationType.DIV || operationType == OperationType.DIVI32){
                     jasminInstruction.append("idiv");
                 } else {
-                    jasminInstruction.append("if_cmplt Then").append(this.labelCounter).append("\n");
-                    jasminInstruction.append(getIndentation()).append("ldc 0").append("\n");
-                    jasminInstruction.append(getIndentation()).append("goto Finally").append(this.labelCounter).append("\n");
-                    this.indentationLevel--;
-                    jasminInstruction.append(getIndentation()).append("Then").append(this.labelCounter).append(":").append("\n");
-                    this.indentationLevel++;
-
-                    jasminInstruction.append(getIndentation()).append("ldc 1").append("\n");
-
-                    this.indentationLevel--;
-                    jasminInstruction.append(getIndentation()).append("Finally").append(this.labelCounter).append(":");
-                    this.indentationLevel++;
-                    this.labelCounter++;
+                    jasminInstruction.append(this.getIfBody("if_cmplt"));
                 }
 
                 return jasminInstruction.toString();
@@ -305,11 +293,20 @@ public class InstructionTranslator {
                 jasminInstruction.append(getCorrespondingLoad(second, ancestorMethod)).append("\n");
                 jasminInstruction.append(getIndentation());
 
-                if (operationType == OperationType.AND) {
+                if (operationType == OperationType.AND || operationType == OperationType.ANDB) {
                     jasminInstruction.append("iand");
                 } else {
                     jasminInstruction.append("ior");
                 }
+
+                return jasminInstruction.toString();
+            case EQ:
+            case EQI32:
+                jasminInstruction.append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
+                jasminInstruction.append(getCorrespondingLoad(second, ancestorMethod)).append("\n");
+                jasminInstruction.append(getIndentation());
+
+                jasminInstruction.append(this.getIfBody("ifeq"));
 
                 return jasminInstruction.toString();
         }
@@ -417,6 +414,25 @@ public class InstructionTranslator {
                     return "";
             }
         }
+    }
+
+    private String getIfBody(String comparisonInstruction) {
+        StringBuilder ifBody = new StringBuilder();
+        ifBody.append(comparisonInstruction).append(" Then").append(this.labelCounter).append("\n");
+        ifBody.append(getIndentation()).append("ldc 0").append("\n");
+        ifBody.append(getIndentation()).append("goto Finally").append(this.labelCounter).append("\n");
+        this.indentationLevel--;
+        ifBody.append(getIndentation()).append("Then").append(this.labelCounter).append(":").append("\n");
+        this.indentationLevel++;
+
+        ifBody.append(getIndentation()).append("ldc 1").append("\n");
+
+        this.indentationLevel--;
+        ifBody.append(getIndentation()).append("Finally").append(this.labelCounter).append(":");
+        this.indentationLevel++;
+        this.labelCounter++;
+
+        return ifBody.toString();
     }
 
     private String getIndentation() {
