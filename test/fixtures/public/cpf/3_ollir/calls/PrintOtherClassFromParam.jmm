@@ -1,0 +1,22 @@
+import GetterAndSetter;
+import io;
+class PrintOtherClassFromParam {
+	public int print(GetterAndSetter b){
+		GetterAndSetter myGetter;
+		int content;
+		myGetter = b;
+		content = myGetter.getA();
+		io.print(content);
+		return 1;
+	}
+	
+	public static void main(String[] args){
+		GetterAndSetter b;
+		PrintOtherClassFromParam c;
+		int dummy;
+		b = new GetterAndSetter();
+		dummy = b.setA(10);
+		c = new PrintOtherClassFromParam();
+		c.print(b);
+	}
+}

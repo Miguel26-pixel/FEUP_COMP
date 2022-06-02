@@ -1,0 +1,27 @@
+import ioPlus;
+class FuncArgsFuncCall {
+
+    public int f1(int a){
+        return a;
+    }
+
+    public int f2(int b){
+        return b;
+    }
+
+    public int func(int a, int b){
+        ioPlus.printResult(a);
+        ioPlus.printResult(b);
+        return 1;
+    }
+
+	public static void main(String[] args) {
+        int a;
+        int b;
+        FuncArgsFuncCall d;
+        d = new FuncArgsFuncCall();
+        a = 10;
+        b = 5;
+		a = d.func(d.f1(a), d.f2(b));
+	}
+}

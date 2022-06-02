@@ -1,0 +1,11 @@
+import io;
+
+class Arithmetic_add {
+	public static void main(String[] args) {
+		int a;
+
+		a = 2 + 3;
+		
+		io.print(a);
+	}
+}

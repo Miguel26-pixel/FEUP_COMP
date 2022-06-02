@@ -1,0 +1,19 @@
+
+class UsesPop  {
+
+
+    public int func5() {
+        int a;
+        boolean b;
+        a = 2;
+        this.func1();
+        b = false;
+        return 1;
+    }
+	
+	
+    public int func1(){
+        return 1;
+    }
+
+}

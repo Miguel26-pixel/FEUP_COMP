@@ -1,0 +1,12 @@
+import ioPlus;
+class ComplexProd {
+	public static void main(String[] args) {
+        int a;
+        int b;
+        int c;
+        a = 1;
+        b = 7;
+        c = a * b * b * 4;
+		ioPlus.printResult(c);
+	}
+}

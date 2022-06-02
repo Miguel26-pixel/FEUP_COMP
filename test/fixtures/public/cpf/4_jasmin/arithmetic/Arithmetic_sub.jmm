@@ -1,0 +1,11 @@
+import io;
+
+class Arithmetic_sub {
+	public static void main(String[] args) {
+		int a;
+
+		a = 5 - 2;
+		
+		io.print(a);
+	}
+}

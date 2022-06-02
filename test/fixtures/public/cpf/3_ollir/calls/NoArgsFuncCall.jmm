@@ -1,0 +1,12 @@
+import Dummy;
+
+class NoArgsFuncCall {
+
+	
+	public int bar(Dummy c) {
+		
+		c.bar();
+        
+		return 1;
+	}
+}

@@ -1,0 +1,12 @@
+class Assignment_Bool_Bad {
+
+	public static void main(String[] args) {
+        boolean b;
+        int i;
+
+        i = 0;
+        b = true;
+        b = i;
+
+	}
+}

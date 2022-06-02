@@ -1,0 +1,19 @@
+import List;
+
+class Inherited_Method_Call_Simple extends List {
+    public static void main(String[] a) { 
+        int k;
+        Inherited_Method_Call_Simple mc;
+
+        mc = new Inherited_Method_Call_Simple();
+
+		k = mc.add(10);
+        mc.foo();
+
+    }
+
+    public int foo(){
+        return this.add(20);
+    }
+
+}

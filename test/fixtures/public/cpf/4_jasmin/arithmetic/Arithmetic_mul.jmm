@@ -1,0 +1,11 @@
+import io;
+
+class Arithmetic_mul {
+	public static void main(String[] args) {
+		int a;
+
+		a = 2 * 11;
+		
+		io.print(a);
+	}
+}

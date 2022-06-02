@@ -1,0 +1,7 @@
+import Super_class;
+
+class Structure_class extends Super_class {
+    public static void main(String[] args) {
+
+    }
+}

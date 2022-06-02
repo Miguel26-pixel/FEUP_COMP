@@ -1,0 +1,32 @@
+import io;
+
+class B {
+	int a;
+	public int getA(){
+		return a;
+	}
+	public int setA(int aNew){
+		a = aNew;
+		return a;
+	}
+	
+	public int compare(B other){
+		int res;
+		if(other.getA() < this.getA())
+			res = 1;
+		else if(this.getA() < other.getA())
+			res = 0-1;
+		else res = 0;
+		return res;
+	}
+	public int compareSelf(){
+		return this.compare(this);
+	}
+	
+	public static void main(String[] args){
+		B b;
+		b = new B();
+		b.setA(20);
+		io.println(b.compareSelf());
+	}
+}

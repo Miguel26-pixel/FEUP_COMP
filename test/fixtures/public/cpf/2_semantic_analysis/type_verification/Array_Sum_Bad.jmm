@@ -1,0 +1,12 @@
+class arraySumNotValid {
+
+	public static void main(String[] args) {
+        int[] arr1;
+        int[] arr2;
+
+        arr1 = new int[3];
+        arr2 = new int[3];
+
+        arr1 = arr1 + arr2;
+	}
+}

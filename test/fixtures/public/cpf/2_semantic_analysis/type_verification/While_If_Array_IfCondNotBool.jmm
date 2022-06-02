@@ -1,0 +1,16 @@
+class While_If_Array_IfCondNotBool {
+
+	public static void main(String[] args) {
+        boolean i;
+        int j;
+
+        i = true;
+        j = 0;
+
+        if (i) {
+            if (i && j) {
+
+            } else {}
+        } else {}
+	}
+}

@@ -1,0 +1,11 @@
+import io;
+
+class Arithmetic_div {
+	public static void main(String[] args) {
+		int a;
+
+		a = 20 / 4;
+		
+		io.print(a);
+	}
+}
