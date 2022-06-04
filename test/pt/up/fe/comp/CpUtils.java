@@ -511,7 +511,7 @@ public class CpUtils {
     }
 
     public static String getLocalsRegex(int numLocals) {
-        return "(a|i)store(_|\\s+)" + (numLocals - 1);
+        return "(a|i)(store|load)(_|\\s+)" + (numLocals - 1);
     }
 
 }

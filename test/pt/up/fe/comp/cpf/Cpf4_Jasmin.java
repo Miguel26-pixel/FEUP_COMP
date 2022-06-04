@@ -410,6 +410,9 @@ public class Cpf4_Jasmin {
         var methodCode = CpUtils.getJasminMethod(jasminResult);
         var numLocals = Integer.parseInt(SpecsStrings.getRegexGroup(methodCode, CpUtils.getLimitLocalsRegex(), 1));
         assertTrue("limit locals should be less than 99:\n" + methodCode, numLocals >= 0 && numLocals < 99);
+
+        // Make sure the code compiles
+        jasminResult.compile();
     }
 
     /*checks if the .limits locals is the expected value (with a tolerance of 2) */
@@ -420,9 +423,12 @@ public class Cpf4_Jasmin {
         var methodCode = CpUtils.getJasminMethod(jasminResult);
         var numLocals = Integer.parseInt(SpecsStrings.getRegexGroup(methodCode, CpUtils.getLimitLocalsRegex(), 1));
 
-        // Find store with numLocals - 1
+        // Find store or load with numLocals - 1
         var regex = CpUtils.getLocalsRegex(numLocals);
         CpUtils.matches(methodCode, regex);
+
+        // Makes sure the code compiles
+        jasminResult.compile();
     }
 
     /*checks if the .limits stack is not a const 99 value */
@@ -432,6 +438,9 @@ public class Cpf4_Jasmin {
         var methodCode = CpUtils.getJasminMethod(jasminResult);
         var numStack = Integer.parseInt(SpecsStrings.getRegexGroup(methodCode, CpUtils.getLimitStackRegex(), 1));
         assertTrue("limit stack should be less than 99:\n" + methodCode, numStack >= 0 && numStack < 99);
+
+        // Make sure the code compiles
+        jasminResult.compile();
     }
 
     /*checks if the .limits stack is the expected value (with a tolerance of 2) */
@@ -442,13 +451,16 @@ public class Cpf4_Jasmin {
         var methodCode = CpUtils.getJasminMethod(jasminResult);
         var numStack = Integer.parseInt(SpecsStrings.getRegexGroup(methodCode, CpUtils.getLimitStackRegex(), 1));
 
-        int expectedLimit = 4;
+        int expectedLimit = 3;
         int errorMargin = 2;
         int upperLimit = expectedLimit + errorMargin;
 
         assertTrue(
                 "limit stack should be = " + expectedLimit + " (accepted if <= " + upperLimit
                         + "), but is " + numStack + ":\n" + methodCode,
-                numStack <= upperLimit && numStack > 1);
+                numStack <= upperLimit && numStack >= expectedLimit);
+
+        // Make sure the code compiles
+        jasminResult.compile();
     }
 }
