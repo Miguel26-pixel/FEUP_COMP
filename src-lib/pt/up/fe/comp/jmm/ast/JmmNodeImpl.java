@@ -178,4 +178,9 @@ public class JmmNodeImpl extends AJmmNode {
             currentChild.setParent(newNodeParent);
         }
     }
+
+    @Override
+    public void removeParent() {
+        this.parent = null;
+    }
 }
