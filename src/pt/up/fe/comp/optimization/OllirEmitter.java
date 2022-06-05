@@ -442,10 +442,11 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         Symbol symbol;
         if (symbolTable.getClosestSymbol(node, variableName).isPresent()) {
             symbol = symbolTable.getClosestSymbol(node, variableName).get();
+            substituteVariable.setVariableType(symbol.getType());
         } else {
             symbol = new Symbol(new Type("void", false), variableName);
+            substituteVariable.setVariableTypeIfNotPresent(symbol.getType());
         }
-        substituteVariable.setVariableTypeIfNotPresent(symbol.getType());
 
         var closestMethod = getClosestMethod(node);
         if (closestMethod.isEmpty()) {

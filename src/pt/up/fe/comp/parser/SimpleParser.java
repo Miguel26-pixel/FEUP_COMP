@@ -48,7 +48,6 @@ public class SimpleParser implements JmmParser {
             }
             new LineColAnnotator().visit((JmmNode) root);
             JmmParserResult result = new JmmParserResult((JmmNode) root, Collections.emptyList(), config);
-            System.out.println(result.getRootNode().toTree());
             return result;
         } catch (Exception e) {
             var exception = TestUtils.getException(e, ParseException.class);
