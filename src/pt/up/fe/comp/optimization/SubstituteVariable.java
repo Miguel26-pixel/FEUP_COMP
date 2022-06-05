@@ -10,7 +10,7 @@ public class SubstituteVariable {
     private Type variableType;
     private String variableName = "";
     private String variableValue;
-    private Type assignType = new Type("int", false);
+    private Type assignType = new Type("void", false);
 
     public SubstituteVariable(String variableName) {
         this.variableName = variableName;
