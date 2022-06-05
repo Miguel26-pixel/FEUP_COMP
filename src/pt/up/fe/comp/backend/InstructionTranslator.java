@@ -142,6 +142,12 @@ public class InstructionTranslator {
             return getCorrespondingStore(destination, ancestorMethod) + "\n" + translateInstruction(rhs, ancestorMethod) + "\n" + getIndentation() + "aastore";
         }
 
+        if (rhs.getInstType() == InstructionType.CALL) {
+            if (((CallInstruction)rhs).getInvocationType() == CallType.NEW) {
+                return translateInstruction(rhs, ancestorMethod);
+            }
+        }
+
         return translateInstruction(rhs, ancestorMethod) + "\n" + getCorrespondingStore(destination, ancestorMethod);
     }
 
@@ -196,7 +202,6 @@ public class InstructionTranslator {
                 }
 
                 jasminInstruction.append(getIndentation());
-
 
                 jasminInstruction.append("invokespecial ");
 
