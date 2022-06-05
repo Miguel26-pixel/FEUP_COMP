@@ -15,7 +15,6 @@ package pt.up.fe.comp.jmm.ollir;
 
 import org.specs.comp.ollir.ClassUnit;
 import org.specs.comp.ollir.parser.OllirParser;
-import org.specs.comp.ollir.parser.ParseException;
 
 import pt.up.fe.specs.util.SpecsIo;
 
@@ -44,7 +43,7 @@ public class OllirUtils {
             return classUnit;
             // TODO: Falta análise semântica no ollir, como forçar literais booleans a true/false,
             // toda semântica que lhes pedimos mais verificações de tipos e imports nas declaracoes
-        } catch (ParseException e) {
+        } catch (Exception e) {
             // // Get cause
             // // Throwable currentException = e;
             // String causeMessage = e.getMessage();
@@ -60,7 +59,6 @@ public class OllirUtils {
             // "Error on line " + e.currentToken.beginLine + ": " + causeMessage, e);
 
             throw new RuntimeException("Exception while parsing OLLIR code:\n" + code, e);
-
         }
 
     }

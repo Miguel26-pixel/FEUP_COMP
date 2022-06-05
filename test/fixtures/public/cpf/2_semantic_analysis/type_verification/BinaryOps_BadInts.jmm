@@ -1,0 +1,11 @@
+class BinaryOps_BadInts {
+
+	public static void main(String[] args) {
+        int i;
+        boolean j;
+        i = 1;
+        j = false;
+        
+        i = i + j;
+	}
+}

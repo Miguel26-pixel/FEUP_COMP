@@ -1,0 +1,21 @@
+import ioPlus;
+class ArithmeticArgsFuncCall {
+
+    public int func(int a, int b, int c){
+        ioPlus.printResult(a);
+        ioPlus.printResult(b);
+        ioPlus.printResult(c);
+        return 1;
+    }
+
+	public static void main(String[] args) {
+        int a;
+        int b;
+        ArithmeticArgsFuncCall d;
+        d = new ArithmeticArgsFuncCall();
+        a = 10;
+        b = 5;
+		a = d.func(100 / 10 + 10 - 10 * 2, a + b, a - b);
+
+	}
+}

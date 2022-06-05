@@ -1,0 +1,15 @@
+class While_If_Array_AccessArrayNotInteger {
+
+	public static void main(String[] args) {
+        int[] arr;
+        int i;
+        boolean j;
+
+        i = 1;
+        j = false;
+        arr = new int[3];
+
+		arr[j] = 20;
+		arr[i] = 0 - arr[j];
+	}
+}

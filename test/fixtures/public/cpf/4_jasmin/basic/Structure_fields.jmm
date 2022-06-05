@@ -1,0 +1,9 @@
+class Structure_fields {
+    int a;
+    boolean b;
+    int[] c;
+
+    public static void main(String[] args) {
+
+    }
+}

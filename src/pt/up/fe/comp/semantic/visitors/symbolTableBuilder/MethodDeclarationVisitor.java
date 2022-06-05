@@ -46,6 +46,11 @@ public class MethodDeclarationVisitor extends ReportCollectorJmmNodeVisitor<Map<
                 }
             } else if (child.getKind().equals("Identifier")) {
                 name = child.get("name");
+                if (methods.containsKey(name)) {
+                    addSemanticErrorReport(methodDeclaration, "Duplicate method declaration "
+                            + name + ". Method overload is not supported");
+                    return false;
+                }
             } else if (child.getKind().equals("Type")) {
                 returnType = new Type(child.get("name"), Boolean.parseBoolean(child.get("isArray")));
             }

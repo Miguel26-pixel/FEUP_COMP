@@ -1,0 +1,12 @@
+import ioPlus;
+class ComplexSubDiv {
+	public static void main(String[] args) {
+        int a;
+        int b;
+        int c;
+        a = 10;
+        b = 5;
+        c = 10 - a / b - a / b - 1;
+		ioPlus.printResult(c);
+	}
+}

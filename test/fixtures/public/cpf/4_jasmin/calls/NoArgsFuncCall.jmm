@@ -1,0 +1,10 @@
+class NoArgsFuncCall {
+
+	public int bar() {
+        int a;
+        NoArgsFuncCall c;
+        c = new NoArgsFuncCall();
+		a = c.bar();
+        return 1;
+	}
+}

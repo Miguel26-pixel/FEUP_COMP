@@ -1,0 +1,11 @@
+
+import Other;
+// import Person;
+
+class BasicMethods extends Other {
+
+    public boolean func2(){
+        return false;
+    }
+
+}

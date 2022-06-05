@@ -290,6 +290,8 @@ public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type,Type> {
             boolean externTarget = targetType == null;
             List<Symbol> params = symbolTable.getParameters(methodCall.get().getChildren().get(0).get("name"));
             if (!externTarget && params.size() != args.size()) {
+                System.out.println(params.size());
+                System.out.println(args.size());
                 addSemanticErrorReport(node, "Invalid number of arguments");
             } else if (!externTarget){
                 for (int i = 0; i < args.size(); i++) {

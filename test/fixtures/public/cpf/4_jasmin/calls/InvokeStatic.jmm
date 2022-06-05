@@ -1,0 +1,10 @@
+import ioPlus;
+class InvokeStatic {
+        
+        public int func() {
+
+                ioPlus.printResult(1);
+                return 1;
+
+        }
+}

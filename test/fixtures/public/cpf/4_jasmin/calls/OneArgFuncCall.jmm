@@ -1,0 +1,15 @@
+import ioPlus;
+class OneArgFuncCall {
+
+    public int func(int a){
+        return a;
+    }
+
+	public static void main(String[] args) {
+        int a;
+        OneArgFuncCall c;
+        c = new OneArgFuncCall();
+		a = c.func(10);
+        ioPlus.printResult(a);
+	}
+}

@@ -58,6 +58,9 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
     }
 
     private String createTemporaryAssign(String variableName, String ollirType, String value) {
+        if (ollirType.equals("V")) {
+            return value + ";";
+        }
         return variableName + "." + ollirType + " :=." + ollirType + " " + value + ";";
     }
 
@@ -80,7 +83,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
     private Boolean visitStart(JmmNode node, SubstituteVariable dummy) {
         fillImports();
         visitAllChildren(node, dummy);
-        return null;
+        return true;
     }
 
     private Boolean visitClassDeclaration(JmmNode node, SubstituteVariable dummy) {
@@ -121,7 +124,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         indentationLevel--;
         startNewLine();
         ollirCode.append("}");
-        return null;
+        return true;
     }
 
     private Boolean visitFieldDeclaration(JmmNode node, SubstituteVariable dummy) {
@@ -129,7 +132,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         Type type = new Type(node.getChildren().get(0).get("name"), Boolean.parseBoolean(node.getChildren().get(0).get("isArray")));
         ollirCode.append(variableName).append(".").append(getOllirType(type));
         ollirCode.append(";");
-        return null;
+        return true;
     }
 
     private Boolean visitMethod(JmmNode node, SubstituteVariable dummy) {
@@ -145,15 +148,23 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         }
         ollirCode.append(").").append(getOllirType(returnType)).append(" {");
         indentationLevel++;
+        boolean returned = false;
         for (var child : node.getChildren()) {
-            if (child.getKind().equals("MethodBody") || child.getKind().equals("Return")) {
+            if (child.getKind().equals("Return")) {
+                visit(child);
+                returned = true;
+            } else if (child.getKind().equals("MethodBody")) {
                 visit(child);
             }
+        }
+        if (!returned) {
+            startNewLine();
+            ollirCode.append("ret.").append(getOllirType(returnType)).append(";");
         }
         indentationLevel--;
         startNewLine();
         ollirCode.append("}");
-        return null;
+        return true;
     }
 
     private Boolean visitIf(JmmNode node, SubstituteVariable dummy) {
@@ -201,7 +212,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         ollirCode.append("goto Loop").append(loopCounter).append(";");
         indentationLevel--;
         startNewLine();
-        ollirCode.append("End").append(loopCounter).append(":");
+        ollirCode.append("EndLoop").append(loopCounter).append(":");
         return true;
     }
 
@@ -209,6 +220,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         var t1 = createTemporaryVariable(node);
         var t2 = createTemporaryVariable(node);
         visit(node.getJmmChild(0), t1);
+        t2.setVariableType(t1.getVariableType());
         visit(node.getJmmChild(1), t2);
 
         String operation = node.get("op");
@@ -442,6 +454,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
 
         boolean isIdentifierAssign = node.getAncestor("BinOp").isPresent()
                 && node.getAncestor("BinOp").get().get("op").equals("assign")
+                && node.getAncestor("BinOp").get().getKind().equals("Identifier")
                 && node.getAncestor("BinOp").get().getJmmChild(0).get("name").equals(variableName);
         if (!isIdentifierAssign && symbolTable.getFields().stream().anyMatch(s -> s.getName().equals(variableName))) {
             SubstituteVariable temporaryHolder = createTemporaryVariable(node);

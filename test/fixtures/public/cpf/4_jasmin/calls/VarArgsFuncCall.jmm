@@ -1,0 +1,22 @@
+import ioPlus;
+class VarArgsFuncCall {
+
+    public int func(int a, int b, int c){
+        ioPlus.printResult(a);
+        ioPlus.printResult(b);
+        ioPlus.printResult(c);
+        return 1;
+    }
+
+	public static void main(String[] args) {
+        int a;
+        int b;
+        int c;
+        VarArgsFuncCall d;
+        d = new VarArgsFuncCall();
+        a = 10;
+        b = 12;
+        c = 11;
+		a = d.func(a,b,c);
+	}
+}

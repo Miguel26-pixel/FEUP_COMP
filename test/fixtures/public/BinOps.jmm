@@ -12,7 +12,7 @@ class BinOps {
         int helloTrials;
         helloTrials = helloHistory[0] + 2 * helloHistory.length - 2 + arr[1] * cof;
         int nights;
-        nights = Nando.getHome().getBedroom().getNightCounter();
+        nights = Nando.getNightCounter();
         return new Nando().sayHello(helloTrials + nights);
     }
 }

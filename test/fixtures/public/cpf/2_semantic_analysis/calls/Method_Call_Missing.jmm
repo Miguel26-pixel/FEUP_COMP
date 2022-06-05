@@ -1,0 +1,24 @@
+class Method_Call_Missing {
+    public static void main(String[] a) { 
+        int k;
+        Method_Call_Missing mc;
+
+        mc = new Method_Call_Missing();
+
+        k = mc.foo(true);
+
+    }
+
+    public int foo(boolean a){
+        int j;
+        
+        if (a) {
+            j = this.solve(20);
+        } else {
+            j = 0;
+        }
+
+        return j;
+    }
+
+}

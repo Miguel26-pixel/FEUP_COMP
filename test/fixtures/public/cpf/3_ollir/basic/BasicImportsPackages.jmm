@@ -1,0 +1,9 @@
+import foo.bar;
+import pt.up.fe.comp.io;
+
+class BasicImportsPackages {
+
+	public static void main(String[] args) {
+	
+	}
+}

@@ -1,0 +1,11 @@
+
+import Other;
+// import Person;
+
+class BasicMethods extends Other {
+
+    public int func1(){
+        return 1;
+    }
+
+}
