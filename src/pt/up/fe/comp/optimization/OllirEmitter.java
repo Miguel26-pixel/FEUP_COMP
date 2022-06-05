@@ -473,8 +473,23 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
             }
             parameterNumber += 1;
         }
-        substituteVariable.setVariableName(variableName);
-        substituteVariable.setValue((isParameter ? "$" + parameterNumber + "." : "") + getSafeVariableName(variableName));
+
+        boolean isClassField = symbolTable.getFields().stream().anyMatch(s -> s.getName().equals(variableName));
+        boolean isAssign = node.getAncestor("BinOp").isPresent()
+                && node.getAncestor("BinOp").get().get("op").equals("assign")
+                && node.getAncestor("BinOp").get().getJmmChild(0).equals(node);
+        if (isClassField && !isAssign) {
+            startNewLine();
+            SubstituteVariable tempHolder = createTemporaryVariable(node);
+            ollirCode.append(createTemporaryAssign(tempHolder.getVariableName(), getOllirType(symbol.getType()),
+                    getField("this", variableName, getOllirType(symbol.getType()))));
+            substituteVariable.setVariableName(tempHolder.getVariableName());
+            substituteVariable.setValue(getSafeVariableName(tempHolder.getVariableName()));
+        } else {
+            substituteVariable.setVariableName(variableName);
+            substituteVariable.setValue((isParameter ? "$" + parameterNumber + "." : "") + getSafeVariableName(variableName));
+        }
+
         return true;
     }
 
