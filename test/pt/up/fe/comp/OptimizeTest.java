@@ -55,7 +55,7 @@ public class OptimizeTest {
 
     @Test
     public void life() {
-        testOptimize("fixtures/public/Life.jmm");;
+        testOptimize("fixtures/public/Life.jmm");
     }
 
     @Test
@@ -76,5 +76,10 @@ public class OptimizeTest {
     @Test
     public void whileAndIf() {
         testOptimize("fixtures/public/WhileAndIf.jmm");
+    }
+
+    @Test
+    public void varLookupField() {
+        testOptimize("fixtures/public/cpf/2_semantic_analysis/lookup/VarLookup_Field.jmm");
     }
 }

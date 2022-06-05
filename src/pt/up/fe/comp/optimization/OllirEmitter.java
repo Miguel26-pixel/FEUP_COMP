@@ -396,10 +396,19 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         String ollirMethodType = getOllirType(methodType);
         SubstituteVariable methodCallHolder = createTemporaryVariable(node);
         boolean isVirtualCall = accessedVariable.getValue().equals("this") || symbolTable.isLocalVariableOrSymbol(node, accessedVariable.getSubstitute());
+
+        SubstituteVariable targetHolder = isVirtualCall ? createTemporaryVariable(node) : accessedVariable;
+        if (isVirtualCall) {
+            ollirCode.append(createTemporaryAssign(targetHolder.getVariableName(),
+                    getOllirType(accessedVariable.getVariableType()), accessedVariable.getSubstituteWithType()));
+            targetHolder.setVariableType(accessedVariable.getVariableType());
+            startNewLine();
+        }
         ollirCode.append(createTemporaryAssign(methodCallHolder.getVariableName(), ollirMethodType,
-                invoke(isVirtualCall ? "invokevirtual" : "invokestatic", accessedVariable.getInvokeString(node, symbolTable),
+                invoke(isVirtualCall ? "invokevirtual" : "invokestatic", targetHolder.getInvokeString(node, symbolTable),
                         node.getJmmChild(0).get("name"),
                         arguments.stream().map(SubstituteVariable::getSubstituteWithType).collect(Collectors.toList()), ollirMethodType)));
+
         accessedVariable.setValue(methodCallHolder.getVariableName());
         accessedVariable.setVariableTypeIfNotPresent(methodType);
         return true;
@@ -443,6 +452,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         if (symbolTable.getClosestSymbol(node, variableName).isPresent()) {
             symbol = symbolTable.getClosestSymbol(node, variableName).get();
             substituteVariable.setVariableType(symbol.getType());
+            substituteVariable.setVariableName(symbol.getName());
         } else {
             symbol = new Symbol(new Type("void", false), variableName);
             substituteVariable.setVariableTypeIfNotPresent(symbol.getType());
@@ -451,19 +461,6 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         var closestMethod = getClosestMethod(node);
         if (closestMethod.isEmpty()) {
             return false;
-        }
-
-        boolean isIdentifierAssign = node.getAncestor("BinOp").isPresent()
-                && node.getAncestor("BinOp").get().get("op").equals("assign")
-                && node.getAncestor("BinOp").get().getKind().equals("Identifier")
-                && node.getAncestor("BinOp").get().getJmmChild(0).get("name").equals(variableName);
-        if (!isIdentifierAssign && symbolTable.getFields().stream().anyMatch(s -> s.getName().equals(variableName))) {
-            SubstituteVariable temporaryHolder = createTemporaryVariable(node);
-            startNewLine();
-            ollirCode.append(createTemporaryAssign(temporaryHolder.getVariableName(), getOllirType(symbol),
-                    getField("this", getSafeVariableName(variableName), getOllirType(symbol.getType()))));
-            substituteVariable.setValue(temporaryHolder.getVariableName());
-            return true;
         }
 
         var methodName = getMethodName(closestMethod.get());
