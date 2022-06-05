@@ -34,7 +34,7 @@ public class SemanticAnalyserTest {
                 "public int bar(int a){this.foo(b); return 0;}" +
                 "}");
         TestUtils.noErrors(result.getReports());
-        result = TestUtils.analyse("class dummy {String a; public static void main(String[] args){args[0] = this.a;}}");
+        result = TestUtils.analyse("class dummy {int a; public int foo(int[] arr){arr[0] = this.a; return 0;}}");
         TestUtils.noErrors(result.getReports());
         result = TestUtils.analyse("import ioPlus;" +
                 "class HelloWorld {" +
