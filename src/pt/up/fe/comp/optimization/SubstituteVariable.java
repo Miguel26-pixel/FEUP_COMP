@@ -57,7 +57,7 @@ public class SubstituteVariable {
 
     public String getInvokeString(JmmNode node, JmmSymbolTable symbolTable) {
         String invokeClass = getSubstitute();
-        return symbolTable.isLocalVariableOrSymbol(node, invokeClass)
+        return symbolTable.isLocalVariable(node, invokeClass)
                 ? invokeClass + "." + getOllirType(getVariableType()) : invokeClass;
     }
 }
