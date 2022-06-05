@@ -368,6 +368,9 @@ public class InstructionTranslator {
             Operand operand = (Operand) element;
 
             Descriptor operandDescriptor = ancestorMethod.getVarTable().get(operand.getName());
+            if (operandDescriptor.getVirtualReg() < 0) {
+                return "";
+            }
 
             switch (operandDescriptor.getVarType().getTypeOfElement()) {
                 case INT32:
