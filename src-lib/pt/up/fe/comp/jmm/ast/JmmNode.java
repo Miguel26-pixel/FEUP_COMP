@@ -82,7 +82,9 @@ public interface JmmNode {
 
     /**
      * 
-     * @return the children of the node or an empty list if there are no children
+     * @return the children of the node or an empty list if there are no children. The returned list is a copy of the
+     *         underlying list, so changes to this list will not be reflected on the AST. To change the AST please use
+     *         the node methods
      * 
      */
     List<JmmNode> getChildren();
@@ -120,6 +122,14 @@ public interface JmmNode {
      * @param index
      */
     void add(JmmNode child, int index);
+
+    /**
+     * Replaces a node at the given position. If the given node already has a parent, swaps positions.
+     * 
+     * @param child
+     * @param index
+     */
+    void setChild(JmmNode newNode, int index);
 
     default String toJson() {
         Gson gson = new GsonBuilder()
@@ -209,6 +219,47 @@ public interface JmmNode {
      */
     default void delete() {
         throw new RuntimeException("Not implemented for this class: " + getClass());
+    }
+
+    /**
+     * @return the index of this token in its parent token, or -1 if it does not have a parent
+     */
+    default int getIndexOfSelf() {
+        var parent = getJmmParent();
+        if (parent == null) {
+            return -1;
+        }
+
+        return parent.getChildren().indexOf(this);
+    }
+
+    /**
+     * Removes the parent from this node. If this node does not have a parent, throws an exception.
+     */
+    default void removeParent() {
+        throw new RuntimeException("Not implemented for this class: " + getClass());
+    }
+
+    default void setParent(JmmNode parent) {
+        throw new RuntimeException("Not implemented for this class: " + getClass());
+    }
+
+    /**
+     * Replaces the current node with the given node. If the given node already has a parent, swaps nodes.
+     * 
+     * @param newNode
+     */
+    default void replace(JmmNode newNode) {
+        var parent = getJmmParent();
+        if (parent == null) {
+            System.out.println("Tried to replace node, but it does not have a parent. Base node:\n" + this
+                    + "\nNew node:\n" + newNode);
+            return;
+        }
+
+        int currentNodeIndex = getIndexOfSelf();
+
+        parent.setChild(newNode, currentNodeIndex);
     }
 
 }

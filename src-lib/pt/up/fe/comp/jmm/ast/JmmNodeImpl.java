@@ -26,7 +26,7 @@ public class JmmNodeImpl extends AJmmNode {
 
     @Override
     public List<JmmNode> getChildren() {
-        return this.children;
+        return new ArrayList<>(this.children);
     }
 
     @Override
@@ -90,7 +90,8 @@ public class JmmNodeImpl extends AJmmNode {
         return gson.fromJson(source, JmmNodeImpl.class);
     }
 
-    public void setParent(JmmNodeImpl parent) {
+    @Override
+    public void setParent(JmmNode parent) {
         this.parent = parent;
     }
 
@@ -150,5 +151,31 @@ public class JmmNodeImpl extends AJmmNode {
         }
 
         parent.removeJmmChild(this);
+    }
+
+    @Override
+    public void setChild(JmmNode newNode, int index) {
+        var currentChild = getJmmChild(index);
+
+        // Remove parent before setting
+        JmmNode newNodeParent = newNode.getJmmParent();
+        int newNodeCurrentIndex = -1;
+
+        if (newNodeParent != null) {
+            newNodeCurrentIndex = newNode.getIndexOfSelf();
+            newNode.removeParent();
+        }
+
+        children.set(index, newNode);
+        newNode.setParent(this);
+
+        // Remove parent from current child
+        currentChild.removeParent();
+
+        // If new node had a parent, set this node at the old position of the new node
+        if (newNodeParent != null) {
+            ((JmmNodeImpl) newNodeParent).children.set(newNodeCurrentIndex, currentChild);
+            currentChild.setParent(newNodeParent);
+        }
     }
 }
