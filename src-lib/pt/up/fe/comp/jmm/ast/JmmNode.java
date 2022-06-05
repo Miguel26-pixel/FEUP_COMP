@@ -129,7 +129,9 @@ public interface JmmNode {
      * @param child
      * @param index
      */
-    void setChild(JmmNode newNode, int index);
+    default void setChild(JmmNode newNode, int index) {
+        throw new RuntimeException("Not implemented for this class: " + getClass());
+    }
 
     default String toJson() {
         Gson gson = new GsonBuilder()
