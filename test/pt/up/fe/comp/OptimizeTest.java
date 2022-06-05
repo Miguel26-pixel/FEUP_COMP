@@ -82,4 +82,9 @@ public class OptimizeTest {
     public void varLookupField() {
         testOptimize("fixtures/public/cpf/2_semantic_analysis/lookup/VarLookup_Field.jmm");
     }
+
+    @Test
+    public void setInline() {
+        testOptimize("fixtures/public/cpf/4_jasmin/calls/PrintOtherClassInline.jmm");
+    }
 }

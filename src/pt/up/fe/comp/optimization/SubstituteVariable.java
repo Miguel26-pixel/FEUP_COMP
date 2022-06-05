@@ -10,7 +10,7 @@ public class SubstituteVariable {
     private Type variableType;
     private String variableName = "";
     private String variableValue;
-    private Type assignType = new Type("void", false);
+    private Type assignType = new Type("int", false);
 
     public SubstituteVariable(String variableName) {
         this.variableName = variableName;
@@ -30,12 +30,6 @@ public class SubstituteVariable {
 
     public void setVariableName(String variableName) {
         this.variableName = variableName;
-    }
-
-    public void setVariableTypeIfNotPresent(Type variableType) {
-        if (this.variableType == null) {
-            this.variableType = variableType;
-        }
     }
 
     public String getValue() {
@@ -59,5 +53,13 @@ public class SubstituteVariable {
         String invokeClass = getSubstitute();
         return symbolTable.isLocalVariable(node, invokeClass)
                 ? invokeClass + "." + getOllirType(getVariableType()) : invokeClass;
+    }
+
+    public void setAssignType(Type assignType) {
+        this.assignType = assignType;
+    }
+
+    public Type getAssignType() {
+        return assignType;
     }
 }
