@@ -3,6 +3,7 @@ package pt.up.fe.comp.backend;
 import org.specs.comp.ollir.*;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class MethodDefinitionGenerator {
     private Method method;
@@ -21,7 +22,7 @@ public class MethodDefinitionGenerator {
 
         StringBuilder instructions = new StringBuilder();
 
-        method.buildVarTable();
+        this.method.buildVarTable();
         InstructionTranslator instructionTranslator = new InstructionTranslator();
         boolean hasReturn = false;
 
@@ -39,7 +40,7 @@ public class MethodDefinitionGenerator {
         }
 
         methodDefinition.append("\t.limit stack ").append(instructionTranslator.getMaxLoadCounter()).append("\n");
-        methodDefinition.append("\t.limit locals 99\n");
+        methodDefinition.append("\t.limit locals ").append(this.getLocalsLimit()).append("\n");
 
         methodDefinition.append(instructions);
 
@@ -88,5 +89,13 @@ public class MethodDefinitionGenerator {
 
     public void setMethod(Method method) {
         this.method = method;
+    }
+
+    private int getLocalsLimit() {
+        if (this.method == null) {
+            return 0;
+        }
+
+        return this.method.getVarTable().values().stream().mapToInt(Descriptor::getVirtualReg).max().orElse(0) + 1;
     }
 }
