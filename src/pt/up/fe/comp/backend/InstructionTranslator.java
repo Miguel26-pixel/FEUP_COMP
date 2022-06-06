@@ -271,31 +271,26 @@ public class InstructionTranslator {
 
         switch (operationType) {
             case ADD:
-            case ADDI32:
             case SUB:
-            case SUBI32:
             case MUL:
-            case MULI32:
             case DIV:
-            case DIVI32:
             case LTH:
             case AND:
             case ANDB:
             case OR:
             case ORB:
             case EQ:
-            case EQI32:
                 jasminInstruction.append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
                 jasminInstruction.append(getCorrespondingLoad(second, ancestorMethod)).append("\n");
                 jasminInstruction.append(getIndentation());
 
-                if (operationType == OperationType.ADD || operationType == OperationType.ADDI32) {
+                if (operationType == OperationType.ADD) {
                     jasminInstruction.append("iadd");
-                } else if (operationType == OperationType.SUB || operationType == OperationType.SUBI32) {
+                } else if (operationType == OperationType.SUB) {
                     jasminInstruction.append("isub");
-                } else if (operationType == OperationType.MUL || operationType == OperationType.MULI32) {
+                } else if (operationType == OperationType.MUL) {
                     jasminInstruction.append("imul");
-                } else if (operationType == OperationType.DIV || operationType == OperationType.DIVI32){
+                } else if (operationType == OperationType.DIV){
                     jasminInstruction.append("idiv");
                 } else if (operationType == OperationType.LTH) {
                     jasminInstruction.append(this.getIfBody("if_icmplt"));
