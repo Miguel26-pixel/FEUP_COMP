@@ -169,52 +169,54 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
 
     private Boolean visitIf(JmmNode node, SubstituteVariable dummy) {
         ifCounter++;
+        int localCounter = ifCounter;
+
         SubstituteVariable conditionHolder = createTemporaryVariable(node);
         visit(node.getJmmChild(0), conditionHolder);
         startNewLine();
         ollirCode.append("if (!.bool ").append(conditionHolder.getSubstituteWithType())
-                .append(") goto Else").append(ifCounter).append(";");
+                .append(") goto Else").append(localCounter).append(";");
         startNewLine();
-        ollirCode.append("Then").append(ifCounter).append(":");
+        ollirCode.append("Then").append(localCounter).append(":");
         indentationLevel++;
         for (var thenChild : node.getJmmChild(1).getChildren()) {
             visit(thenChild);
         }
         startNewLine();
-        ollirCode.append("goto EndIf").append(ifCounter).append(";");
+        ollirCode.append("goto EndIf").append(localCounter).append(";");
         indentationLevel--;
         startNewLine();
-        ollirCode.append("Else").append(ifCounter).append(":");
+        ollirCode.append("Else").append(localCounter).append(":");
         indentationLevel++;
         for (var elseChild : node.getJmmChild(2).getChildren()) {
             visit(elseChild);
         }
         indentationLevel--;
         startNewLine();
-        ollirCode.append("EndIf").append(ifCounter).append(":");
-        ifCounter--;
+        ollirCode.append("EndIf").append(localCounter).append(":");
         return true;
     }
 
     private Boolean visitWhile(JmmNode node, SubstituteVariable dummy) {
         loopCounter++;
+        int localCounter = loopCounter;
+
         startNewLine();
-        ollirCode.append("Loop").append(loopCounter).append(":");
+        ollirCode.append("Loop").append(localCounter).append(":");
         indentationLevel++;
         SubstituteVariable conditionHolder = createTemporaryVariable(node);
         visit(node.getJmmChild(0), conditionHolder);
         startNewLine();
         ollirCode.append("if (!.bool ").append(conditionHolder.getSubstituteWithType())
-                .append(") goto EndLoop").append(loopCounter).append(";");
+                .append(") goto EndLoop").append(localCounter).append(";");
         for (var bodyChild : node.getJmmChild(1).getChildren()) {
             visit(bodyChild);
         }
         startNewLine();
-        ollirCode.append("goto Loop").append(loopCounter).append(";");
+        ollirCode.append("goto Loop").append(localCounter).append(";");
         indentationLevel--;
         startNewLine();
-        ollirCode.append("EndLoop").append(loopCounter).append(":");
-        loopCounter--;
+        ollirCode.append("EndLoop").append(localCounter).append(":");
         return true;
     }
 
