@@ -529,7 +529,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
     }
 
     private Boolean visitBooleanLiteral(JmmNode node, SubstituteVariable substituteVariable) {
-        substituteVariable.setValue(node.get("value"));
+        substituteVariable.setValue(node.get("value").equals("true") ? "1" : "0");
         substituteVariable.setVariableType(new Type("boolean", false));
         return true;
     }
