@@ -16,8 +16,10 @@ public class MethodDefinitionGenerator {
 
         methodDefinition.append(getMethodHeader()).append("\n");
 
-        methodDefinition.append("\t.limit stack 99\n");
-        methodDefinition.append("\t.limit locals 99\n");
+        //methodDefinition.append("\t.limit stack 99\n");
+        //methodDefinition.append("\t.limit locals 99\n");
+
+        StringBuilder instructions = new StringBuilder();
 
         method.buildVarTable();
         InstructionTranslator instructionTranslator = new InstructionTranslator();
@@ -30,11 +32,16 @@ public class MethodDefinitionGenerator {
 
             for (Map.Entry<String, Instruction> entry: method.getLabels().entrySet()) {
                 if (entry.getValue().equals(instruction)) {
-                    methodDefinition.append(entry.getKey()).append(":").append("\n");
+                    instructions.append(entry.getKey()).append(":").append("\n");
                 }
             }
-            methodDefinition.append(instructionTranslator.translateInstruction(instruction, method)).append("\n");
+            instructions.append(instructionTranslator.translateInstruction(instruction, method)).append("\n");
         }
+
+        methodDefinition.append("\t.limit stack ").append(instructionTranslator.getMaxLoadCounter()).append("\n");
+        methodDefinition.append("\t.limit locals 99\n");
+
+        methodDefinition.append(instructions);
 
         if (!hasReturn) {
             methodDefinition.append("\t").append("return").append("\n");

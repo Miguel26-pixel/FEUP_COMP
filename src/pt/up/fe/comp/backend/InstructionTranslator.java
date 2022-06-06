@@ -7,34 +7,52 @@ import java.util.ArrayList;
 public class InstructionTranslator {
     private int indentationLevel = 1;
     private int labelCounter = 0;
+    private int loadCounter = 1;
+    private int maxLoadCounter = 1;
 
     public String translateInstruction(Instruction instruction, Method ancestorMethod) {
         InstructionType instructionType = instruction.getInstType();
+        StringBuilder translatedInstruction = new StringBuilder();
+        loadCounter = 1;
 
         switch (instructionType) {
             case CALL:
-                return translateInstruction((CallInstruction) instruction, ancestorMethod);
+                translatedInstruction.append(translateInstruction((CallInstruction) instruction, ancestorMethod));
+                break;
             case RETURN:
-                return translateInstruction((ReturnInstruction) instruction, ancestorMethod);
+                translatedInstruction.append(translateInstruction((ReturnInstruction) instruction, ancestorMethod));
+                break;
             case PUTFIELD:
-                return translateInstruction((PutFieldInstruction) instruction, ancestorMethod);
+                translatedInstruction.append(translateInstruction((PutFieldInstruction) instruction, ancestorMethod));
+                break;
             case GETFIELD:
-                return translateInstruction((GetFieldInstruction) instruction, ancestorMethod);
+                translatedInstruction.append(translateInstruction((GetFieldInstruction) instruction, ancestorMethod));
+                break;
             case ASSIGN:
-                return translateInstruction((AssignInstruction) instruction, ancestorMethod);
+                translatedInstruction.append(translateInstruction((AssignInstruction) instruction, ancestorMethod));
+                break;
             case BINARYOPER:
-                return translateInstruction((BinaryOpInstruction) instruction, ancestorMethod);
+                translatedInstruction.append(translateInstruction((BinaryOpInstruction) instruction, ancestorMethod));
+                break;
             case UNARYOPER:
-                return translateInstruction((UnaryOpInstruction) instruction, ancestorMethod);
+                translatedInstruction.append(translateInstruction((UnaryOpInstruction) instruction, ancestorMethod));
+                break;
             case NOPER:
-                return translateInstruction((SingleOpInstruction) instruction, ancestorMethod);
+                translatedInstruction.append(translateInstruction((SingleOpInstruction) instruction, ancestorMethod));
+                break;
             case GOTO:
-                return translateInstruction((GotoInstruction) instruction, ancestorMethod);
+                translatedInstruction.append(translateInstruction((GotoInstruction) instruction, ancestorMethod));
+                break;
             case BRANCH:
-                return translateInstruction((CondBranchInstruction) instruction, ancestorMethod);
+                translatedInstruction.append(translateInstruction((CondBranchInstruction) instruction, ancestorMethod));
+                break;
             default:
-                return "";
+                break;
         }
+
+        this.maxLoadCounter = Integer.max(this.maxLoadCounter, this.loadCounter);
+
+        return translatedInstruction.toString();
     }
 
     public String translateInstruction(CondBranchInstruction instruction, Method ancestorMethod) {
@@ -324,6 +342,7 @@ public class InstructionTranslator {
     }
 
     private String getCorrespondingLoad(Element element, Method ancestorMethod) {
+        this.loadCounter += 1;
         if (element.isLiteral()) {
             LiteralElement literalElement = (LiteralElement) element;
 
@@ -465,5 +484,9 @@ public class InstructionTranslator {
 
     private String getIndentation() {
         return "\t".repeat(this.indentationLevel);
+    }
+
+    public int getMaxLoadCounter() {
+        return maxLoadCounter;
     }
 }
