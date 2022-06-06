@@ -19,9 +19,9 @@ public class JmmSymbolTable extends ReportCollectorTable implements SymbolTable 
 
     public JmmSymbolTable(JmmParserResult parserResult) {
         importsTable = new ImportsTable(parserResult);
-        methodsTable = new MethodsTable(parserResult);
         ClassDeclarationVisitor classDeclarationVisitor = new ClassDeclarationVisitor();
         classDeclarationVisitor.visit(parserResult.getRootNode(), classSignature);
+        methodsTable = new MethodsTable(parserResult);
         this.reports.addAll(importsTable.getReports());
         this.reports.addAll(methodsTable.getReports());
         this.reports.addAll(classDeclarationVisitor.getReports());
@@ -100,17 +100,16 @@ public class JmmSymbolTable extends ReportCollectorTable implements SymbolTable 
         return method;
     }
 
-    public boolean isLocalVariableOrSymbol(JmmNode node, String name) {
+    public boolean isLocalVariable(JmmNode node, String name) {
         var closestSymbol = getClosestSymbol(node, name);
         if (closestSymbol.isEmpty()) {
             return !this.importsTable.getImports().contains(name) && !name.equals("this");
         }
-        for (Symbol symbol : classSignature.getFields()) {
-            if (symbol.getName().equals(name)) {
-                return false;
-            }
+        var closestMethod = getClosestMethod(node);
+        if (closestMethod.isEmpty()){
+            return false;
         }
-        return true;
+        return this.getLocalVariables(getMethodName(closestMethod.get())).stream().anyMatch(s -> s.getName().equals(name));
     }
 
     public static String getMethodName(JmmNode method) {

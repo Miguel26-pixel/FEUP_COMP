@@ -38,7 +38,7 @@ class Lazysort extends Quicksort {
             lazy = !lazy;
         }
         else {
-            lazy = this.quicksort(L, 0, L.length - 1);
+            lazy = this.quicksort(L);
         }
         
         return lazy;

@@ -2,33 +2,72 @@ package pt.up.fe.comp.backend;
 
 import org.specs.comp.ollir.*;
 
+import java.util.ArrayList;
+
 public class InstructionTranslator {
-    public String translateInstruction(Instruction instruction, Method ancestorMethod, int indentationLevel) {
+    private int indentationLevel = 1;
+    private int labelCounter = 0;
+    private int loadCounter = 1;
+    private int maxLoadCounter = 1;
+
+    public String translateInstruction(Instruction instruction, Method ancestorMethod) {
         InstructionType instructionType = instruction.getInstType();
+        StringBuilder translatedInstruction = new StringBuilder();
+        loadCounter = 1;
 
         switch (instructionType) {
             case CALL:
-                return translateInstruction((CallInstruction) instruction, ancestorMethod, indentationLevel);
+                translatedInstruction.append(translateInstruction((CallInstruction) instruction, ancestorMethod));
+                break;
             case RETURN:
-                return translateInstruction((ReturnInstruction) instruction, ancestorMethod, indentationLevel);
+                translatedInstruction.append(translateInstruction((ReturnInstruction) instruction, ancestorMethod));
+                break;
             case PUTFIELD:
-                return translateInstruction((PutFieldInstruction) instruction, ancestorMethod, indentationLevel);
+                translatedInstruction.append(translateInstruction((PutFieldInstruction) instruction, ancestorMethod));
+                break;
             case GETFIELD:
-                return translateInstruction((GetFieldInstruction) instruction, ancestorMethod, indentationLevel);
+                translatedInstruction.append(translateInstruction((GetFieldInstruction) instruction, ancestorMethod));
+                break;
             case ASSIGN:
-                return translateInstruction((AssignInstruction) instruction, ancestorMethod, indentationLevel);
+                translatedInstruction.append(translateInstruction((AssignInstruction) instruction, ancestorMethod));
+                break;
             case BINARYOPER:
-                return translateInstruction((BinaryOpInstruction) instruction, ancestorMethod, indentationLevel);
+                translatedInstruction.append(translateInstruction((BinaryOpInstruction) instruction, ancestorMethod));
+                break;
             case UNARYOPER:
-                return translateInstruction((UnaryOpInstruction) instruction, ancestorMethod, indentationLevel);
+                translatedInstruction.append(translateInstruction((UnaryOpInstruction) instruction, ancestorMethod));
+                break;
             case NOPER:
-                return translateInstruction((SingleOpInstruction) instruction, ancestorMethod, indentationLevel);
+                translatedInstruction.append(translateInstruction((SingleOpInstruction) instruction, ancestorMethod));
+                break;
+            case GOTO:
+                translatedInstruction.append(translateInstruction((GotoInstruction) instruction, ancestorMethod));
+                break;
+            case BRANCH:
+                translatedInstruction.append(translateInstruction((CondBranchInstruction) instruction, ancestorMethod));
+                break;
             default:
-                return "";
+                break;
         }
+
+        this.maxLoadCounter = Integer.max(this.maxLoadCounter, this.loadCounter);
+
+        return translatedInstruction.toString();
     }
 
-    public String translateInstruction(UnaryOpInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(CondBranchInstruction instruction, Method ancestorMethod) {
+        StringBuilder jasminInstruction = new StringBuilder();
+        jasminInstruction.append(translateInstruction(instruction.getCondition(), ancestorMethod)).append("\n");
+        //jasminInstruction.append(getIndentation()).append("ldc 1").append("\n");
+        jasminInstruction.append(getIndentation()).append("ifne ").append(instruction.getLabel());
+        return jasminInstruction.toString();
+    }
+
+    public String translateInstruction(GotoInstruction instruction, Method ancestorMethod) {
+        return getIndentation() + "goto " + instruction.getLabel();
+    }
+
+    public String translateInstruction(UnaryOpInstruction instruction, Method ancestorMethod) {
         Operation operation = instruction.getOperation();
         OperationType operationType = operation.getOpType();
         Element first = instruction.getOperand();
@@ -36,16 +75,8 @@ public class InstructionTranslator {
         if (operationType == OperationType.NOT || operationType == OperationType.NOTB) {
             StringBuilder jasminInstruction = new StringBuilder();
 
-            if (first.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement()) {
-                return "UNMATCHING TYPES";
-            }
-
-            if (operation.getTypeInfo().getTypeOfElement() != ElementType.BOOLEAN) {
-                return "INCORRECT TYPE";
-            }
-
-            jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
-            jasminInstruction.append(getIndentation(indentationLevel)).append("ineg");
+            jasminInstruction.append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
+            jasminInstruction.append(getIndentation()).append(getIfBody("ifeq"));
 
             return jasminInstruction.toString();
         }
@@ -53,11 +84,11 @@ public class InstructionTranslator {
         return "UNSUPPORTED UNARY OPERATION";
     }
 
-    public String translateInstruction(SingleOpInstruction instruction, Method ancestorMethod, int indentationLevel) {
-        return getIndentation(indentationLevel) + getCorrespondingLoad(instruction.getSingleOperand(), ancestorMethod);
+    public String translateInstruction(SingleOpInstruction instruction, Method ancestorMethod) {
+        return getCorrespondingLoad(instruction.getSingleOperand(), ancestorMethod);
     }
 
-    public String translateInstruction(GetFieldInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(GetFieldInstruction instruction, Method ancestorMethod) {
         Element destinationObject = instruction.getFirstOperand();
         Element destinationField = instruction.getSecondOperand();
 
@@ -68,10 +99,10 @@ public class InstructionTranslator {
         StringBuilder jasminInstruction = new StringBuilder();
 
         if (destinationObject.getType().getTypeOfElement() == ElementType.OBJECTREF || destinationObject.getType().getTypeOfElement() == ElementType.THIS) {
-            jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(destinationObject, ancestorMethod)).append("\n");
-            jasminInstruction.append(getIndentation(indentationLevel)).append("getfield ");
+            jasminInstruction.append(getCorrespondingLoad(destinationObject, ancestorMethod)).append("\n");
+            jasminInstruction.append(getIndentation()).append("getfield ");
         } else if (destinationObject.getType().getTypeOfElement() == ElementType.CLASS) {
-            jasminInstruction.append(getIndentation(indentationLevel)).append("getstatic ");
+            jasminInstruction.append(getIndentation()).append("getstatic ");
         }
 
         ClassType classType = (ClassType) destinationObject.getType();
@@ -82,7 +113,7 @@ public class InstructionTranslator {
         return jasminInstruction.toString();
     }
 
-    public String translateInstruction(PutFieldInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(PutFieldInstruction instruction, Method ancestorMethod) {
         Element destinationObject = instruction.getFirstOperand();
         Element destinationField = instruction.getSecondOperand();
 
@@ -94,11 +125,11 @@ public class InstructionTranslator {
         Element newFieldValue = instruction.getThirdOperand();
 
         if (destinationObject.getType().getTypeOfElement() == ElementType.OBJECTREF || destinationObject.getType().getTypeOfElement() == ElementType.THIS) {
-            jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(destinationObject, ancestorMethod)).append("\n");
-            jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(newFieldValue, ancestorMethod)).append("\n");
-            jasminInstruction.append(getIndentation(indentationLevel)).append("putfield ");
+            jasminInstruction.append(getCorrespondingLoad(destinationObject, ancestorMethod)).append("\n");
+            jasminInstruction.append(getCorrespondingLoad(newFieldValue, ancestorMethod)).append("\n");
+            jasminInstruction.append(getIndentation()).append("putfield ");
         } else {
-            jasminInstruction.append(getIndentation(indentationLevel)).append("putstatic ");
+            jasminInstruction.append(getIndentation()).append("putstatic ");
         }
         ClassType classType = (ClassType) destinationObject.getType();
 
@@ -108,7 +139,7 @@ public class InstructionTranslator {
         return jasminInstruction.toString();
     }
 
-    public String translateInstruction(AssignInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(AssignInstruction instruction, Method ancestorMethod) {
         Element destination = instruction.getDest();
 
         if (destination.isLiteral()) {
@@ -117,16 +148,24 @@ public class InstructionTranslator {
 
         Instruction rhs = instruction.getRhs();
 
+        if (destination instanceof ArrayOperand) {
+            return getCorrespondingStore(destination, ancestorMethod) + "\n" + translateInstruction(rhs, ancestorMethod) + "\n" + getIndentation() + "iastore";
+        }
+
         if (rhs.getInstType() == InstructionType.CALL) {
-            if (((CallInstruction) rhs).getInvocationType() == CallType.NEW) {
-                return translateInstruction(rhs, ancestorMethod, indentationLevel);
+            CallInstruction callInstruction = (CallInstruction) rhs;
+            if (callInstruction.getInvocationType() == CallType.NEW) {
+                ElementType elementType = callInstruction.getFirstArg().getType().getTypeOfElement();
+                if (elementType != ElementType.ARRAYREF) {
+                    return translateInstruction(rhs, ancestorMethod);
+                }
             }
         }
 
-        return translateInstruction(rhs, ancestorMethod, indentationLevel) + "\n" + getIndentation(indentationLevel) + getCorrespondingStore(destination, ancestorMethod);
+        return translateInstruction(rhs, ancestorMethod) + "\n" + getCorrespondingStore(destination, ancestorMethod);
     }
 
-    public String translateInstruction(CallInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(CallInstruction instruction, Method ancestorMethod) {
         StringBuilder jasminInstruction = new StringBuilder();
         StringBuilder parametersDescriptor = new StringBuilder();
         Operand caller = (Operand) instruction.getFirstArg();
@@ -138,15 +177,15 @@ public class InstructionTranslator {
             case invokestatic:
             case invokevirtual:
                 if (callType == CallType.invokevirtual) {
-                    jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(caller, ancestorMethod)).append("\n");
+                    jasminInstruction.append(getCorrespondingLoad(caller, ancestorMethod)).append("\n");
                 }
 
                 for (Element element: instruction.getListOfOperands()) {
-                    jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
+                    jasminInstruction.append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
                     parametersDescriptor.append(JasminUtils.translateType(ancestorMethod.getOllirClass(), element.getType()));
                 }
 
-                jasminInstruction.append(getIndentation(indentationLevel));
+                jasminInstruction.append(getIndentation());
 
                 if (callType == CallType.invokestatic) {
                     jasminInstruction.append("invokestatic ").append(caller.getName());
@@ -167,17 +206,16 @@ public class InstructionTranslator {
             case invokespecial:
                 if (ancestorMethod.isConstructMethod()) {
                     if (caller.getName().equals("this")) {
-                        jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(caller, ancestorMethod)).append("\n");
+                        jasminInstruction.append(getCorrespondingLoad(caller, ancestorMethod)).append("\n");
                     }
                 }
 
                 for (Element element: instruction.getListOfOperands()) {
-                    jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
+                    jasminInstruction.append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
                     parametersDescriptor.append(JasminUtils.translateType(ancestorMethod.getOllirClass(), element.getType()));
                 }
 
-                jasminInstruction.append(getIndentation(indentationLevel));
-
+                jasminInstruction.append(getIndentation());
 
                 jasminInstruction.append("invokespecial ");
 
@@ -198,23 +236,33 @@ public class InstructionTranslator {
                 jasminInstruction.append(")").append(JasminUtils.translateType(ancestorMethod.getOllirClass(), instruction.getReturnType()));
 
                 if (!ancestorMethod.isConstructMethod()) {
-                    jasminInstruction.append("\n").append(getIndentation(indentationLevel)).append(getCorrespondingStore(instruction.getFirstArg(), ancestorMethod));
+                    jasminInstruction.append("\n").append(getCorrespondingStore(instruction.getFirstArg(), ancestorMethod));
                 }
                 break;
             case NEW:
                 ElementType elementType = caller.getType().getTypeOfElement();
                 if (elementType == ElementType.OBJECTREF || elementType == ElementType.CLASS) {
-                    jasminInstruction.append(getIndentation(indentationLevel)).append("new ").append(caller.getName()).append("\n");
-                    jasminInstruction.append(getIndentation(indentationLevel)).append("dup");
+                    jasminInstruction.append(getIndentation()).append("new ").append(caller.getName()).append("\n");
+                    jasminInstruction.append(getIndentation()).append("dup");
+                } else if (elementType == ElementType.ARRAYREF) {
+                    ArrayList<Element> operands = instruction.getListOfOperands();
+                    if (operands.size() < 1) {
+                        return "";
+                    }
+
+                    jasminInstruction.append(getCorrespondingLoad(operands.get(0), ancestorMethod)).append("\n");
+                    jasminInstruction.append(getIndentation()).append("newarray int");
                 }
                 break;
             case arraylength:
+                jasminInstruction.append(getCorrespondingLoad(caller, ancestorMethod)).append("\n");
+                jasminInstruction.append(getIndentation()).append("arraylength");
                 break;
         }
         return jasminInstruction.toString();
     }
 
-    public String translateInstruction(BinaryOpInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(BinaryOpInstruction instruction, Method ancestorMethod) {
         Element first = instruction.getLeftOperand();
         Element second = instruction.getRightOperand();
         Operation operation = instruction.getOperation();
@@ -231,17 +279,15 @@ public class InstructionTranslator {
             case DIV:
             case DIVI32:
             case LTH:
-                if (first.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement() || second.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement()) {
-                    return "UNMATCHING TYPES";
-                }
-
-                if (operation.getTypeInfo().getTypeOfElement() != ElementType.INT32) {
-                    return "INCORRECT TYPE";
-                }
-
-                jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
-                jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(second, ancestorMethod)).append("\n");
-                jasminInstruction.append(getIndentation(indentationLevel));
+            case AND:
+            case ANDB:
+            case OR:
+            case ORB:
+            case EQ:
+            case EQI32:
+                jasminInstruction.append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
+                jasminInstruction.append(getCorrespondingLoad(second, ancestorMethod)).append("\n");
+                jasminInstruction.append(getIndentation());
 
                 if (operationType == OperationType.ADD || operationType == OperationType.ADDI32) {
                     jasminInstruction.append("iadd");
@@ -251,29 +297,14 @@ public class InstructionTranslator {
                     jasminInstruction.append("imul");
                 } else if (operationType == OperationType.DIV || operationType == OperationType.DIVI32){
                     jasminInstruction.append("idiv");
-                } else {
-                    jasminInstruction.append("if_cmplt");
-                }
-
-                return jasminInstruction.toString();
-            case AND:
-            case OR:
-                if (first.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement() || second.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement()) {
-                    return "UNMATCHING TYPES";
-                }
-
-                if (operation.getTypeInfo().getTypeOfElement() != ElementType.BOOLEAN) {
-                    return "INCORRECT TYPE";
-                }
-
-                jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
-                jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(second, ancestorMethod)).append("\n");
-                jasminInstruction.append(getIndentation(indentationLevel));
-
-                if (operationType == OperationType.AND) {
+                } else if (operationType == OperationType.LTH) {
+                    jasminInstruction.append(this.getIfBody("if_icmplt"));
+                } else if (operationType == OperationType.AND || operationType == OperationType.ANDB) {
                     jasminInstruction.append("iand");
-                } else {
+                } else if (operationType == OperationType.OR || operationType == operationType.ORB){
                     jasminInstruction.append("ior");
+                } else {
+                    jasminInstruction.append(this.getIfBody("if_icmpeq"));
                 }
 
                 return jasminInstruction.toString();
@@ -281,7 +312,7 @@ public class InstructionTranslator {
         return "";
     }
 
-    public String translateInstruction(ReturnInstruction instruction, Method ancestorMethod, int indentationLevel) {
+    public String translateInstruction(ReturnInstruction instruction, Method ancestorMethod) {
         StringBuilder jasminInstruction = new StringBuilder();
         ElementType returnType = instruction.getReturnType().getTypeOfElement();
 
@@ -291,9 +322,10 @@ public class InstructionTranslator {
             case OBJECTREF:
             case CLASS:
             case STRING:
-                jasminInstruction.append(getIndentation(indentationLevel)).append(getCorrespondingLoad(instruction.getOperand(), ancestorMethod)).append("\n");
+            case ARRAYREF:
+                jasminInstruction.append(getCorrespondingLoad(instruction.getOperand(), ancestorMethod)).append("\n");
 
-                jasminInstruction.append(getIndentation(indentationLevel));
+                jasminInstruction.append(getIndentation());
                 if (returnType == ElementType.BOOLEAN || returnType == ElementType.INT32) {
                     jasminInstruction.append("ireturn");
                 } else {
@@ -302,7 +334,7 @@ public class InstructionTranslator {
 
                 break;
             case VOID:
-                jasminInstruction.append(getIndentation(indentationLevel)).append("return");
+                jasminInstruction.append(getIndentation()).append("return");
                 break;
         }
 
@@ -310,35 +342,62 @@ public class InstructionTranslator {
     }
 
     private String getCorrespondingLoad(Element element, Method ancestorMethod) {
+        this.loadCounter += 1;
         if (element.isLiteral()) {
             LiteralElement literalElement = (LiteralElement) element;
 
             switch (literalElement.getType().getTypeOfElement()) {
                 case INT32:
                 case STRING:
-                    return "ldc " + JasminUtils.trimLiteral(literalElement.getLiteral());
+                    return getIndentation() + "ldc " + JasminUtils.trimLiteral(literalElement.getLiteral());
                 case BOOLEAN:
                     String literal = JasminUtils.trimLiteral(literalElement.getLiteral());
-                    return literal.equals("true") ? "ldc 1" : "ldc 0";
+                    return getIndentation() + (literal.equals("true") || literal.equals("1") ? "ldc 1" : "ldc 0");
                 default:
-                    return "";
+                    return "Literal";
             }
         } else {
             Operand operand = (Operand) element;
 
             Descriptor operandDescriptor = ancestorMethod.getVarTable().get(operand.getName());
+            if (operandDescriptor.getVirtualReg() < 0) {
+                return "";
+            }
 
-            switch (operand.getType().getTypeOfElement()) {
+            switch (operandDescriptor.getVarType().getTypeOfElement()) {
                 case INT32:
                 case BOOLEAN:
-                    return "iload " + operandDescriptor.getVirtualReg();
+                    return getIndentation() + "iload " + operandDescriptor.getVirtualReg();
+                case ARRAYREF:
+                    StringBuilder jasminInstruction = new StringBuilder();
+
+                    jasminInstruction.append(getIndentation()).append("aload ").append(operandDescriptor.getVirtualReg());
+
+                    if (element instanceof ArrayOperand) {
+                        ArrayOperand arrayOperand = (ArrayOperand) operand;
+
+                        jasminInstruction.append("\n");
+
+                        ArrayList<Element> indexes = arrayOperand.getIndexOperands();
+
+                        if (indexes.size() < 1) {
+                            return "";
+                        }
+
+                        Element index = indexes.get(0);
+                        jasminInstruction.append(getCorrespondingLoad(index, ancestorMethod)).append("\n");
+
+                        jasminInstruction.append(getIndentation()).append("iaload");
+                    }
+
+                    return jasminInstruction.toString();
                 case CLASS:
                 case OBJECTREF:
                 case THIS:
                 case STRING:
-                    return "aload " + operandDescriptor.getVirtualReg();
+                    return getIndentation() + "aload " + operandDescriptor.getVirtualReg();
                 default:
-                    return "";
+                    return "Hello";
             }
         }
     }
@@ -354,19 +413,80 @@ public class InstructionTranslator {
             switch (operand.getType().getTypeOfElement()) {
                 case INT32:
                 case BOOLEAN:
-                    return "istore " + operandDescriptor.getVirtualReg();
+                    if (element instanceof ArrayOperand) {
+                        ArrayOperand arrayOperand = (ArrayOperand) operand;
+                        StringBuilder jasminInstruction = new StringBuilder();
+
+                        jasminInstruction.append(getIndentation()).append("aload ").append(operandDescriptor.getVirtualReg()).append("\n");
+
+                        ArrayList<Element> indexes = arrayOperand.getIndexOperands();
+
+                        if (indexes.size() < 1) {
+                            return "";
+                        }
+
+                        Element index = indexes.get(0);
+                        jasminInstruction.append(getCorrespondingLoad(index, ancestorMethod));
+
+                        return jasminInstruction.toString();
+                    }
+
+                    return getIndentation() + "istore " + operandDescriptor.getVirtualReg();
                 case CLASS:
                 case OBJECTREF:
                 case THIS:
                 case STRING:
-                    return "astore " + operandDescriptor.getVirtualReg();
+                    return getIndentation() + "astore " + operandDescriptor.getVirtualReg();
+                case ARRAYREF:
+                    StringBuilder jasminInstruction = new StringBuilder();
+
+                    if (element instanceof ArrayOperand) {
+                        ArrayOperand arrayOperand = (ArrayOperand) operand;
+                        jasminInstruction.append(getIndentation()).append("aload ").append(operandDescriptor.getVirtualReg()).append("\n");
+
+                        ArrayList<Element> indexes = arrayOperand.getIndexOperands();
+
+                        if (indexes.size() < 1) {
+                            return "";
+                        }
+
+                        Element index = indexes.get(0);
+                        jasminInstruction.append(getCorrespondingLoad(index, ancestorMethod)).append("\n");
+                    } else {
+                        jasminInstruction.append(getIndentation()).append("astore ").append(operandDescriptor.getVirtualReg());
+                    }
+
+                    return jasminInstruction.toString();
                 default:
                     return "";
             }
         }
     }
 
-    private String getIndentation(int indentationLevel) {
-        return "\t".repeat(indentationLevel);
+    private String getIfBody(String comparisonInstruction) {
+        StringBuilder ifBody = new StringBuilder();
+        ifBody.append(comparisonInstruction).append(" Then_").append(this.labelCounter).append("\n");
+        ifBody.append(getIndentation()).append("ldc 0").append("\n");
+        ifBody.append(getIndentation()).append("goto Finally_").append(this.labelCounter).append("\n");
+        this.indentationLevel--;
+        ifBody.append(getIndentation()).append("Then_").append(this.labelCounter).append(":").append("\n");
+        this.indentationLevel++;
+
+        ifBody.append(getIndentation()).append("ldc 1").append("\n");
+
+        this.indentationLevel--;
+        ifBody.append(getIndentation()).append("Finally_").append(this.labelCounter).append(":");
+        this.indentationLevel++;
+        this.labelCounter++;
+
+        return ifBody.toString();
+    }
+
+    private String getIndentation() {
+        return "\t".repeat(this.indentationLevel);
+    }
+
+    public int getMaxLoadCounter() {
+        return maxLoadCounter;
     }
 }

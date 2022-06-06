@@ -32,12 +32,6 @@ public class SubstituteVariable {
         this.variableName = variableName;
     }
 
-    public void setVariableTypeIfNotPresent(Type variableType) {
-        if (this.variableType == null) {
-            this.variableType = variableType;
-        }
-    }
-
     public String getValue() {
         return variableValue != null ? variableValue : variableName;
     }
@@ -57,7 +51,15 @@ public class SubstituteVariable {
 
     public String getInvokeString(JmmNode node, JmmSymbolTable symbolTable) {
         String invokeClass = getSubstitute();
-        return symbolTable.isLocalVariableOrSymbol(node, invokeClass)
+        return symbolTable.isLocalVariable(node, invokeClass)
                 ? invokeClass + "." + getOllirType(getVariableType()) : invokeClass;
+    }
+
+    public void setAssignType(Type assignType) {
+        this.assignType = assignType;
+    }
+
+    public Type getAssignType() {
+        return assignType;
     }
 }

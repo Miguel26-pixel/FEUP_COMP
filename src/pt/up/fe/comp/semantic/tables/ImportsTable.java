@@ -13,7 +13,6 @@ public class ImportsTable extends ReportCollectorTable {
         ImportDeclarationVisitor importDeclarationVisitor = new ImportDeclarationVisitor();
         importDeclarationVisitor.visit(parserResult.getRootNode(), this.imports);
         this.reports.addAll(importDeclarationVisitor.getReports());
-        System.out.println(this);
     }
 
     public List<String> getImports() {

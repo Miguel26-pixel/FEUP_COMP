@@ -23,7 +23,6 @@ public class MethodsTable extends ReportCollectorTable {
         localVariablesVisitor.visit(parserResult.getRootNode(), this.localVariables);
         this.reports.addAll(methodDeclarationVisitor.getReports());
         this.reports.addAll(localVariablesVisitor.getReports());
-        System.out.println(this);
     }
 
     public Map<String, JmmMethodSignature> getMethodSignatures() {

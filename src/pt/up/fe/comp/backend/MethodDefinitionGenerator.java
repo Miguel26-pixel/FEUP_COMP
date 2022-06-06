@@ -2,6 +2,9 @@ package pt.up.fe.comp.backend;
 
 import org.specs.comp.ollir.*;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
 public class MethodDefinitionGenerator {
     private Method method;
 
@@ -14,10 +17,12 @@ public class MethodDefinitionGenerator {
 
         methodDefinition.append(getMethodHeader()).append("\n");
 
-        methodDefinition.append("\t.limit stack 99\n");
-        methodDefinition.append("\t.limit locals 99\n");
+        //methodDefinition.append("\t.limit stack 99\n");
+        //methodDefinition.append("\t.limit locals 99\n");
 
-        method.buildVarTable();
+        StringBuilder instructions = new StringBuilder();
+
+        this.method.buildVarTable();
         InstructionTranslator instructionTranslator = new InstructionTranslator();
         boolean hasReturn = false;
 
@@ -25,8 +30,19 @@ public class MethodDefinitionGenerator {
             if (!hasReturn && instruction.getInstType() == InstructionType.RETURN) {
                 hasReturn = true;
             }
-            methodDefinition.append(instructionTranslator.translateInstruction(instruction, method, 1)).append("\n");
+
+            for (Map.Entry<String, Instruction> entry: method.getLabels().entrySet()) {
+                if (entry.getValue().equals(instruction)) {
+                    instructions.append(entry.getKey()).append(":").append("\n");
+                }
+            }
+            instructions.append(instructionTranslator.translateInstruction(instruction, method)).append("\n");
         }
+
+        methodDefinition.append("\t.limit stack ").append(instructionTranslator.getMaxLoadCounter()).append("\n");
+        methodDefinition.append("\t.limit locals ").append(this.getLocalsLimit()).append("\n");
+
+        methodDefinition.append(instructions);
 
         if (!hasReturn) {
             methodDefinition.append("\t").append("return").append("\n");
@@ -73,5 +89,13 @@ public class MethodDefinitionGenerator {
 
     public void setMethod(Method method) {
         this.method = method;
+    }
+
+    private int getLocalsLimit() {
+        if (this.method == null) {
+            return 0;
+        }
+
+        return this.method.getVarTable().values().stream().mapToInt(Descriptor::getVirtualReg).max().orElse(0) + 1;
     }
 }
