@@ -41,7 +41,7 @@ public class InstructionTranslator {
         StringBuilder jasminInstruction = new StringBuilder();
         jasminInstruction.append(translateInstruction(instruction.getCondition(), ancestorMethod)).append("\n");
         //jasminInstruction.append(getIndentation()).append("ldc 1").append("\n");
-        jasminInstruction.append(getIndentation()).append("ifeq ").append(instruction.getLabel());
+        jasminInstruction.append(getIndentation()).append("ifne ").append(instruction.getLabel());
         return jasminInstruction.toString();
     }
 
@@ -57,16 +57,8 @@ public class InstructionTranslator {
         if (operationType == OperationType.NOT || operationType == OperationType.NOTB) {
             StringBuilder jasminInstruction = new StringBuilder();
 
-            if (first.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement()) {
-                return "UNMATCHING TYPES";
-            }
-
-            if (operation.getTypeInfo().getTypeOfElement() != ElementType.BOOLEAN) {
-                return "INCORRECT TYPE";
-            }
-
             jasminInstruction.append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
-            jasminInstruction.append(getIndentation()).append("ineg");
+            jasminInstruction.append(getIndentation()).append(getIfBody("ifeq"));
 
             return jasminInstruction.toString();
         }
@@ -454,17 +446,17 @@ public class InstructionTranslator {
 
     private String getIfBody(String comparisonInstruction) {
         StringBuilder ifBody = new StringBuilder();
-        ifBody.append(comparisonInstruction).append(" Then").append(this.labelCounter).append("\n");
+        ifBody.append(comparisonInstruction).append(" Then_").append(this.labelCounter).append("\n");
         ifBody.append(getIndentation()).append("ldc 0").append("\n");
-        ifBody.append(getIndentation()).append("goto Finally").append(this.labelCounter).append("\n");
+        ifBody.append(getIndentation()).append("goto Finally_").append(this.labelCounter).append("\n");
         this.indentationLevel--;
-        ifBody.append(getIndentation()).append("Then").append(this.labelCounter).append(":").append("\n");
+        ifBody.append(getIndentation()).append("Then_").append(this.labelCounter).append(":").append("\n");
         this.indentationLevel++;
 
         ifBody.append(getIndentation()).append("ldc 1").append("\n");
 
         this.indentationLevel--;
-        ifBody.append(getIndentation()).append("Finally").append(this.labelCounter).append(":");
+        ifBody.append(getIndentation()).append("Finally_").append(this.labelCounter).append(":");
         this.indentationLevel++;
         this.labelCounter++;
 
