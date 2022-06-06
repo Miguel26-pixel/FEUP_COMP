@@ -139,7 +139,7 @@ public class InstructionTranslator {
         Instruction rhs = instruction.getRhs();
 
         if (destination instanceof ArrayOperand) {
-            return getCorrespondingStore(destination, ancestorMethod) + "\n" + translateInstruction(rhs, ancestorMethod) + "\n" + getIndentation() + "aastore";
+            return getCorrespondingStore(destination, ancestorMethod) + "\n" + translateInstruction(rhs, ancestorMethod) + "\n" + getIndentation() + "iastore";
         }
 
         if (rhs.getInstType() == InstructionType.CALL) {
@@ -404,7 +404,7 @@ public class InstructionTranslator {
                         Element index = indexes.get(0);
                         jasminInstruction.append(getCorrespondingLoad(index, ancestorMethod)).append("\n");
 
-                        jasminInstruction.append(getIndentation()).append("aaload");
+                        jasminInstruction.append(getIndentation()).append("iaload");
                     }
 
                     return jasminInstruction.toString();
