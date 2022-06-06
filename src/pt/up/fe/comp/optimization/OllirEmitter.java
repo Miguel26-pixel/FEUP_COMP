@@ -192,6 +192,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         indentationLevel--;
         startNewLine();
         ollirCode.append("EndIf").append(ifCounter).append(":");
+        ifCounter--;
         return true;
     }
 
