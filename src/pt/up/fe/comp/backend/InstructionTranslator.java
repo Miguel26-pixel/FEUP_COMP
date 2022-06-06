@@ -269,14 +269,12 @@ public class InstructionTranslator {
             case DIV:
             case DIVI32:
             case LTH:
-                if (first.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement() || second.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement()) {
-                    return "UNMATCHING TYPES";
-                }
-
-                if (operation.getTypeInfo().getTypeOfElement() != ElementType.INT32) {
-                    return "INCORRECT TYPE";
-                }
-
+            case AND:
+            case ANDB:
+            case OR:
+            case ORB:
+            case EQ:
+            case EQI32:
                 jasminInstruction.append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
                 jasminInstruction.append(getCorrespondingLoad(second, ancestorMethod)).append("\n");
                 jasminInstruction.append(getIndentation());
@@ -289,41 +287,15 @@ public class InstructionTranslator {
                     jasminInstruction.append("imul");
                 } else if (operationType == OperationType.DIV || operationType == OperationType.DIVI32){
                     jasminInstruction.append("idiv");
-                } else {
-                    jasminInstruction.append(this.getIfBody("if_cmplt"));
-                }
-
-                return jasminInstruction.toString();
-            case AND:
-            case ANDB:
-            case OR:
-            case ORB:
-                if (first.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement() || second.getType().getTypeOfElement() != operation.getTypeInfo().getTypeOfElement()) {
-                    return "UNMATCHING TYPES";
-                }
-
-                if (operation.getTypeInfo().getTypeOfElement() != ElementType.BOOLEAN) {
-                    return "INCORRECT TYPE";
-                }
-
-                jasminInstruction.append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
-                jasminInstruction.append(getCorrespondingLoad(second, ancestorMethod)).append("\n");
-                jasminInstruction.append(getIndentation());
-
-                if (operationType == OperationType.AND || operationType == OperationType.ANDB) {
+                } else if (operationType == OperationType.LTH) {
+                    jasminInstruction.append(this.getIfBody("if_icmplt"));
+                } else if (operationType == OperationType.AND || operationType == OperationType.ANDB) {
                     jasminInstruction.append("iand");
-                } else {
+                } else if (operationType == OperationType.OR || operationType == operationType.ORB){
                     jasminInstruction.append("ior");
+                } else {
+                    jasminInstruction.append(this.getIfBody("if_icmpeq"));
                 }
-
-                return jasminInstruction.toString();
-            case EQ:
-            case EQI32:
-                jasminInstruction.append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
-                jasminInstruction.append(getCorrespondingLoad(second, ancestorMethod)).append("\n");
-                jasminInstruction.append(getIndentation());
-
-                jasminInstruction.append(this.getIfBody("if_icmpeq"));
 
                 return jasminInstruction.toString();
         }
