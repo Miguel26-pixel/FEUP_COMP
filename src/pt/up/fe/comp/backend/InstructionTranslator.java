@@ -40,7 +40,7 @@ public class InstructionTranslator {
     public String translateInstruction(CondBranchInstruction instruction, Method ancestorMethod) {
         StringBuilder jasminInstruction = new StringBuilder();
         jasminInstruction.append(translateInstruction(instruction.getCondition(), ancestorMethod)).append("\n");
-        jasminInstruction.append(getIndentation()).append("ldc 1").append("\n");
+        //jasminInstruction.append(getIndentation()).append("ldc 1").append("\n");
         jasminInstruction.append(getIndentation()).append("ifeq ").append(instruction.getLabel());
         return jasminInstruction.toString();
     }
@@ -319,7 +319,7 @@ public class InstructionTranslator {
                 jasminInstruction.append(getCorrespondingLoad(second, ancestorMethod)).append("\n");
                 jasminInstruction.append(getIndentation());
 
-                jasminInstruction.append(this.getIfBody("ifeq"));
+                jasminInstruction.append(this.getIfBody("if_icmpeq"));
 
                 return jasminInstruction.toString();
         }
