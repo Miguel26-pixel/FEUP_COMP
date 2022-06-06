@@ -143,8 +143,12 @@ public class InstructionTranslator {
         }
 
         if (rhs.getInstType() == InstructionType.CALL) {
-            if (((CallInstruction)rhs).getInvocationType() == CallType.NEW) {
-                return translateInstruction(rhs, ancestorMethod);
+            CallInstruction callInstruction = (CallInstruction) rhs;
+            if (callInstruction.getInvocationType() == CallType.NEW) {
+                ElementType elementType = callInstruction.getFirstArg().getType().getTypeOfElement();
+                if (elementType != ElementType.ARRAYREF) {
+                    return translateInstruction(rhs, ancestorMethod);
+                }
             }
         }
 
