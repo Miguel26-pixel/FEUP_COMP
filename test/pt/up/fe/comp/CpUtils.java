@@ -220,6 +220,14 @@ public class CpUtils {
         Assert.assertEquals(toMessage(message, result), expected, actual);
     }
 
+    public static void assertNotEquals(String message, Object expected, Object actual, JasminResult jasminResult) {
+        Assert.assertNotEquals(toMessage(message, jasminResult), expected, actual);
+    }
+
+    public static void assertNotNull(String message, Object obj, JasminResult jasminResult) {
+        Assert.assertNotNull(toMessage(message, jasminResult), obj);
+    }
+
     static public void assertTrue(String message, boolean condition, JasminResult result) {
         Assert.assertTrue(toMessage(message, result), condition);
     }
@@ -318,7 +326,7 @@ public class CpUtils {
                 .findFirst()
                 .orElse(null);
 
-        assertNotNull("Could not find method " + methodName + "\n\nOLLIR code:\n" + ollir.getOllirCode(), method);
+        Assert.assertNotNull("Could not find method " + methodName + "\n\nOLLIR code:\n" + ollir.getOllirCode(), method);
 
         return method;
     }
@@ -514,4 +522,9 @@ public class CpUtils {
         return "(a|i)(store|load)(_|\\s+)" + (numLocals - 1);
     }
 
+
+    public static int countOccurences(JasminResult jasminResult, String word) {
+        String code = jasminResult.getJasminCode();
+        return (code.length() - code.replace(word, "").length()) / word.length();
+    }
 }

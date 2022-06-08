@@ -1,0 +1,7 @@
+class InstSelection_sipush_128 {
+	public int foo() {
+		int a;
+		a = 128;
+		return a;
+	}
+}

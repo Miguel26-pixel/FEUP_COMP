@@ -1,0 +1,14 @@
+class PropWithIf {
+    public int foo(int max){
+	  int a;
+	  a = 10;
+	  if(max < a){
+		a = max;
+	  }else{
+	    a = a;
+	  }
+	  return a;
+	}
+	public static void main(String[] args) {
+	}
+}
