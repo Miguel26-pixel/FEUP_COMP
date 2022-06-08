@@ -18,6 +18,7 @@ class MethodsAndFields{
 	
 	public int[] all(int a, boolean b, MethodsAndFields maf){
 		int[] c;
+		c = new int[1];
 		return c;
 	}
 	
