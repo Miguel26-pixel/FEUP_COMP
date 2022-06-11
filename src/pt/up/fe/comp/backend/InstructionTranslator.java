@@ -340,11 +340,22 @@ public class InstructionTranslator {
 
             switch (literalElement.getType().getTypeOfElement()) {
                 case INT32:
-                case STRING:
-                    return getIndentation() + "ldc " + JasminUtils.trimLiteral(literalElement.getLiteral());
                 case BOOLEAN:
+                    StringBuilder jasminInstruction = new StringBuilder(getIndentation());
                     String literal = JasminUtils.trimLiteral(literalElement.getLiteral());
-                    return getIndentation() + (literal.equals("true") || literal.equals("1") ? "ldc 1" : "ldc 0");
+
+                    try {
+                        int literalInt = Integer.parseInt(literal);
+
+                        if (literalInt <= 5) {
+                            jasminInstruction.append("iconst_").append(literal);
+                        } else {
+                            throw new Exception("");
+                        }
+                    } catch (Exception e) {
+                        jasminInstruction.append("ldc ").append(literal);
+                    }
+                    return jasminInstruction.toString();
                 default:
                     return "";
             }
