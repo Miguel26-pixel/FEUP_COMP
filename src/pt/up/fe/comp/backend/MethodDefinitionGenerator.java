@@ -17,9 +17,6 @@ public class MethodDefinitionGenerator {
 
         methodDefinition.append(getMethodHeader()).append("\n");
 
-        //methodDefinition.append("\t.limit stack 99\n");
-        //methodDefinition.append("\t.limit locals 99\n");
-
         StringBuilder instructions = new StringBuilder();
 
         this.method.buildVarTable();
@@ -42,9 +39,7 @@ public class MethodDefinitionGenerator {
         methodDefinition.append("\t.limit stack ").append(instructionTranslator.getMaxLoadCounter()).append("\n");
         methodDefinition.append("\t.limit locals ").append(this.getLocalsLimit()).append("\n");
 
-        LoadOptimizer loadOptimizer = new LoadOptimizer(instructions.toString());
-        methodDefinition.append(loadOptimizer.optimize());
-
+        methodDefinition.append(instructions);
 
         if (!hasReturn) {
             methodDefinition.append("\t").append("return").append("\n");
