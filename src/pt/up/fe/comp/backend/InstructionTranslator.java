@@ -277,29 +277,42 @@ public class InstructionTranslator {
             case OR:
             case ORB:
             case EQ:
-                jasminInstruction.append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
-                jasminInstruction.append(getCorrespondingLoad(second, ancestorMethod)).append("\n");
-                jasminInstruction.append(getIndentation());
+                String operationString = "";
+                String loads = getCorrespondingLoad(first, ancestorMethod) + "\n"
+                        + getCorrespondingLoad(second, ancestorMethod) + "\n";
 
-                if (operationType == OperationType.ADD) {
-                    jasminInstruction.append("iadd");
-                } else if (operationType == OperationType.SUB) {
-                    jasminInstruction.append("isub");
+                if (operationType == OperationType.ADD || operationType == OperationType.SUB) {
+                    if (!first.isLiteral() && second.isLiteral()) {
+                        jasminInstruction.append("iinc ").append(this.getVirtualReg((Operand) first, ancestorMethod));
+                        jasminInstruction.append(" ");
+                        if (operationType == OperationType.SUB) {
+                            jasminInstruction.append("-");
+                        }
+
+                        jasminInstruction.append(JasminUtils.trimLiteral(((LiteralElement) second).getLiteral()));
+                        return getIndentation() + jasminInstruction + "\n" + getCorrespondingLoad(first, ancestorMethod);
+                    } else {
+                        if (operationType == OperationType.ADD) {
+                            operationString = "iadd";
+                        } else {
+                            operationString = "isub";
+                        }
+                    }
                 } else if (operationType == OperationType.MUL) {
-                    jasminInstruction.append("imul");
+                    operationString = "imul";
                 } else if (operationType == OperationType.DIV){
-                    jasminInstruction.append("idiv");
+                    operationString = "idiv";
                 } else if (operationType == OperationType.LTH) {
-                    jasminInstruction.append(this.getIfBody("if_icmplt"));
+                    operationString = this.getIfBody("if_icmplt");
                 } else if (operationType == OperationType.AND || operationType == OperationType.ANDB) {
-                    jasminInstruction.append("iand");
+                    operationString = "iand";
                 } else if (operationType == OperationType.OR || operationType == OperationType.ORB){
-                    jasminInstruction.append("ior");
+                    operationString = "ior";
                 } else {
-                    jasminInstruction.append(this.getIfBody("if_icmpeq"));
+                    operationString = this.getIfBody("if_icmpeq");
                 }
 
-                return jasminInstruction.toString();
+                return loads + getIndentation() + operationString;
         }
         return "";
     }
@@ -468,6 +481,12 @@ public class InstructionTranslator {
                     return "";
             }
         }
+    }
+
+    private String getVirtualReg(Operand operand, Method ancestorMethod) {
+        Descriptor operandDescriptor = ancestorMethod.getVarTable().get(operand.getName());
+
+        return Integer.toString(operandDescriptor.getVirtualReg());
     }
 
     private String getIfBody(String comparisonInstruction) {
