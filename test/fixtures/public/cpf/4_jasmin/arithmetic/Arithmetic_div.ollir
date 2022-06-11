@@ -1,0 +1,15 @@
+import io;
+Arithmetic_div {
+
+    .construct Arithmetic_div().V {
+        invokespecial(this, "<init>").V;
+    }
+
+    .method public static main(args.array.String).V {
+a.i32 :=.i32 20.i32 /.i32 4.i32;
+invokestatic(io, "print", a.i32).V;
+
+ret.V;
+    }
+
+}

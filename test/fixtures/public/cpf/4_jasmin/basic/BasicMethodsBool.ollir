@@ -1,0 +1,12 @@
+import Other;
+BasicMethods extends Other {
+
+    .construct BasicMethods().V {
+        invokespecial(this, "<init>").V;
+    }
+
+    .method public func2().bool {
+ret.bool false.bool;
+    }
+
+}

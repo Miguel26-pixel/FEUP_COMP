@@ -1,0 +1,20 @@
+import ioPlus;
+OneArgFuncCall {
+
+    .construct OneArgFuncCall().V {
+        invokespecial(this, "<init>").V;
+    }
+
+    .method public func(a.i32).i32 {
+ret.i32 a.i32;
+    }
+    .method public static main(args.array.String).V {
+c.OneArgFuncCall :=.OneArgFuncCall new(OneArgFuncCall).OneArgFuncCall;
+invokespecial(c.OneArgFuncCall,"<init>").V;
+a.i32 :=.i32 invokevirtual(c.OneArgFuncCall, "func", 10.i32).i32;
+invokestatic(ioPlus, "printResult", a.i32).V;
+
+ret.V;
+    }
+
+}

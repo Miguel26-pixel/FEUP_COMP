@@ -1,0 +1,12 @@
+Structure_class {
+
+    .construct Structure_class().V {
+        invokespecial(this, "<init>").V;
+    }
+
+    .method public static main(args.array.String).V {
+
+ret.V;
+    }
+
+}

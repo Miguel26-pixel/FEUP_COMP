@@ -1,0 +1,21 @@
+import ioPlus;
+ComplexAddMul {
+
+    .construct ComplexAddMul().V {
+        invokespecial(this, "<init>").V;
+    }
+
+    .method public static main(args.array.String).V {
+a.i32 :=.i32 1.i32;
+b.i32 :=.i32 10.i32;
+temp8.i32 :=.i32 b.i32 *.i32 5.i32;
+temp7.i32 :=.i32 b.i32 *.i32 2.i32;
+temp6.i32 :=.i32 a.i32 +.i32 temp7.i32;
+temp4.i32 :=.i32 temp6.i32 +.i32 temp8.i32;
+c.i32 :=.i32 temp4.i32 +.i32 2.i32;
+invokestatic(ioPlus, "printResult", c.i32).V;
+
+ret.V;
+    }
+
+}
