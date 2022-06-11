@@ -4,15 +4,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
 import pt.up.fe.comp.backend.JmmBackend;
+import pt.up.fe.comp.cli.CLIArgumentsParser;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
@@ -30,22 +29,16 @@ public class Launcher {
         SpecsSystem.programStandardInit();
         SpecsLogs.info("Executing with args: " + Arrays.toString(args));
 
-        // Read the input code
-        if (args.length != 1) {
-            throw new RuntimeException("Expected a single argument, a path to an existing input file.");
-        }
-        File inputFile = new File(args[0]);
+        Map<String, String> config = (new CLIArgumentsParser(args)).getConfig();
+
+        String fileName = config.get("inputFile");
+        File inputFile = new File(fileName);
         if (!inputFile.isFile()) {
-            throw new RuntimeException("Expected a path to an existing input file, got '" + args[0] + "'.");
+            throw new RuntimeException("Expected a path to an existing input file, got '" + fileName + "'.");
         }
         String input = SpecsIo.read(inputFile);
 
         // Create config
-        Map<String, String> config = new HashMap<>();
-        config.put("inputFile", args[0]);
-        config.put("optimize", "false");
-        config.put("registerAllocation", "-1");
-        config.put("debug", "false");
 
         // Instantiate JmmParser
         SimpleParser parser = new SimpleParser();
@@ -81,7 +74,7 @@ public class Launcher {
         TestUtils.noErrors(ollirResult.getReports());
 
         // Save ollir file
-        try (FileWriter writer = new FileWriter(config.get("inputFile") + ".ollir")) {
+        try (FileWriter writer = new FileWriter(config.get("className") + ".ollir")) {
             writer.write(ollirResult.getOllirCode());
         }
 
@@ -95,12 +88,12 @@ public class Launcher {
         TestUtils.noErrors(jasminResult.getReports());
 
         // Save jasmin file
-        try (FileWriter writer = new FileWriter(config.get("inputFile") + ".j")) {
-            writer.write(ollirResult.getOllirCode());
+        try (FileWriter writer = new FileWriter(config.get("className") + ".j")) {
+            writer.write(jasminResult.getJasminCode());
         }
 
         // Save compiled file
         File compilationResult = jasminResult.compile();
-        Files.copy(compilationResult.toPath(), new File(config.get("inputFile") + ".j").toPath());
+        Files.copy(compilationResult.toPath(), new File(config.get("className") + ".class").toPath(), StandardCopyOption.REPLACE_EXISTING);
     }
 }
