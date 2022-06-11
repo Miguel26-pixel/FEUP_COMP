@@ -42,7 +42,9 @@ public class MethodDefinitionGenerator {
         methodDefinition.append("\t.limit stack ").append(instructionTranslator.getMaxLoadCounter()).append("\n");
         methodDefinition.append("\t.limit locals ").append(this.getLocalsLimit()).append("\n");
 
-        methodDefinition.append(instructions);
+        LoadOptimizer loadOptimizer = new LoadOptimizer(instructions.toString());
+        methodDefinition.append(loadOptimizer.optimize());
+
 
         if (!hasReturn) {
             methodDefinition.append("\t").append("return").append("\n");
