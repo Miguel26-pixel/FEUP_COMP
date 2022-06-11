@@ -1,6 +1,12 @@
 package pt.up.fe.comp.backend;
 
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class LoadOptimizer {
+    private final Pattern loadPattern = Pattern.compile("^[ia]load$");
+    private final Pattern storePattern = Pattern.compile("^[ia]store$");
     private final String[] instructions;
 
     public LoadOptimizer(String instructions) {
@@ -17,15 +23,18 @@ public class LoadOptimizer {
         for (int index = 0; index < instructions.length; index++) {
             String instruction = instructions[index];
 
-            String[] splitInstruction = instruction.split(" ");
+            List<String> splitInstruction = new java.util.ArrayList<>(List.of(instruction.split("[\\s_]")));
+
+            if (splitInstruction.get(0).strip().equals("")) {
+                splitInstruction.remove(0);
+            }
 
             if (previousWasStore) {
                 try {
-                    int loadRegister = Integer.parseInt(splitInstruction[1]);
+                    int loadRegister = Integer.parseInt(splitInstruction.get(1));
+                    Matcher patternMatcher = loadPattern.matcher(splitInstruction.get(0));
 
-                    if (!(splitInstruction[0].equals("\taload") || splitInstruction[0].equals("\tiload"))
-                            || storeRegister != loadRegister
-                            || isVarNeededLater(index, loadRegister)) {
+                    if (!(patternMatcher.find()) || storeRegister != loadRegister || isVarNeededLater(index, loadRegister)) {
                         optimizedInstructions.append(previousStore).append("\n");
                         optimizedInstructions.append(instruction).append("\n");
                     }
@@ -41,10 +50,12 @@ public class LoadOptimizer {
                 continue;
             }
 
-            if (splitInstruction[0].equals("\tastore") || splitInstruction[0].equals("\tistore")) {
+            Matcher patternMatcher = storePattern.matcher(splitInstruction.get(0));
+
+            if (patternMatcher.find()) {
                 previousWasStore = true;
                 previousStore = instruction;
-                storeRegister = Integer.parseInt(splitInstruction[1]);
+                storeRegister = Integer.parseInt(splitInstruction.get(1));
                 continue;
             }
 
@@ -55,12 +66,17 @@ public class LoadOptimizer {
     }
 
     private boolean isVarNeededLater(int instructionIndex, int varRegister) {
+        Pattern loadRegisterPattern = Pattern.compile("\t[ia]load[\\s_]" + varRegister);
+        Pattern storeRegisterPattern = Pattern.compile("\t[ia]store[\\s_]" + varRegister);
         for (int index = instructionIndex + 1; index < this.instructions.length; index++) {
-            if (instructions[index].equals("\tistore " + varRegister) || instructions[index].equals("\tastore " + varRegister)) {
+
+            Matcher storeMatch = storeRegisterPattern.matcher(instructions[index]);
+            if (storeMatch.find()) {
                 return false;
             }
 
-            if (instructions[index].equals("\tiload " + varRegister) || instructions[index].equals("\taload " + varRegister)) {
+            Matcher loadMatch = loadRegisterPattern.matcher(instructions[index]);
+            if (loadMatch.find()) {
                 return true;
             }
         }
