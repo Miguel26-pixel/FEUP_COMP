@@ -56,11 +56,8 @@ public class InstructionTranslator {
     }
 
     public String translateInstruction(CondBranchInstruction instruction, Method ancestorMethod) {
-        StringBuilder jasminInstruction = new StringBuilder();
-        jasminInstruction.append(translateInstruction(instruction.getCondition(), ancestorMethod)).append("\n");
-        //jasminInstruction.append(getIndentation()).append("ldc 1").append("\n");
-        jasminInstruction.append(getIndentation()).append("ifne ").append(instruction.getLabel());
-        return jasminInstruction.toString();
+        return translateInstruction(instruction.getCondition(), ancestorMethod) + "\n" +
+                getIndentation() + "ifne " + instruction.getLabel();
     }
 
     public String translateInstruction(GotoInstruction instruction, Method ancestorMethod) {
@@ -81,7 +78,7 @@ public class InstructionTranslator {
             return jasminInstruction.toString();
         }
 
-        return "UNSUPPORTED UNARY OPERATION";
+        return "";
     }
 
     public String translateInstruction(SingleOpInstruction instruction, Method ancestorMethod) {
@@ -93,7 +90,7 @@ public class InstructionTranslator {
         Element destinationField = instruction.getSecondOperand();
 
         if (destinationObject.isLiteral() || destinationField.isLiteral()) {
-            return "THERE ARE NO FIELD LITERALS";
+            return "";
         }
 
         StringBuilder jasminInstruction = new StringBuilder();
@@ -118,7 +115,7 @@ public class InstructionTranslator {
         Element destinationField = instruction.getSecondOperand();
 
         if (destinationObject.isLiteral() || destinationField.isLiteral()) {
-            return "THERE ARE NO FIELD LITERALS";
+            return "";
         }
 
         StringBuilder jasminInstruction = new StringBuilder();
@@ -143,7 +140,7 @@ public class InstructionTranslator {
         Element destination = instruction.getDest();
 
         if (destination.isLiteral()) {
-            return "UNABLE TO STORE TO A LITERAL";
+            return "";
         }
 
         Instruction rhs = instruction.getRhs();
@@ -296,7 +293,7 @@ public class InstructionTranslator {
                     jasminInstruction.append(this.getIfBody("if_icmplt"));
                 } else if (operationType == OperationType.AND || operationType == OperationType.ANDB) {
                     jasminInstruction.append("iand");
-                } else if (operationType == OperationType.OR || operationType == operationType.ORB){
+                } else if (operationType == OperationType.OR || operationType == OperationType.ORB){
                     jasminInstruction.append("ior");
                 } else {
                     jasminInstruction.append(this.getIfBody("if_icmpeq"));
@@ -349,7 +346,7 @@ public class InstructionTranslator {
                     String literal = JasminUtils.trimLiteral(literalElement.getLiteral());
                     return getIndentation() + (literal.equals("true") || literal.equals("1") ? "ldc 1" : "ldc 0");
                 default:
-                    return "Literal";
+                    return "";
             }
         } else {
             Operand operand = (Operand) element;
@@ -359,14 +356,16 @@ public class InstructionTranslator {
                 return "";
             }
 
+            String spacer = operandDescriptor.getVirtualReg() < 4 ? "_" : " ";
+
             switch (operandDescriptor.getVarType().getTypeOfElement()) {
                 case INT32:
                 case BOOLEAN:
-                    return getIndentation() + "iload " + operandDescriptor.getVirtualReg();
+                    return getIndentation() + "iload" + spacer + operandDescriptor.getVirtualReg();
                 case ARRAYREF:
                     StringBuilder jasminInstruction = new StringBuilder();
 
-                    jasminInstruction.append(getIndentation()).append("aload ").append(operandDescriptor.getVirtualReg());
+                    jasminInstruction.append(getIndentation()).append("aload").append(spacer).append(operandDescriptor.getVirtualReg());
 
                     if (element instanceof ArrayOperand) {
                         ArrayOperand arrayOperand = (ArrayOperand) operand;
@@ -390,20 +389,22 @@ public class InstructionTranslator {
                 case OBJECTREF:
                 case THIS:
                 case STRING:
-                    return getIndentation() + "aload " + operandDescriptor.getVirtualReg();
+                    return getIndentation() + "aload" + spacer + operandDescriptor.getVirtualReg();
                 default:
-                    return "Hello";
+                    return "";
             }
         }
     }
 
     private String getCorrespondingStore(Element element, Method ancestorMethod) {
         if (element.isLiteral()) {
-            return "UNABLE TO STORE TO A LITERAL";
+            return "";
         } else {
             Operand operand = (Operand) element;
 
             Descriptor operandDescriptor = ancestorMethod.getVarTable().get(operand.getName());
+
+            String spacer = operandDescriptor.getVirtualReg() < 4 ? "_" : " ";
 
             switch (operand.getType().getTypeOfElement()) {
                 case INT32:
@@ -412,7 +413,7 @@ public class InstructionTranslator {
                         ArrayOperand arrayOperand = (ArrayOperand) operand;
                         StringBuilder jasminInstruction = new StringBuilder();
 
-                        jasminInstruction.append(getIndentation()).append("aload ").append(operandDescriptor.getVirtualReg()).append("\n");
+                        jasminInstruction.append(getIndentation()).append("aload").append(spacer).append(operandDescriptor.getVirtualReg()).append("\n");
 
                         ArrayList<Element> indexes = arrayOperand.getIndexOperands();
 
@@ -426,18 +427,18 @@ public class InstructionTranslator {
                         return jasminInstruction.toString();
                     }
 
-                    return getIndentation() + "istore " + operandDescriptor.getVirtualReg();
+                    return getIndentation() + "istore" + spacer + operandDescriptor.getVirtualReg();
                 case CLASS:
                 case OBJECTREF:
                 case THIS:
                 case STRING:
-                    return getIndentation() + "astore " + operandDescriptor.getVirtualReg();
+                    return getIndentation() + "astore" + spacer + operandDescriptor.getVirtualReg();
                 case ARRAYREF:
                     StringBuilder jasminInstruction = new StringBuilder();
 
                     if (element instanceof ArrayOperand) {
                         ArrayOperand arrayOperand = (ArrayOperand) operand;
-                        jasminInstruction.append(getIndentation()).append("aload ").append(operandDescriptor.getVirtualReg()).append("\n");
+                        jasminInstruction.append(getIndentation()).append("aload").append(spacer).append(operandDescriptor.getVirtualReg()).append("\n");
 
                         ArrayList<Element> indexes = arrayOperand.getIndexOperands();
 
@@ -448,7 +449,7 @@ public class InstructionTranslator {
                         Element index = indexes.get(0);
                         jasminInstruction.append(getCorrespondingLoad(index, ancestorMethod)).append("\n");
                     } else {
-                        jasminInstruction.append(getIndentation()).append("astore ").append(operandDescriptor.getVirtualReg());
+                        jasminInstruction.append(getIndentation()).append("astore").append(spacer).append(operandDescriptor.getVirtualReg());
                     }
 
                     return jasminInstruction.toString();
