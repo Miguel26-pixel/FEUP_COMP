@@ -281,23 +281,16 @@ public class InstructionTranslator {
                 String loads = getCorrespondingLoad(first, ancestorMethod) + "\n"
                         + getCorrespondingLoad(second, ancestorMethod) + "\n";
 
-                if (operationType == OperationType.ADD || operationType == OperationType.SUB) {
+                if (operationType == OperationType.ADD) {
                     if (!first.isLiteral() && second.isLiteral()) {
-                        jasminInstruction.append("iinc ").append(this.getVirtualReg((Operand) first, ancestorMethod));
-                        jasminInstruction.append(" ");
-                        if (operationType == OperationType.SUB) {
-                            jasminInstruction.append("-");
-                        }
-
-                        jasminInstruction.append(JasminUtils.trimLiteral(((LiteralElement) second).getLiteral()));
-                        return getIndentation() + jasminInstruction + "\n" + getCorrespondingLoad(first, ancestorMethod);
+                        return getIinc(ancestorMethod, (LiteralElement) second, (Operand) first, jasminInstruction);
+                    } else if (first.isLiteral() && !second.isLiteral()) {
+                        return getIinc(ancestorMethod, (LiteralElement) first, (Operand) second, jasminInstruction);
                     } else {
-                        if (operationType == OperationType.ADD) {
-                            operationString = "iadd";
-                        } else {
-                            operationString = "isub";
-                        }
+                        operationString = "iadd";
                     }
+                } else if (operationType == OperationType.SUB) {
+                  operationString = "isub";
                 } else if (operationType == OperationType.MUL) {
                     operationString = "imul";
                 } else if (operationType == OperationType.DIV){
@@ -315,6 +308,14 @@ public class InstructionTranslator {
                 return loads + getIndentation() + operationString;
         }
         return "";
+    }
+
+    private String getIinc(Method ancestorMethod, LiteralElement literalElement, Operand operand, StringBuilder jasminInstruction) {
+        jasminInstruction.append("iinc ").append(this.getVirtualReg(operand, ancestorMethod));
+        jasminInstruction.append(" ");
+
+        jasminInstruction.append(JasminUtils.trimLiteral(literalElement.getLiteral()));
+        return getIndentation() + jasminInstruction + "\n" + getCorrespondingLoad(operand, ancestorMethod);
     }
 
     public String translateInstruction(ReturnInstruction instruction, Method ancestorMethod) {
