@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.Integer.parseInt;
-
 public class MethodDeclarationVisitor extends ReportCollectorJmmNodeVisitor<Map<String, JmmMethodSignature>, Boolean> {
 
     public MethodDeclarationVisitor() {

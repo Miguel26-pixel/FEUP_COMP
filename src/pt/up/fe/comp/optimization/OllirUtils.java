@@ -3,7 +3,6 @@ package pt.up.fe.comp.optimization;
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class OllirUtils {
@@ -28,7 +27,7 @@ public class OllirUtils {
     public static String getSafeVariableName(String variableName) {
         final String[] reserved = {"ret", "putfield", "getstatic", "invokespecial", "invokestatic", "invokevirtual"};
         for (var r : reserved) {
-            if (variableName.equals(r)){
+            if (variableName.equals(r)) {
                 return variableName + "_";
             }
         }
