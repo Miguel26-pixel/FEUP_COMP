@@ -117,9 +117,11 @@ The `MethodDefinitionGenerator` class takes a `Method` object and translates it 
 
 However, the individual instruction is delegated to the `Instruction Translator` class. This class is responsible translating every type of instruction and ensuring that the necessary loads and stores are performed. Furthermore, it is also its task to generate the necessary labels to handle `if` and `goto` instructions.
 
-The instruction translation was optimized through the usage of more efficient Jasmin instructions. Accesses and storages for registers 5 and below use the respective `iload_` and `istore_` instructions. Furthermore, constants smaller than 4 use the `iconst_` family of instructions whenever they are pushed to the stack. Finally, the addition operations are also made more efficient when one of the operands is a literal value, through the usage of the `iinc` instruction.
+The instruction translation was optimized through the usage of more efficient Jasmin instructions. Accesses and storages for registers 5 and below use the respective `iload_` and `istore_` instructions. Furthermore, constants smaller than 6 use the `iconst_` family of instructions whenever they are pushed to the stack, while byte-sized numbers use `bipush` and short-sized numbers use `sipush`. Other, larger, numbers use `ldc`. The addition operations are also made more efficient when one of the operands is a literal value, through the usage of the `iinc` instruction. 
 
 >Assuming that t1 is stored in register 2, both `t1 + 10` and `10 + t1` would be converted to the instruction `iinc 2 10`.
+
+Finally, less than comparisons are optimized whenver 0 is on the right side, through the usage of the `iflt` instruction.
 
 Even though these classes behave as expected, we feel that we could have created a proper class-based framework for the translation of instructions instead of a direct instruction-to-string translation. This would have enabled us to have a better codebase, but time constraints did not allow us to implement this. 
  
