@@ -3,13 +3,10 @@ package pt.up.fe.comp;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
 import pt.up.fe.comp.backend.JmmBackend;
 import pt.up.fe.comp.cli.CLIArgumentsParser;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;

@@ -8,7 +8,6 @@ import pt.up.fe.comp.semantic.tables.JmmSymbolTable;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static pt.up.fe.comp.optimization.OllirUtils.*;
 import static pt.up.fe.comp.semantic.tables.JmmSymbolTable.getClosestMethod;
@@ -53,7 +52,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
     }
 
     private void startNewLine() {
-        ollirCode.append("\n").append(IntStream.range(0, numberOfSpaces * indentationLevel).mapToObj(i -> " ").collect(Collectors.joining("")));
+        ollirCode.append("\n").append(" ".repeat(numberOfSpaces * indentationLevel));
     }
 
     private String createTemporaryAssign(SubstituteVariable substituteVariable, String value) {
@@ -283,7 +282,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
             visit(node.getJmmChild(0), childHolder);
             substituteVariable.setVariableType(childHolder.getVariableType());
             startNewLine();
-            ollirCode.append(createTemporaryAssign(substituteVariable,"!.bool " + childHolder.getSubstituteWithType()));
+            ollirCode.append(createTemporaryAssign(substituteVariable, "!.bool " + childHolder.getSubstituteWithType()));
             substituteVariable.setVariableType(childHolder.getVariableType());
         }
         return true;

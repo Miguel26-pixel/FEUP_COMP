@@ -8,7 +8,7 @@ import static pt.up.fe.comp.optimization.OllirUtils.getOllirType;
 
 public class SubstituteVariable {
     private Type variableType;
-    private String variableName = "";
+    private String variableName;
     private String variableValue;
     private Type assignType = new Type("void", false);
 

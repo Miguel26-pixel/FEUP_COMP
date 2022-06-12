@@ -70,12 +70,8 @@ public class InstructionTranslator {
         Element first = instruction.getOperand();
 
         if (operationType == OperationType.NOT || operationType == OperationType.NOTB) {
-            StringBuilder jasminInstruction = new StringBuilder();
-
-            jasminInstruction.append(getCorrespondingLoad(first, ancestorMethod)).append("\n");
-            jasminInstruction.append(getIndentation()).append(getIfBody("ifeq"));
-
-            return jasminInstruction.toString();
+            return getCorrespondingLoad(first, ancestorMethod) + "\n" +
+                    getIndentation() + getIfBody("ifeq");
         }
 
         return "";
@@ -177,7 +173,7 @@ public class InstructionTranslator {
                     jasminInstruction.append(getCorrespondingLoad(caller, ancestorMethod)).append("\n");
                 }
 
-                for (Element element: instruction.getListOfOperands()) {
+                for (Element element : instruction.getListOfOperands()) {
                     jasminInstruction.append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
                     parametersDescriptor.append(JasminUtils.translateType(ancestorMethod.getOllirClass(), element.getType()));
                 }
@@ -207,7 +203,7 @@ public class InstructionTranslator {
                     }
                 }
 
-                for (Element element: instruction.getListOfOperands()) {
+                for (Element element : instruction.getListOfOperands()) {
                     jasminInstruction.append(getCorrespondingLoad(element, ancestorMethod)).append("\n");
                     parametersDescriptor.append(JasminUtils.translateType(ancestorMethod.getOllirClass(), element.getType()));
                 }
@@ -277,7 +273,7 @@ public class InstructionTranslator {
             case OR:
             case ORB:
             case EQ:
-                String operationString = "";
+                String operationString;
                 String loads = getCorrespondingLoad(first, ancestorMethod) + "\n"
                         + getCorrespondingLoad(second, ancestorMethod) + "\n";
 
@@ -290,10 +286,10 @@ public class InstructionTranslator {
                         operationString = "iadd";
                     }
                 } else if (operationType == OperationType.SUB) {
-                  operationString = "isub";
+                    operationString = "isub";
                 } else if (operationType == OperationType.MUL) {
                     operationString = "imul";
-                } else if (operationType == OperationType.DIV){
+                } else if (operationType == OperationType.DIV) {
                     operationString = "idiv";
                 } else if (operationType == OperationType.LTH) {
                     try {
@@ -314,7 +310,7 @@ public class InstructionTranslator {
                     }
                 } else if (operationType == OperationType.AND || operationType == OperationType.ANDB) {
                     operationString = "iand";
-                } else if (operationType == OperationType.OR || operationType == OperationType.ORB){
+                } else if (operationType == OperationType.OR || operationType == OperationType.ORB) {
                     operationString = "ior";
                 } else {
                     operationString = this.getIfBody("if_icmpeq");
@@ -456,18 +452,12 @@ public class InstructionTranslator {
                     if (element instanceof ArrayOperand) {
                         ArrayOperand arrayOperand = (ArrayOperand) operand;
                         StringBuilder jasminInstruction = new StringBuilder();
-
                         jasminInstruction.append(getIndentation()).append("aload").append(spacer).append(operandDescriptor.getVirtualReg()).append("\n");
 
                         ArrayList<Element> indexes = arrayOperand.getIndexOperands();
-
-                        if (indexes.size() < 1) {
-                            return "";
-                        }
-
                         Element index = indexes.get(0);
-                        jasminInstruction.append(getCorrespondingLoad(index, ancestorMethod));
 
+                        jasminInstruction.append(getCorrespondingLoad(index, ancestorMethod));
                         return jasminInstruction.toString();
                     }
 
@@ -485,12 +475,8 @@ public class InstructionTranslator {
                         jasminInstruction.append(getIndentation()).append("aload").append(spacer).append(operandDescriptor.getVirtualReg()).append("\n");
 
                         ArrayList<Element> indexes = arrayOperand.getIndexOperands();
-
-                        if (indexes.size() < 1) {
-                            return "";
-                        }
-
                         Element index = indexes.get(0);
+
                         jasminInstruction.append(getCorrespondingLoad(index, ancestorMethod)).append("\n");
                     } else {
                         jasminInstruction.append(getIndentation()).append("astore").append(spacer).append(operandDescriptor.getVirtualReg());
