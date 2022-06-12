@@ -24,8 +24,9 @@ public class LivenessAnalysis {
 
             def.put(instruction, getDefVars(instruction, method.getVarTable()));
             use.put(instruction, isUseVars(instruction, method.getVarTable()));
-            in.put(instruction, null);
-            out.put(instruction,null);
+            ArrayList<Operand> op = new ArrayList<>();
+            in.put(instruction, op);
+            out.put(instruction, op);
 
         }
 
@@ -34,7 +35,7 @@ public class LivenessAnalysis {
         ArrayList<Instruction> nodes = new ArrayList<>(method.getInstructions());
         Collections.reverse(nodes);
 
-        while(!done){
+        while (!done) {
             System.out.println("iteration " + i);
             i++;
             HashMap<Node, ArrayList<Operand>> in_temp = new HashMap<>(in);
@@ -46,21 +47,24 @@ public class LivenessAnalysis {
                     if (instruction.getSucc1().getNodeType() != NodeType.END) {
                         opList = in.get(instruction.getSucc1());
                         if (instruction.getSucc2() != null) {
-                            opList = orArray(opList,in.get(instruction.getSucc2()));
+                                opList.addAll(in.get(instruction.getSucc2()));
                         }
                     }
                 }
                 out.replace(instruction, opList);
                 ArrayList<Operand> opList2 = out.get(instruction);
                 ArrayList<Operand> temp_def = def.get(instruction);
-                for (int index = 0; index < n_vars; index++) {
-                    if (opList2.get(index) != null && (temp_def.get(index) != null))
-                        opList2.remove(index);
-                    else
-                        opList2.set(index, null);
+                if(opList2.size() != 0) {
+                    for (int index = 0; index < n_vars; index++) {
+                        if (opList2.get(index) != null && (temp_def.get(index) != null)) {
+                            opList2.remove(index);
+                            index--;
+                        } else
+                            opList2.set(index, null);
+                    }
+                    opList2.addAll(in.get(instruction.getSucc2()));
+                    in.replace(instruction, opList2);
                 }
-                opList2 = orArray(opList2,in.get(instruction.getSucc2()));
-                in.replace(instruction, opList2);
             }
 
             //printTable(use, def, in, out, nodes, n_vars + 1);
@@ -91,7 +95,7 @@ public class LivenessAnalysis {
 
             Descriptor d = varTable.get(((Operand) e).getName());
 
-            if(d.getScope() == VarScope.PARAMETER || d.getScope() == VarScope.FIELD) {
+            if (d.getScope() == VarScope.PARAMETER || d.getScope() == VarScope.FIELD) {
                 return null;
             }
             opList.add((Operand) e);
@@ -129,21 +133,31 @@ public class LivenessAnalysis {
 
     private ArrayList<Operand> getUsedVarsBinaryOp(BinaryOpInstruction instruction, HashMap<String, Descriptor> varTable) {
         ArrayList<Operand> opList = new ArrayList<>();
-        for (Element arg : instruction.getOperands()){
-            opList.add((Operand) arg);
+        if(instruction.getOperands() == null) return opList;
+        for (Element arg : instruction.getOperands()) {
+            if(!arg.isLiteral()) {
+                opList.add((Operand) arg);
+            }
+            opList.add(new Operand(arg.getType()));
         }
         return opList;
     }
 
     private ArrayList<Operand> getUsedVarsUnaryOp(UnaryOpInstruction instruction, HashMap<String, Descriptor> varTable) {
         ArrayList<Operand> opList = new ArrayList<>();
-        opList.add((Operand) instruction.getOperand());
+        if(!instruction.getOperand().isLiteral()) {
+            opList.add((Operand) instruction.getOperand());
+        }
+        opList.add(new Operand(instruction.getOperand().getType()));
         return opList;
     }
 
     private ArrayList<Operand> getUsedVarsPutField(PutFieldInstruction instruction, HashMap<String, Descriptor> varTable) {
         ArrayList<Operand> opList = new ArrayList<>();
-        opList.add((Operand) instruction.getThirdOperand());
+        if(!instruction.getThirdOperand().isLiteral()) {
+            opList.add((Operand) instruction.getThirdOperand());
+        }
+        opList.add(new Operand(instruction.getThirdOperand().getType()));
         return opList;
     }
 
@@ -156,15 +170,23 @@ public class LivenessAnalysis {
 
     private ArrayList<Operand> getUsedVarsReturn(ReturnInstruction instruction, HashMap<String, Descriptor> varTable) {
         ArrayList<Operand> opList = new ArrayList<>();
-        if (instruction.hasReturnValue())
-            opList.add((Operand) instruction.getOperand());
+        if (instruction.hasReturnValue()) {
+            if(!instruction.getOperand().isLiteral()) {
+                opList.add((Operand) instruction.getOperand());
+            }
+            opList.add(new Operand(instruction.getOperand().getType()));
+            return opList;
+        }
         return null;
     }
 
     private ArrayList<Operand> getUsedVarsBranch(CondBranchInstruction instruction, HashMap<String, Descriptor> varTable) {
         ArrayList<Operand> opList = new ArrayList<>();
-        for (Element arg : instruction.getOperands()){
-            opList.add((Operand) arg);
+        for (Element arg : instruction.getOperands()) {
+            if(!arg.isLiteral()) {
+                opList.add((Operand) arg);
+            }
+            opList.add(new Operand(arg.getType()));
         }
         return opList;
     }
@@ -175,22 +197,23 @@ public class LivenessAnalysis {
 
     private ArrayList<Operand> getUsedVarsSingleOp(SingleOpInstruction instruction, HashMap<String, Descriptor> varTable) {
         ArrayList<Operand> opList = new ArrayList<>();
-        opList.add((Operand) instruction.getSingleOperand());
+        if(!instruction.getSingleOperand().isLiteral()) {
+            opList.add((Operand) instruction.getSingleOperand());
+        }
+        opList.add(new Operand(instruction.getSingleOperand().getType()));
         return opList;
     }
 
     private ArrayList<Operand> getUsedVarsCall(CallInstruction instruction, HashMap<String, Descriptor> varTable) {
         ArrayList<Operand> opList = new ArrayList<>();
-        for (Element arg : instruction.getListOfOperands()){
-            opList.add((Operand) arg);
-        }
-        return opList;
-    }
-
-    private ArrayList<Operand> orArray(ArrayList<Operand> opList,ArrayList<Operand> list2) {
-        for (Operand op : list2){
-            opList.add(op);
+        if(instruction.getListOfOperands() == null) return opList;
+        for (Element arg : instruction.getListOfOperands()) {
+            if(!arg.isLiteral()) {
+                opList.add((Operand) arg);
+            }
+            opList.add(new Operand(arg.getType()));
         }
         return opList;
     }
 }
+
