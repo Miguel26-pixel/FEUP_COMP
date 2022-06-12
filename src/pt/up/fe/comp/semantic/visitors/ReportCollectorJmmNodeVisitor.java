@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ReportCollectorJmmNodeVisitor<D, R> extends AJmmVisitor<D, R> {
-    protected List<Report> reports = new ArrayList<>();
+    final protected List<Report> reports = new ArrayList<>();
 
     public List<Report> getReports() {
         return reports;

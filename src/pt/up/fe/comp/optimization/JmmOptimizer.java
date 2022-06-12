@@ -10,7 +10,7 @@ import java.util.Collections;
 
 public class JmmOptimizer implements JmmOptimization {
 
-    StringBuilder ollirCode = new StringBuilder();
+    final StringBuilder ollirCode = new StringBuilder();
 
     @Override
     public OllirResult toOllir(JmmSemanticsResult semanticsResult) {

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public class TypeCheckVisitor extends ReportCollectorJmmNodeVisitor<Type, Type> {
 
-    JmmSymbolTable symbolTable;
+    final JmmSymbolTable symbolTable;
 
     public TypeCheckVisitor(JmmSymbolTable symbolTable) {
         this.symbolTable = symbolTable;
