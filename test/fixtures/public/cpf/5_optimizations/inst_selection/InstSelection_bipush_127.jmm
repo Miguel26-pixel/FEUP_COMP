@@ -1,0 +1,7 @@
+class InstSelection_bipush_127 {
+	public int foo() {
+		int a;
+		a = 127;
+		return a;
+	}
+}

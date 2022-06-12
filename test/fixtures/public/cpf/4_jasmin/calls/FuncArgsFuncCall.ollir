@@ -1,0 +1,31 @@
+import ioPlus;
+FuncArgsFuncCall {
+
+    .construct FuncArgsFuncCall().V {
+        invokespecial(this, "<init>").V;
+    }
+
+    .method public f1(a.i32).i32 {
+ret.i32 a.i32;
+    }
+    .method public f2(b.i32).i32 {
+ret.i32 b.i32;
+    }
+    .method public func(a.i32, b.i32).i32 {
+invokestatic(ioPlus, "printResult", a.i32).V;
+invokestatic(ioPlus, "printResult", b.i32).V;
+ret.i32 1.i32;
+    }
+    .method public static main(args.array.String).V {
+d.FuncArgsFuncCall :=.FuncArgsFuncCall new(FuncArgsFuncCall).FuncArgsFuncCall;
+invokespecial(d.FuncArgsFuncCall,"<init>").V;
+a.i32 :=.i32 10.i32;
+b.i32 :=.i32 5.i32;
+temp0.i32 :=.i32 invokevirtual(d.FuncArgsFuncCall, "f1", a.i32).i32.i32;
+temp1.i32 :=.i32 invokevirtual(d.FuncArgsFuncCall, "f2", b.i32).i32.i32;
+a.i32 :=.i32 invokevirtual(d.FuncArgsFuncCall, "func", temp0.i32, temp1.i32).i32;
+
+ret.V;
+    }
+
+}

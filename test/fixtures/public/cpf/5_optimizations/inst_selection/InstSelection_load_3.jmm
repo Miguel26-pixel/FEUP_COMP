@@ -1,0 +1,5 @@
+class InstSelection_load_3 {
+	public int foo(int a, int b, int c) {
+		return c;
+	}
+}

@@ -1,0 +1,19 @@
+import GetterAndSetter;
+import io;
+PrintOtherClassInline {
+
+    .construct PrintOtherClassInline().V {
+        invokespecial(this, "<init>").V;
+    }
+
+    .method public static main(args.array.String).V {
+b.GetterAndSetter :=.GetterAndSetter new(GetterAndSetter).GetterAndSetter;
+invokespecial(b.GetterAndSetter,"<init>").V;
+content.i32 :=.i32 invokevirtual(b.GetterAndSetter, "setA", 10.i32).i32;
+content.i32 :=.i32 invokevirtual(b.GetterAndSetter, "getA").i32;
+invokestatic(io, "print", content.i32).V;
+
+ret.V;
+    }
+
+}
