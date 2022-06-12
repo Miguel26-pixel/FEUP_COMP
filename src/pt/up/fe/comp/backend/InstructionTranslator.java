@@ -363,6 +363,10 @@ public class InstructionTranslator {
 
                         if (literalInt <= 5) {
                             jasminInstruction.append("iconst_").append(literal);
+                        } else if (literalInt < Math.pow(2, 7)) {
+                            jasminInstruction.append("bipush ").append(literal);
+                        } else if (literalInt < Math.pow(2, 15)) {
+                            jasminInstruction.append("sipush ").append(literal);
                         } else {
                             throw new Exception("");
                         }
