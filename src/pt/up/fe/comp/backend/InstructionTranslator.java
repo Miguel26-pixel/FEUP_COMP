@@ -296,7 +296,22 @@ public class InstructionTranslator {
                 } else if (operationType == OperationType.DIV){
                     operationString = "idiv";
                 } else if (operationType == OperationType.LTH) {
-                    operationString = this.getIfBody("if_icmplt");
+                    try {
+                        if (second.isLiteral()) {
+                            LiteralElement literalElement = (LiteralElement) second;
+
+                            int literal = Integer.parseInt(JasminUtils.trimLiteral(literalElement.getLiteral()));
+                            if (literal == 0) {
+                                return getCorrespondingLoad(first, ancestorMethod) + "\n" + getIndentation() + this.getIfBody("iflt");
+                            } else {
+                                throw new Exception("");
+                            }
+                        } else {
+                            throw new Exception("");
+                        }
+                    } catch (Exception e) {
+                        operationString = this.getIfBody("if_icmplt");
+                    }
                 } else if (operationType == OperationType.AND || operationType == OperationType.ANDB) {
                     operationString = "iand";
                 } else if (operationType == OperationType.OR || operationType == OperationType.ORB){
