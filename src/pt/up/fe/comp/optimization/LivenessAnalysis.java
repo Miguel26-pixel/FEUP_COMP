@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 public class LivenessAnalysis {
-    public ArrayList<HashMap<Node, ArrayList<Operand>>> LivenessAnalysis(Method method) {
+    public ArrayList<HashMap<Node, ArrayList<Operand>>> analyze(Method method) {
         HashMap<Node, ArrayList<Operand>> def = new HashMap<>();
         HashMap<Node, ArrayList<Operand>> use = new HashMap<>();
         HashMap<Node, ArrayList<Operand>> out = new HashMap<>();
