@@ -39,6 +39,35 @@ To generate the symbol table we visit all nodes of the syntax tree to obtain all
 
 ### Semantic tests
 
+After building the symbol table and together with the syntax tree (AST), all tests and verifications to all declarations and statements in the code are performed. The list of every semantic rule is divided in the following four major classes:
+
+> In the `TypeCheckVisitor` is where the most magic happens. It runs through all the nodes of the syntax tree visiting everyone with an visitor associated to each node kind making the necessary verifications. The implementation is assuming that every outer method call that belongs to the super class or to one of the imports declaration is correct and returns null leaving the handle task to the parent's visitor
+
+- `ImportCheckVisitor`
+  - Verifies if all types of all declared variables associated with an outer class are imported, with exception if it refeers to the superclass that is extended
+
+- `MethodCallVisitor`
+  - If the class does not extends another class and a function call is made by an object of the class, checks if the method exists.
+
+- `ArrayAccessVisitor`
+  - Checks if every array access is done over an array 
+
+- `TypeCheckVisitor`
+  - Checks if there is no `ThisLiteral` in the `MainMethod` because the main method is static
+  - Checks if in the `MainMethod` there is no access to the class fields
+  - Checks if every `Identifier` associated to a method or a variable exists. In case it does not exist, it is checked if it corresponds to any import declaration or to the class extended
+  - Checks if the argument in every `UnaryOp` (not operation) is of type boolean
+  - Verifies if the types of the two elements in every `BinaryOp` is compatible with the operation:
+    - `assign`: type of the assignee must be compatible with the assigned
+    - `and`, `or`: both elements must be of the type `boolean`
+    - `add`, `sub`, `mul`, `div`, `lt`: both elements must be of the type `int`
+  - Checks if every array access index is an expression of type `int`
+  - Checks if the field of a class exists when a access to an attribute is made. In case it does not exist, the class must extend another class
+  - Verifies that every expressions in conditions must return a boolean, either for `If` statement or `While` loop
+  - Checks if the return type of every method is the same compared to the given return expression
+  - Verifies that for every function call, the number of arguments is correct
+  - Checks if the arguments type of every function call is correct
+  - For every `VarDeclaration`, checks if the type is valid
 
 
 ## Code generation
