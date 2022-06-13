@@ -8,7 +8,7 @@ import java.util.*;
 
 public class ConstantPropagationVisitor extends AJmmVisitor<Boolean, Boolean> {
     private final Map<String, JmmNode> constantAssigns = new HashMap<>();
-    private final Map<String, JmmNode> scheduledAssignRemovals = new HashMap<>();
+    private final Map<String, List<JmmNode>> scheduledAssignRemovals = new HashMap<>();
     private final Map<String, JmmNode> varDeclarations = new HashMap<>();
     private final JmmSymbolTable symbolTable;
 
@@ -82,12 +82,16 @@ public class ConstantPropagationVisitor extends AJmmVisitor<Boolean, Boolean> {
         JmmNode rhs = node.getJmmChild(1);
         if ((!rhs.getKind().equals("IntLiteral") && !rhs.getKind().equals("BooleanLiteral")) || node.getChildren().size() > 2) {
             constantAssigns.remove(targetName);
+            varDeclarations.remove(targetName);
         } else if (symbolTable.isLocalVariable(lhs, targetName)
                 && node.getAncestor("Then").isEmpty()
                 && node.getAncestor("Else").isEmpty()
                 && node.getAncestor("Do").isEmpty()) {
             constantAssigns.put(targetName, rhs);
-            scheduledAssignRemovals.put(targetName, node);
+            if (!scheduledAssignRemovals.containsKey(targetName)) {
+                scheduledAssignRemovals.put(targetName, new ArrayList<>());
+            }
+            scheduledAssignRemovals.get(targetName).add(node);
         }
         return true;
     }
@@ -95,8 +99,10 @@ public class ConstantPropagationVisitor extends AJmmVisitor<Boolean, Boolean> {
     private void removeAllConstantAssignsAndVarDeclarations() {
         for (Map.Entry<String, JmmNode> constantAssign : constantAssigns.entrySet()) {
             if (scheduledAssignRemovals.containsKey(constantAssign.getKey())) {
-                JmmNode assign = scheduledAssignRemovals.get(constantAssign.getKey());
-                assign.getJmmParent().removeJmmChild(assign);
+                List<JmmNode> assigns = scheduledAssignRemovals.get(constantAssign.getKey());
+                for (JmmNode assign : assigns) {
+                    assign.getJmmParent().removeJmmChild(assign);
+                }
             }
             if (varDeclarations.containsKey(constantAssign.getKey())) {
                 JmmNode declaration = varDeclarations.get(constantAssign.getKey());

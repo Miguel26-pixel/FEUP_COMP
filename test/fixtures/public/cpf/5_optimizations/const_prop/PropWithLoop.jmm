@@ -3,6 +3,7 @@ class PropWithLoop {
 	  int a;
 	  int i;
 	  int res;
+	  a = 0;
 	  a = 10;
 	  i = 0;
 	  while (i < a){
