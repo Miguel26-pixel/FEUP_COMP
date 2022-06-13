@@ -308,14 +308,14 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         // Hold indexation in variable
         startNewLine();
         SubstituteVariable positionTemporaryVariable = createTemporaryVariable(node);
-        positionTemporaryVariable.setVariableType(elementType);
+        positionTemporaryVariable.setVariableType(new Type("int", false));
         ollirCode.append(createTemporaryAssign(positionTemporaryVariable, positionChild.getSubstituteWithType()));
         var closestMethod = getClosestMethod(node);
         boolean isClassField = symbolTable.getFields().stream().anyMatch(s -> s.getName().equals(variableName) && closestMethod.isPresent())
                 && symbolTable.getLocalVariables(getMethodName(closestMethod.get())).stream().noneMatch(s -> s.getName().equals(variableName));
         if (isClassField) {
             SubstituteVariable referenceHolder = createTemporaryVariable(node);
-            referenceHolder.setVariableType(elementType);
+            referenceHolder.setVariableType(symbol.getType());
             startNewLine();
             ollirCode.append(createTemporaryAssign(referenceHolder, getField("this", variableName, getOllirType(symbol.getType()))));
             substituteVariable.setVariableName(referenceHolder.getVariableName() + "[" + positionTemporaryVariable.getSubstituteWithType() + "]");
