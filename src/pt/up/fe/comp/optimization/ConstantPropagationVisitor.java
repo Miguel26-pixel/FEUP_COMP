@@ -82,7 +82,10 @@ public class ConstantPropagationVisitor extends AJmmVisitor<Boolean, Boolean> {
         JmmNode rhs = node.getJmmChild(1);
         if ((!rhs.getKind().equals("IntLiteral") && !rhs.getKind().equals("BooleanLiteral")) || node.getChildren().size() > 2) {
             constantAssigns.remove(targetName);
-        } else if (symbolTable.isLocalVariable(lhs, targetName)) {
+        } else if (symbolTable.isLocalVariable(lhs, targetName)
+                && node.getAncestor("Then").isEmpty()
+                && node.getAncestor("Else").isEmpty()
+                && node.getAncestor("Do").isEmpty()) {
             constantAssigns.put(targetName, rhs);
             scheduledAssignRemovals.put(targetName, node);
         }

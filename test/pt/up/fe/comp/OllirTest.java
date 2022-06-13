@@ -14,17 +14,11 @@ package pt.up.fe.comp;
 
 import org.junit.Test;
 import pt.up.fe.specs.util.SpecsIo;
-import java.util.HashMap;
-import java.util.Map;
+
 public class OllirTest {
     private void testOptimize(String resourcePath) {
-        Map<String, String> config =  new HashMap<>();
-        config.put("optimize", "true");
-        var result = TestUtils.optimize(SpecsIo.getResource(resourcePath), config);
+        var result = TestUtils.optimize(SpecsIo.getResource(resourcePath));
         System.out.println(result.getOllirCode());
-        var unoptimized = TestUtils.optimize(SpecsIo.getResource(resourcePath));
-        System.out.println("wowo");
-        System.out.println(unoptimized.getOllirCode());
         TestUtils.noErrors(result.getReports());
     }
 
