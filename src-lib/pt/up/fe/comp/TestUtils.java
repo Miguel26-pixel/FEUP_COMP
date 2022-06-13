@@ -231,6 +231,9 @@ public class TestUtils {
 
         semanticsResult = optimization.optimize(semanticsResult);
 
+        System.out.println("\nAST");
+        System.out.println(semanticsResult.getRootNode().toTree());
+
         var ollirResult = optimization.toOllir(semanticsResult);
 
         ollirResult = optimization.optimize(ollirResult);

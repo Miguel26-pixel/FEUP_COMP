@@ -26,6 +26,7 @@ public class Launcher {
         SpecsSystem.programStandardInit();
         SpecsLogs.info("Executing with args: " + Arrays.toString(args));
 
+        // Create config
         Map<String, String> config = (new CLIArgumentsParser(args)).getConfig();
 
         String fileName = config.get("inputFile");
@@ -34,8 +35,6 @@ public class Launcher {
             throw new RuntimeException("Expected a path to an existing input file, got '" + fileName + "'.");
         }
         String input = SpecsIo.read(inputFile);
-
-        // Create config
 
         // Instantiate JmmParser
         SimpleParser parser = new SimpleParser();

@@ -29,14 +29,6 @@ import java.util.Map;
 
 public class BackendTest {
 
-    // @Test
-    // public void testHelloWorld() {
-    // var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/HelloWorld.jmm"));
-    // TestUtils.noErrors(result.getReports());
-    // var output = result.run();
-    // assertEquals("Hello, World!", output.trim());
-    // }
-
     @Test
     public void testHelloWorld() {
         String jasminCode = SpecsIo.getResource("fixtures/public/jasmin/HelloWorld.j");
