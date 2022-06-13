@@ -85,7 +85,6 @@ public class Cpf4_Jasmin {
                 "(invokespecial|invokenonvirtual)\\s+java/lang/Object(\\.|/)<init>\\(\\)V");
         CpUtils.assertTrue("Could not find return", jasminResult.getJasminCode().contains("return"), jasminResult);
         CpUtils.matches(jasminResult, "\\.end\\s+method");
-        // System.out.println(jasminResult);
     }
 
     /**

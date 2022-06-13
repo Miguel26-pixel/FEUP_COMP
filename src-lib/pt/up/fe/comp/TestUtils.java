@@ -231,6 +231,9 @@ public class TestUtils {
 
         semanticsResult = optimization.optimize(semanticsResult);
 
+        System.out.println("Optimized tree\n");
+        System.out.println(semanticsResult.getRootNode().toTree());
+
         var ollirResult = optimization.toOllir(semanticsResult);
 
         ollirResult = optimization.optimize(ollirResult);
