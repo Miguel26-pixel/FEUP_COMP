@@ -1,5 +1,5 @@
 import io;
-class WhileAndIF {
+class WhileAndIf {
  
     public static void main(String[] args){
         int a;
