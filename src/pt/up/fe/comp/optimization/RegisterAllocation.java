@@ -4,6 +4,7 @@ import pt.up.fe.comp.graph.Graph;
 import org.specs.comp.ollir.*;
 import org.specs.comp.ollir.Method;
 import org.specs.comp.ollir.Node;
+import pt.up.fe.comp.jmm.report.Report;
 
 import java.util.*;
 
@@ -11,9 +12,12 @@ public class RegisterAllocation {
     private final ClassUnit classUnit;
     private final LivenessAnalysis livenessAnalyzer;
 
-    public RegisterAllocation(ClassUnit classUnit) {
+    private List<Report> reports;
+
+    public RegisterAllocation(ClassUnit classUnit, List<Report> reports) {
         this.classUnit = classUnit;
         this.livenessAnalyzer = new LivenessAnalysis();
+        this.reports = reports;
     }
 
     public void allocateRegisters(int n) {
@@ -30,14 +34,17 @@ public class RegisterAllocation {
             System.out.println("semantic.Method: " + method.getMethodName());
 
             ArrayList<HashMap<Node, ArrayList<Operand>>> liveRanges = livenessAnalyzer.analyze(method);
-            Graph varGraph = new Graph(liveRanges, method);
+            Graph varGraph = new Graph(liveRanges, method, reports);
 
             HashMap<String, Descriptor> v2Table = varGraph.graphColoring(n);
 
-            method.getVarTable().clear();
+            if(v2Table != null) {
 
-            for (String s: v2Table.keySet()) {
-                method.getVarTable().put(s,v2Table.get(s));
+                method.getVarTable().clear();
+
+                for (String s : v2Table.keySet()) {
+                    method.getVarTable().put(s, v2Table.get(s));
+                }
             }
         }
     }

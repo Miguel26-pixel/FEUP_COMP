@@ -91,6 +91,10 @@ public class LivenessAnalysis {
         if (instruction.getInstType() == InstructionType.ASSIGN) {
             e = ((AssignInstruction) instruction).getDest();
 
+            if (e.getType().getTypeOfElement() == ElementType.THIS) {
+                return opList;
+            }
+
             if (e.isLiteral()) return null;
 
             Descriptor d = varTable.get(((Operand) e).getName());
@@ -138,7 +142,7 @@ public class LivenessAnalysis {
             if(!arg.isLiteral()) {
                 opList.add((Operand) arg);
             }
-            opList.add(new Operand(arg.getType()));
+            else opList.add(new Operand(arg.getType()));
         }
         return opList;
     }
@@ -147,8 +151,7 @@ public class LivenessAnalysis {
         ArrayList<Operand> opList = new ArrayList<>();
         if(!instruction.getOperand().isLiteral()) {
             opList.add((Operand) instruction.getOperand());
-        }
-        opList.add(new Operand(instruction.getOperand().getType()));
+        } else opList.add(new Operand(instruction.getOperand().getType()));
         return opList;
     }
 
@@ -157,7 +160,7 @@ public class LivenessAnalysis {
         if(!instruction.getThirdOperand().isLiteral()) {
             opList.add((Operand) instruction.getThirdOperand());
         }
-        opList.add(new Operand(instruction.getThirdOperand().getType()));
+        else opList.add(new Operand(instruction.getThirdOperand().getType()));
         return opList;
     }
 
@@ -173,8 +176,7 @@ public class LivenessAnalysis {
         if (instruction.hasReturnValue()) {
             if(!instruction.getOperand().isLiteral()) {
                 opList.add((Operand) instruction.getOperand());
-            }
-            opList.add(new Operand(instruction.getOperand().getType()));
+            } else opList.add(new Operand(instruction.getOperand().getType()));
             return opList;
         }
         return null;
@@ -185,8 +187,7 @@ public class LivenessAnalysis {
         for (Element arg : instruction.getOperands()) {
             if(!arg.isLiteral()) {
                 opList.add((Operand) arg);
-            }
-            opList.add(new Operand(arg.getType()));
+            }else opList.add(new Operand(arg.getType()));
         }
         return opList;
     }
@@ -199,19 +200,23 @@ public class LivenessAnalysis {
         ArrayList<Operand> opList = new ArrayList<>();
         if(!instruction.getSingleOperand().isLiteral()) {
             opList.add((Operand) instruction.getSingleOperand());
-        }
-        opList.add(new Operand(instruction.getSingleOperand().getType()));
+        }else opList.add(new Operand(instruction.getSingleOperand().getType()));
         return opList;
     }
 
     private ArrayList<Operand> getUsedVarsCall(CallInstruction instruction, HashMap<String, Descriptor> varTable) {
         ArrayList<Operand> opList = new ArrayList<>();
-        if(instruction.getListOfOperands() == null) return opList;
-        for (Element arg : instruction.getListOfOperands()) {
-            if(!arg.isLiteral()) {
-                opList.add((Operand) arg);
+        opList.add((Operand) instruction.getFirstArg());
+        if (instruction.getNumOperands() > 1) {
+            if (instruction.getInvocationType() != CallType.NEW)
+                opList.add((Operand) instruction.getFirstArg());
+
+            for (Element arg : instruction.getListOfOperands()) {
+                if (!arg.isLiteral()) {
+                    opList.add((Operand) arg);
+                }
+                else opList.add(new Operand(arg.getType()));
             }
-            opList.add(new Operand(arg.getType()));
         }
         return opList;
     }

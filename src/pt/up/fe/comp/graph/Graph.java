@@ -1,6 +1,9 @@
 package pt.up.fe.comp.graph;
 
 import org.specs.comp.ollir.*;
+import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.ReportType;
+import pt.up.fe.comp.jmm.report.Stage;
 
 import java.util.*;
 
@@ -10,10 +13,13 @@ public class Graph {
         boolean staticMethod;
         HashMap<String, Descriptor> varTable;
 
-        public Graph(ArrayList<HashMap<Node, ArrayList<Operand>>> liveRanges, Method method) {
+        List<Report> reportsList;
+
+        public Graph(ArrayList<HashMap<Node, ArrayList<Operand>>> liveRanges, Method method, List<Report> reports) {
                 nodes = new HashMap<>();
 
                 varTable = method.getVarTable();
+                reportsList = reports;
                 staticMethod = method.isStaticMethod();
                 minReg = staticMethod ? 0 : 1;
 
@@ -43,9 +49,13 @@ public class Graph {
         }
 
         public HashMap<String, Descriptor> graphColoring(int k) {
-                if (k < minReg) {
-                        System.out.println("Insufficient registers to store this method's variables");
-                        return graphColoring(k+1);
+                if(k==0){
+                        k=minReg;
+                }
+                else if (k < minReg) {
+                        reportsList.add(new Report(ReportType.ERROR, Stage.OPTIMIZATION,-1,"Insufficient registers to store this method's variables, you need at least " + minReg + " registers."));
+                        return null;
+
                 }
 
                 Stack<GraphNode> stack = new Stack<>();
