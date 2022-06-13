@@ -88,18 +88,15 @@ public class ConstantPropagationVisitor extends AJmmVisitor<Boolean, Boolean> {
     }
 
     private void removeAllConstantAssignsAndVarDeclarations() {
-        for (Map.Entry<String, JmmNode> assign : scheduledAssignRemovals.entrySet()){
-            if (!constantAssigns.containsKey(assign.getKey())){
-                continue;
+        for (Map.Entry<String, JmmNode> constantAssign : constantAssigns.entrySet()){
+            if (scheduledAssignRemovals.containsKey(constantAssign.getKey())){
+                JmmNode assign = scheduledAssignRemovals.get(constantAssign.getKey());
+                assign.getJmmParent().removeJmmChild(assign);
             }
-            assign.getValue().getJmmParent().removeJmmChild(assign.getValue());
-        }
-
-        for (Map.Entry<String, JmmNode> varDeclaration : varDeclarations.entrySet()) {
-            if (!constantAssigns.containsKey(varDeclaration.getKey())){
-                continue;
+            if (varDeclarations.containsKey(constantAssign.getKey())){
+                JmmNode declaration = varDeclarations.get(constantAssign.getKey());
+                declaration.getJmmParent().removeJmmChild(declaration);
             }
-            varDeclaration.getValue().getJmmParent().removeJmmChild(varDeclaration.getValue());
         }
     }
 }
