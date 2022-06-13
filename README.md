@@ -117,7 +117,20 @@ It is thus quite difficult to infer the types of complex, external nested method
 In terms of code organization, we feel that the `OllirEmitter` class has become quite large; we could have split its responsibilities in more files, which would raise state management challenges, but greatly improve the legibility.
 
 ### Optimizations at the `ollir` level
-@poker
+
+#### Register Allocation
+
+After generating the OllirResult, if the "-r" option is used, the *register allocation optimization* is performed to each method.
+
+First, the algorithm starts by using *dataflow analysis* to determine the lifetime of local variables. After that, it constructs the *Register-Interference Graph*, where each node represents a variable and each edge represents the interference between two variables with intersecting lifetimes.
+
+Then, uses *Graph Coloring* to allocate registers and builds a new varTable for the method, updating each variable's virtual register.
+
+If the specified number of registers isn't enough to store all the variables, the program aborts and reports an error, showing the minimum number of registers needed.
+
+
+
+
 
 ### `Jasmin` generation
 
