@@ -1,5 +1,6 @@
 package pt.up.fe.comp.cli;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -23,31 +24,33 @@ public class CLIArgumentsParser {
         this.config.put("inputFile", "");
         this.config.put("className", "");
 
-        for (String argument: args) {
-            if (argument.equals("-o")) {
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-o")) {
                 this.config.replace("optimize", "true");
-            } else if (argument.equals("-d")) {
+            } else if (args[i].equals("-d")) {
                 this.config.replace("debug", "true");
+            } else if (args[i].equals("-r") && i+1 < args.length) {
+                this.config.replace("registerAllocation", args[i+1]);
             }
 
-            Matcher patternMatch = registerOptPattern.matcher(argument);
+            Matcher patternMatch = registerOptPattern.matcher(args[i]);
 
             if (patternMatch.find()) {
                 try {
-                    Integer.parseInt(argument.substring(3));
+                    Integer.parseInt(args[i].substring(3));
                 } catch (Exception e) {
                     throw new RuntimeException("Invalid number of registers.");
                 }
-                this.config.replace("registerAllocation", argument.substring(3));
+                this.config.replace("registerAllocation", args[i].substring(3));
             }
 
-            patternMatch = inputFileOptPattern.matcher(argument);
+            patternMatch = inputFileOptPattern.matcher(args[i]);
 
             if (patternMatch.find()) {
-                patternMatch = classNamePattern.matcher(argument.substring(3));
+                patternMatch = classNamePattern.matcher(args[i].substring(3));
                 if (patternMatch.find()) {
                     this.config.replace("className", patternMatch.group(1));
-                    this.config.replace("inputFile", argument.substring(3));
+                    this.config.replace("inputFile", args[i].substring(3));
                 }
             }
         }

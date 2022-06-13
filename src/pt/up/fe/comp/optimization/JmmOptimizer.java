@@ -22,7 +22,7 @@ public class JmmOptimizer implements JmmOptimization {
     @Override
     public OllirResult optimize(OllirResult ollirResult) {
         if (ollirResult.getConfig().containsKey("registerAllocation")
-                && !(Integer.parseInt(ollirResult.getConfig().get("registerAllocation")) >= 1)) {
+                && (Integer.parseInt(ollirResult.getConfig().get("registerAllocation")) >= 0)) {
             Integer n = Integer.parseInt(ollirResult.getConfig().get("registerAllocation"));
             ClassUnit classUnit = ollirResult.getOllirClass();
             RegisterAllocation optimizer = new RegisterAllocation(classUnit, ollirResult.getReports());

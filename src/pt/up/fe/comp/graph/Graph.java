@@ -50,7 +50,7 @@ public class Graph {
 
         public HashMap<String, Descriptor> graphColoring(int k) {
                 if(k==0){
-                        k=minReg;
+                        k = minReg;
                 }
                 else if (k < minReg) {
                         reportsList.add(new Report(ReportType.ERROR, Stage.OPTIMIZATION,-1,"Insufficient registers to store this method's variables, you need at least " + minReg + " registers."));

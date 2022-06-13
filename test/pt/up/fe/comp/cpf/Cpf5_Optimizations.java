@@ -13,24 +13,40 @@
 
 package pt.up.fe.comp.cpf;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.junit.Assert;
 import org.junit.Test;
 
+import org.specs.comp.ollir.ClassUnit;
+import org.specs.comp.ollir.Node;
+import org.specs.comp.ollir.Operand;
 import pt.up.fe.comp.CpUtils;
 import pt.up.fe.comp.TestUtils;
+import pt.up.fe.comp.graph.Graph;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
+import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.optimization.LivenessAnalysis;
+import pt.up.fe.comp.optimization.RegisterAllocation;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsStrings;
+
+import static org.junit.Assert.fail;
 
 public class Cpf5_Optimizations {
 
     static OllirResult getOllirResult(String filename) {
         return TestUtils.optimize(SpecsIo.getResource("fixtures/public/cpf/5_optimizations/" + filename));
+    }
+
+    static OllirResult getOllirResult2(String filename) {
+        return TestUtils.optimize(SpecsIo.getResource("fixtures/public/cpf/3_ollir/" + filename));
     }
 
     static JasminResult getJasminResult(String filename) {
@@ -317,5 +333,49 @@ public class Cpf5_Optimizations {
         CpUtils.assertEquals("Expected exactly " + expectedIf + " if instruction", expectedIf, ifOccurOpt, optimized);
         CpUtils.assertEquals("Expected exactly " + expectedGoto + " goto instructions", expectedGoto, gotoOccurOpt,
                 optimized);
+    }
+
+
+    @Test
+    public void livenessAnalysisTest(){
+
+
+        var result = getOllirResult2("basic/BasicMethodsClass.jmm");
+        var method = CpUtils.getMethod(result, "func3");
+
+        LivenessAnalysis liveAnal = new LivenessAnalysis();
+        ArrayList<HashMap<Node, ArrayList<Operand>>> opNodes = liveAnal.analyze(method);
+
+        Assert.assertNotNull(opNodes);
+
+    }
+
+    @Test
+    public void graphColoringTest () {
+
+        var result = getOllirResult2("basic/BasicMethodsClass.jmm");
+        var method = CpUtils.getMethod(result, "func3");
+        List<Report> reports = result.getReports();
+        ClassUnit classUnit = result.getOllirClass();
+
+        LivenessAnalysis liveAnal = new LivenessAnalysis();
+        ArrayList<HashMap<Node, ArrayList<Operand>>> opNodes = liveAnal.analyze(method);
+        RegisterAllocation optimizer = new RegisterAllocation(classUnit, result.getReports());
+
+        Assert.assertNotNull(opNodes);
+
+        Graph varGraph = new Graph(opNodes, method, reports);
+
+        Assert.assertNotNull(varGraph);
+        Assert.assertNotNull(optimizer);
+
+        try {
+            optimizer.allocateRegisters(4);
+        }catch (Exception e){
+            String msg = "ALlocateRegister failed";
+            fail(msg);
+        }
+
+
     }
 }
