@@ -7,11 +7,11 @@ import pt.up.fe.comp.semantic.visitors.ReportCollectorJmmNodeVisitor;
 
 public class ImportCheckVisitor extends ReportCollectorJmmNodeVisitor<Type, Type> {
 
-    JmmSymbolTable symbolTable;
+    final JmmSymbolTable symbolTable;
 
     public ImportCheckVisitor(JmmSymbolTable symbolTable) {
         this.symbolTable = symbolTable;
-        addVisit("Identifier",this::visitIdentifier);
+        addVisit("Identifier", this::visitIdentifier);
         setDefaultVisit(this::visitDefault);
     }
 
@@ -23,12 +23,14 @@ public class ImportCheckVisitor extends ReportCollectorJmmNodeVisitor<Type, Type
     }
 
     private Type visitIdentifier(JmmNode node, Type dummy) {
-        if (!node.getJmmParent().getKind().equals("VarDeclaration")) { return null; }
+        if (!node.getJmmParent().getKind().equals("VarDeclaration")) {
+            return null;
+        }
         JmmNode varDecl = node.getJmmParent();
         String className = varDecl.getChildren().get(0).get("name");
         if (!className.equals("int") && !className.equals("boolean") && !className.equals("String") &&
                 !className.equals(symbolTable.getClassName()) && !className.equals(symbolTable.getSuper())) {
-            for (var imp: symbolTable.getImports()) {
+            for (var imp : symbolTable.getImports()) {
                 String classImported = imp.substring(imp.lastIndexOf('.') + 1);
                 if (classImported.equals(className)) {
                     return new Type(classImported, false);

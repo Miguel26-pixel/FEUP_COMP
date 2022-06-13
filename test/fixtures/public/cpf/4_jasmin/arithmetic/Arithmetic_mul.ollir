@@ -1,0 +1,15 @@
+import io;
+Arithmetic_mul {
+
+    .construct Arithmetic_mul().V {
+        invokespecial(this, "<init>").V;
+    }
+
+    .method public static main(args.array.String).V {
+a.i32 :=.i32 2.i32 *.i32 11.i32;
+invokestatic(io, "print", a.i32).V;
+
+ret.V;
+    }
+
+}

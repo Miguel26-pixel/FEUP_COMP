@@ -1,0 +1,15 @@
+Structure_fields {
+    .field private a.i32;
+    .field private b.bool;
+    .field private c.array.i32;
+
+    .construct Structure_fields().V {
+        invokespecial(this, "<init>").V;
+    }
+
+    .method public static main(args.array.String).V {
+
+ret.V;
+    }
+
+}

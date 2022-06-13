@@ -65,7 +65,7 @@ public class JmmBackend implements JasminBackend {
             fieldDefinitions.append(".field ");
 
             if (field.getFieldAccessModifier().toString().equals("DEFAULT")) {
-                fieldDefinitions.append("public ");
+                fieldDefinitions.append("private ");
             } else {
                 fieldDefinitions.append(field.getFieldAccessModifier().toString().toLowerCase()).append(" ");
             }

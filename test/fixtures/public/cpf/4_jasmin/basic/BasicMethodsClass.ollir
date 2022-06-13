@@ -1,0 +1,15 @@
+import io;
+import Other;
+BasicMethods extends Other {
+
+    .construct BasicMethods().V {
+        invokespecial(this, "<init>").V;
+    }
+
+    .method public func3().BasicMethods {
+p1.BasicMethods :=.BasicMethods new(BasicMethods).BasicMethods;
+invokespecial(p1.BasicMethods,"<init>").V;
+ret.BasicMethods p1.BasicMethods;
+    }
+
+}

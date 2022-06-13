@@ -17,9 +17,6 @@ public class MethodDefinitionGenerator {
 
         methodDefinition.append(getMethodHeader()).append("\n");
 
-        //methodDefinition.append("\t.limit stack 99\n");
-        //methodDefinition.append("\t.limit locals 99\n");
-
         StringBuilder instructions = new StringBuilder();
 
         this.method.buildVarTable();

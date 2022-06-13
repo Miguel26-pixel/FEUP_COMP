@@ -1,0 +1,14 @@
+NoArgsFuncCall {
+
+    .construct NoArgsFuncCall().V {
+        invokespecial(this, "<init>").V;
+    }
+
+    .method public bar().i32 {
+c.NoArgsFuncCall :=.NoArgsFuncCall new(NoArgsFuncCall).NoArgsFuncCall;
+invokespecial(c.NoArgsFuncCall,"<init>").V;
+a.i32 :=.i32 invokevirtual(c.NoArgsFuncCall, "bar").i32;
+ret.i32 1.i32;
+    }
+
+}
