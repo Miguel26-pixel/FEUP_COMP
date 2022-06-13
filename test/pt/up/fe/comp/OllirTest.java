@@ -15,7 +15,7 @@ package pt.up.fe.comp;
 import org.junit.Test;
 import pt.up.fe.specs.util.SpecsIo;
 
-public class OptimizeTest {
+public class OllirTest {
 
     private void testOptimize(String resourcePath) {
         var result = TestUtils.optimize(SpecsIo.getResource(resourcePath));

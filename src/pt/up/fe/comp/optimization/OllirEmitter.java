@@ -317,7 +317,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
             SubstituteVariable referenceHolder = createTemporaryVariable(node);
             referenceHolder.setVariableType(elementType);
             startNewLine();
-            ollirCode.append(createTemporaryAssign(referenceHolder, getField("this", variableName, getOllirType(elementType))));
+            ollirCode.append(createTemporaryAssign(referenceHolder, getField("this", variableName, getOllirType(symbol.getType()))));
             substituteVariable.setVariableName(referenceHolder.getVariableName() + "[" + positionTemporaryVariable.getSubstituteWithType() + "]");
         } else {
             substituteVariable.setVariableName(variableName + "[" + positionTemporaryVariable.getSubstituteWithType() + "]");
