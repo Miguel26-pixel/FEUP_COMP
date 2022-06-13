@@ -26,7 +26,8 @@ public class JmmOptimizer implements JmmOptimization {
     public JmmSemanticsResult optimize(JmmSemanticsResult semanticsResult) {
         if (semanticsResult.getConfig().containsKey("optimize")
                 && semanticsResult.getConfig().get("optimize").equals("true")) {
-            ConstantPropagationVisitor constantPropagationVisitor = new ConstantPropagationVisitor();
+            ConstantPropagationVisitor constantPropagationVisitor =
+                    new ConstantPropagationVisitor((JmmSymbolTable) semanticsResult.getSymbolTable());
             constantPropagationVisitor.visit(semanticsResult.getRootNode());
         }
         return semanticsResult;

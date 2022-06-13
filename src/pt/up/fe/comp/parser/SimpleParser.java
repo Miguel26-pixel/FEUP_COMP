@@ -47,6 +47,7 @@ public class SimpleParser implements JmmParser {
                         "JmmNode interface not yet implemented, returning null root node"));
             }
             new LineColAnnotator().visit((JmmNode) root);
+            new ReservedVariableNameChanger().visit((JmmNode) root);
             return new JmmParserResult((JmmNode) root, Collections.emptyList(), config);
         } catch (Exception e) {
             var exception = TestUtils.getException(e, ParseException.class);
