@@ -14,12 +14,9 @@ package pt.up.fe.comp;
 
 import org.junit.Test;
 import pt.up.fe.specs.util.SpecsIo;
-
 import java.util.HashMap;
 import java.util.Map;
-
-public class OptimizeTest {
-
+public class OllirTest {
     private void testOptimize(String resourcePath) {
         Map<String, String> config =  new HashMap<>();
         config.put("optimize", "true");

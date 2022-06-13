@@ -403,6 +403,7 @@ public class InstructionTranslator {
                 case BOOLEAN:
                     return getIndentation() + "iload" + spacer + operandDescriptor.getVirtualReg();
                 case ARRAYREF:
+                    loadCounter += 1;
                     StringBuilder jasminInstruction = new StringBuilder();
 
                     jasminInstruction.append(getIndentation()).append("aload").append(spacer).append(operandDescriptor.getVirtualReg());
@@ -413,14 +414,9 @@ public class InstructionTranslator {
                         jasminInstruction.append("\n");
 
                         ArrayList<Element> indexes = arrayOperand.getIndexOperands();
-
-                        if (indexes.size() < 1) {
-                            return "";
-                        }
-
                         Element index = indexes.get(0);
-                        jasminInstruction.append(getCorrespondingLoad(index, ancestorMethod)).append("\n");
 
+                        jasminInstruction.append(getCorrespondingLoad(index, ancestorMethod)).append("\n");
                         jasminInstruction.append(getIndentation()).append("iaload");
                     }
 
@@ -429,6 +425,7 @@ public class InstructionTranslator {
                 case OBJECTREF:
                 case THIS:
                 case STRING:
+                    loadCounter += 1;
                     return getIndentation() + "aload" + spacer + operandDescriptor.getVirtualReg();
                 default:
                     return "";
