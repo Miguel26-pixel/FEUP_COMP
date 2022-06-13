@@ -14,7 +14,6 @@ public class JmmOptimizer implements JmmOptimization {
         final StringBuilder ollirCode = new StringBuilder();
         OllirEmitter ollirEmitter = new OllirEmitter(ollirCode, (JmmSymbolTable) semanticsResult.getSymbolTable(), 4);
         ollirEmitter.visit(semanticsResult.getRootNode());
-        System.out.println(ollirCode);
         return new OllirResult(semanticsResult, ollirCode.toString(), Collections.emptyList());
     }
 
