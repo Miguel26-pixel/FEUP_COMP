@@ -33,7 +33,7 @@ The semantic analysis phase of the compiler is where the program ensure that all
 
 The symbol table is composed by a `JmmClassSignature` that stores the class information (class name, super class name, fields), and two sub-tables, the `ImportsTable` and the `MethodsTable`. The `ImportsTable` stores information about every import that the file contain and the `MethodsTable` saves all the content of each method of the class, the method signature and all the local variables.  
 
-To generate the symbol table we visit all nodes of the syntax tree to obtain all the data needed for the table. Therefore four visitors were implemented:
+To generate the symbol table we visit all nodes of the syntax tree to obtain all the data needed for the table. Therefore, four visitors were implemented:
 
 | Visitor                    | Explanation                                                                                                                                                                                                                     |
 |----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -41,6 +41,8 @@ To generate the symbol table we visit all nodes of the syntax tree to obtain all
 | `ClassDeclarationVisitor`  | Visit the `ClassDeclaration` node to get the main data from the class and visit all the nodes of the kind `VarDeclaration` to get the fields of the class. The retrieved information allow the build of the `JmmClassSignature` |
 | `MethodDeclarationVisitor` | If exists, visit the `MainMethod` and every node of kind `RegularMethod` to obtain all the information of each method of the class, which are saved into the `MethodsTable`                                                     |
 | `LocalVariablesVisitor`    | This visitor adds to the method table the information of all local variables by visiting all nodes of kind `VarDeclaration` inside any method                                                                                   |
+
+As an addition, at this level, we ensure that there are no duplicate method definitions (since overloading is not supported), and that the file name matches the class name (if `inputFile` is provided in the configuration), as required by the Java specification for public classes.
 
 ### Semantic tests
 
@@ -138,9 +140,11 @@ The instruction translation was optimized through the usage of more efficient `j
 Finally, less than comparisons are optimized whenever 0 is on the right side, through the usage of the `iflt` instruction.
 
 Even though these classes behave as expected, we feel that we could have created a proper class-based framework for the translation of instructions instead of a direct instruction-to-string translation. This would have enabled us to have a better codebase, but time constraints did not allow us to implement this. 
- 
+
 ## Best features
 In terms of the base language, we added support for the `||` ("or") operator and for local variable declarations after statements (the original grammar forced all declarations to appear at the top of the method body).
+
+At the semantic level, we added two extra checks, detailed above, related with method duplication detection and class name mismatch.
 
 In terms of the code architecture, we are confident that our pipeline is simple and robust, capable of detecting edge case errors and generating code for very complex expressions, in correct order. We built a strong base which can be painlessly used to support some modern `Java` syntax sugars.
 
