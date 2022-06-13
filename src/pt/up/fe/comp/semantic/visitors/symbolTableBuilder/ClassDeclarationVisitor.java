@@ -9,12 +9,23 @@ import pt.up.fe.comp.semantic.visitors.ReportCollectorJmmNodeVisitor;
 import java.util.Optional;
 
 public class ClassDeclarationVisitor extends ReportCollectorJmmNodeVisitor<JmmClassSignature, Boolean> {
+    private final String className;
 
-    public ClassDeclarationVisitor() {
+    public ClassDeclarationVisitor(String inputFile) {
         addVisit("Start", this::visitStart);
         addVisit("ClassDeclaration", this::visitClassDeclaration);
         addVisit("VarDeclaration", this::visitVarDeclaration);
         setDefaultVisit((node, classSignature) -> true);
+        className = getClassNameFromFileName(inputFile);
+    }
+
+    private String getClassNameFromFileName(String inputFile) {
+        if (inputFile == null){
+            return null;
+        }
+        inputFile = inputFile.substring(inputFile.lastIndexOf('/') + 1);
+        inputFile = inputFile.substring(0, inputFile.indexOf('.'));
+        return inputFile;
     }
 
     private Boolean visitStart(JmmNode startNode, JmmClassSignature classSignature) {
@@ -25,6 +36,10 @@ public class ClassDeclarationVisitor extends ReportCollectorJmmNodeVisitor<JmmCl
     }
 
     private Boolean visitClassDeclaration(JmmNode classNode, JmmClassSignature classSignature) {
+        if (className != null && !className.equals(classNode.get("name"))){
+            addSemanticErrorReport(classNode, "The name of the class must match the filename");
+        }
+
         classSignature.setClassName(classNode.get("name"));
         Optional<String> superName = classNode.getOptional("extends");
         superName.ifPresent(classSignature::setSuperName);
