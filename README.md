@@ -106,6 +106,11 @@ While visiting any kind of expression, a temporary variable is created to hold i
 
 > There is no need to translate `a = b` to `temp = b; a = temp;`. A simple registry allocation optimization in the `visitIdentifier` method changes the value of the temporary variable to the actual identifier name and does not inject any code. The `ollir` thus becomes simply `a = b`.
 
+Since the methods' local variables' liveliness cannot interfere, the variable temporary counter, used for its name, is reset for each method.
+The name is also escaped if it exists in the symbol table, to prevent name clashes.
+
+> The second compiled method can reuse the `t0` name for its first temporary variable, or `t0_`, if that method's local variables include a `t0`.
+
 An interesting challenge is the deduction of external `invoke` method call types (the internal ones are easier, since they are described in the symbol table). Since we have no access to the imported classes, we must trust the type matches at this level: the assigned variable type is passed to the right hand side expression visitor through the `assignType` field of the `SubstituteVariable` class.
 
 > A `jmm` code like `Imported obj; obj.bar(...)` becomes `invoke(...).V`, while `Imported obj; int a; a = obj.bar(...)` becomes `a.i32 :=.i32 invoke(...).i32`.
