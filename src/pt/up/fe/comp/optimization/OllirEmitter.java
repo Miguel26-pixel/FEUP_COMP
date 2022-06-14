@@ -148,6 +148,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         ollirCode.append(").").append(getOllirType(returnType)).append(" {");
         indentationLevel++;
         boolean returned = false;
+        int currentTemporaryVariableCounter = temporaryVariableCounter;
         for (var child : node.getChildren()) {
             if (child.getKind().equals("Return")) {
                 visit(child);
@@ -156,6 +157,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
                 visit(child);
             }
         }
+        temporaryVariableCounter = currentTemporaryVariableCounter;
         if (!returned) {
             startNewLine();
             ollirCode.append("ret.").append(getOllirType(returnType)).append(";");
