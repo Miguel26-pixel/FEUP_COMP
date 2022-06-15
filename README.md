@@ -155,7 +155,7 @@ In terms of the code architecture, we are confident that our pipeline is simple 
 
 > While supporting other operators such as `>`, `!=`, or `==` would be a breeze, an addition like assignments in declarations would not be so difficult, too.
  
-While we implemented the required register allocation and constant propagation optimizations, we would like to point out the bigger feature set of the latter, given that it removes declarations and assignments of constant propagated variables, as explained above.
+While we implemented the required register allocation and constant propagation optimizations, we would like to point out the bigger feature set of the latter, given that it removes some dead code, as explained above.
 
 As a whole, we were able to run in the JVM all `jmm` code samples, including complex ones such as *TicTacToe* or *Life*.
 It was interesting to see that *Life.jmm* contained a field named *field*, which initially raised confusion at the Jasmin level, and proved the need for our AST disambiguation traversal.
@@ -163,10 +163,6 @@ Also, the `WhileAndIf` sample provided contained a public class named `WhileAndI
 
 ## Possible improvements
 Beside the already mentioned large size of some important classes, and the lack of a bigger optimization pipeline, we feel that our work could be much improved if we added more features to the base `jmm` language, such as method overloading, string literals or class constructor customizations.
-
-## Project setup
-
-There are three important subfolders inside the main folder. First, inside the subfolder named ``javacc`` you will find the initial grammar definition. Then, inside the subfolder named ``src`` you will find the entry point of the application. Finally, the subfolder named ``tutorial`` contains code solutions for each step of the tutorial. JavaCC21 will generate code inside the subfolder ``generated``.
 
 ## Compile and Running
 
