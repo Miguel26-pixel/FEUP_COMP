@@ -406,9 +406,6 @@ public class Cpf5_Optimizations {
 
         JasminResult jasminResultOptimized = getJasminResultReg2("basic/BasicMethodsClass.jmm", 4);
 
-        System.out.println(jasminResult.getJasminCode());
-        System.out.println("-----------");
-        System.out.println(jasminResultOptimized.getJasminCode());
         Assert.assertNotEquals(jasminResult,jasminResultOptimized);
 
     }
