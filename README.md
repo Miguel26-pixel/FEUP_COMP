@@ -163,3 +163,18 @@ Also, the `WhileAndIf` sample provided contained a public class named `WhileAndI
 
 ## Possible improvements
 Beside the already mentioned large size of some important classes, and the lack of a bigger optimization pipeline, we feel that our work could be much improved if we added more features to the base `jmm` language, such as method overloading, string literals or class constructor customizations.
+
+## Project setup
+
+There are three important subfolders inside the main folder. First, inside the subfolder named ``javacc`` you will find the initial grammar definition. Then, inside the subfolder named ``src`` you will find the entry point of the application. Finally, the subfolder named ``tutorial`` contains code solutions for each step of the tutorial. JavaCC21 will generate code inside the subfolder ``generated``.
+
+## Compile and Running
+
+To compile and install the program, run ``gradle installDist``. This will compile your classes and create a launcher script in the folder ``./build/install/comp2022-9b/bin``. For convenience, there are two script files, one for Windows (``comp2022-9b.bat``) and another for Linux (``comp2022-9b``), in the root folder, that call tihs launcher script.
+
+After compilation, a series of tests will be automatically executed. The build will stop if any test fails. Whenever you want to ignore the tests and build the program anyway, you can call Gradle with the flag ``-x test``.
+
+## Test
+
+To test the program, run ``gradle test``. This will execute the build, and run the JUnit tests in the ``test`` folder. If you want to see output printed during the tests, use the flag ``-i`` (i.e., ``gradle test -i``).
+You can also see a test report by opening ``./build/reports/tests/test/index.html``.
