@@ -145,6 +145,7 @@ public class Cpf4_Jasmin {
     @Test
     public void section1_Basic_Method_Declaration_Class() {
         JasminResult jasminResult = getJasminResult("basic/BasicMethodsClass.jmm");
+        System.out.println(jasminResult.getJasminCode());
         CpUtils.matches(jasminResult, JASMIN_METHOD_REGEX_PREFIX + "'?LBasicMethods;'?");
     }
 

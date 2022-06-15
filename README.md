@@ -122,12 +122,13 @@ In terms of code organization, we feel that the `OllirEmitter` class has become 
 
 After generating the OllirResult, if the "-r" option is used, the *register allocation optimization* is performed to each method.
 
-First, the algorithm starts by using *dataflow analysis* to determine the lifetime of local variables. After that, it constructs the *Register-Interference Graph*, where each node represents a variable and each edge represents the interference between two variables with intersecting lifetimes.
+First, the algorithm starts by using our implementation of the algorithm *liveliness analysis* which uses *dataflow analysis* to determine the lifetime of local variables. After that, it constructs the *Interference Graph*, a HashMap where it's saved all variables and for each variable, a set of variables representing all the others variables that have an intersecting lifetimes.
 
 Then, uses *Graph Coloring* to allocate registers and builds a new varTable for the method, updating each variable's virtual register.
 
 If the specified number of registers isn't enough to store all the variables, the program aborts and reports an error, showing the minimum number of registers needed.
 
+If the specified number of registers is zero, then the program uses the number of registers needed to finish the allocation.
 
 
 
