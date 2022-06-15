@@ -6,10 +6,10 @@
 
 | Name              | Number    | Self-evaluation | Contribution | Performed work                                                                            |
 |-------------------|-----------|-----------------|--------------|-------------------------------------------------------------------------------------------|
-| **Bruno Mendes**  | 201906166 | TBD             | 28%          | Grammar, symbol table generation, `ollir` generation, constant propagation optimization   |
-| **David Preda**   | 201904726 | TBD             | 28%          | Grammar, symbol table generation, `jasmin` generation, instruction selection optimization |
-| **Fernando Rego** | 201905951 | TBD             | 28%          | Grammar, symbol table generation, semantic analysis                                       |
-| **Miguel Amorim** | 201907756 | TBD             | 16%          | Grammar, register allocation optimization                                                 |
+| **Bruno Mendes**  | 201906166 | 19              | 28%          | Grammar, symbol table generation, `ollir` generation, constant propagation optimization   |
+| **David Preda**   | 201904726 | 19              | 28%          | Grammar, symbol table generation, `jasmin` generation, instruction selection optimization |
+| **Fernando Rego** | 201905951 | 19              | 28%          | Grammar, symbol table generation, semantic analysis                                       |
+| **Miguel Amorim** | 201907756 | 16              | 16%          | Grammar, register allocation optimization                                                 |
 
 #### Global self-evaluation of the project: 19
 
@@ -122,7 +122,7 @@ In terms of code organization, we feel that the `OllirEmitter` class has become 
 
 After generating the OllirResult, if the "-r" option is used, the *register allocation optimization* is performed to each method.
 
-First, the algorithm starts by using our implementation of the algorithm *liveness analysis* which uses *dataflow analysis* to determine the lifetime of local variables. After that, it constructs the *Interference Graph*, a HashMap where it's saved all variables and for each variable, a set of variables representing all the others variables that have an intersecting lifetimes.
+First, the algorithm starts by using our implementation of the algorithm *liveliness analysis* which uses *dataflow analysis* to determine the lifetime of local variables. After that, it constructs the *Interference Graph*, a HashMap where it's saved all variables and for each variable, a set of variables representing all the others variables that have an intersecting lifetimes.
 Unfortunately, there is some error we couldn't fix, so the algorithm is not at the 100%.
 
 Then, uses *Graph Coloring* to allocate registers and builds a new varTable for the method, updating each variable's virtual register.
@@ -131,8 +131,7 @@ If the specified number of registers isn't enough to store all the variables, th
 
 If the specified number of registers is zero, then the program uses the number of registers needed to finish the allocation.
 
-
-
+Unfortunately, the algorithm does not work correctly all the times. There are some issues regarding the calculation of the life-time of the variables, on set of out variables and in variables.
 
 ### `Jasmin` generation
 

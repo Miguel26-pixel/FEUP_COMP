@@ -9,9 +9,9 @@ import java.util.List;
 
 public class RegAlloc {
 
-    private ClassUnit classUnit;
-    private LivenessAnalysis liveAnalyzer;
-    private List<Report> reportsList;
+    private final ClassUnit classUnit;
+    private final LivenessAnalysis liveAnalyzer;
+    private final List<Report> reportsList;
 
     public RegAlloc(ClassUnit cUnit, List<Report> reports) {
         classUnit = cUnit;
@@ -29,14 +29,13 @@ public class RegAlloc {
 
             HashMap<String, Descriptor> v2Table = intGraph.graphColoring(numberOfRegs);
 
-            if(v2Table != null) {
-
-                for (var entry: method.getVarTable().entrySet()) {
-                    for (var entry2: v2Table.entrySet()) {
-                        if(entry.getKey().equals(entry2.getKey())) {
+            if (v2Table != null) {
+                for (var entry : method.getVarTable().entrySet()) {
+                    for (var entry2 : v2Table.entrySet()) {
+                        if (entry.getKey().equals(entry2.getKey())) {
                             method.getVarTable().replace(entry.getKey(), entry.getValue(), entry2.getValue());
                         }
-                        if(!v2Table.containsKey(entry.getKey())) {
+                        if (!v2Table.containsKey(entry.getKey())) {
                             method.getVarTable().remove(entry.getKey());
                         }
                     }

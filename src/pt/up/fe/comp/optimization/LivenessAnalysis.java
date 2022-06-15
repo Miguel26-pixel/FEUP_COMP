@@ -14,6 +14,7 @@ public class LivenessAnalysis {
     HashMap<Node, ArrayList<Operand>> succ;
     HashMap<Node, ArrayList<Operand>> out;
     HashMap<Node, ArrayList<Operand>> in;
+
     public ArrayList<HashMap<Node, ArrayList<Operand>>> analyze(Method method) {
         def = new HashMap<>();
         use = new HashMap<>();
@@ -39,24 +40,22 @@ public class LivenessAnalysis {
         boolean somethingChanged;
 
         do {
-            somethingChanged = false;
-
             HashMap<Node, ArrayList<Operand>> inTemp = new HashMap<>(in);
             HashMap<Node, ArrayList<Operand>> outTemp = new HashMap<>(out);
 
             for (Instruction instruction : nodes) {
                 ArrayList<Operand> opList = new ArrayList<>();
                 if (instruction.getSucc1() != null && instruction.getSucc1().getNodeType() != NodeType.END) {
-                        opList = in.get(instruction.getSucc1());
-                        if (instruction.getSucc2() != null) {
-                            opList.addAll(in.get(instruction.getSucc2()));
-                        }
+                    opList = in.get(instruction.getSucc1());
+                    if (instruction.getSucc2() != null) {
+                        opList.addAll(in.get(instruction.getSucc2()));
+                    }
                 }
                 out.replace(instruction, opList);
                 ArrayList<Operand> temp_out = out.get(instruction);
                 ArrayList<Operand> temp_def = def.get(instruction);
                 int i = 0;
-                if(temp_out.size() != 0) {
+                if (temp_out.size() != 0) {
                     while (i < method.getVarTable().size()) {
                         if (temp_out.get(i) != null && (temp_def.get(i) != null)) {
                             temp_out.remove(i);
@@ -76,7 +75,7 @@ public class LivenessAnalysis {
                     somethingChanged = false;
             }
 
-        }while(!somethingChanged);
+        } while (!somethingChanged);
 
         ArrayList<HashMap<Node, ArrayList<Operand>>> result = new ArrayList<>();
         result.add(in);
@@ -114,105 +113,106 @@ public class LivenessAnalysis {
         ArrayList<Operand> list = new ArrayList<>();
 
         switch (instruction.getInstType()) {
-            case CALL -> {
+            case CALL: {
                 CallInstruction callInst = (CallInstruction) instruction;
 
                 try {
                     list.add((Operand) callInst.getFirstArg());
-                }catch(ClassCastException ignored){}
+                } catch (ClassCastException ignored) {
+                }
 
                 if (callInst.getNumOperands() > 1) {
-                    if(callInst.getInvocationType() != CallType.NEW){
+                    if (callInst.getInvocationType() != CallType.NEW) {
                         try {
                             list.add((Operand) callInst.getSecondArg());
-                        }catch(ClassCastException ignored){}
+                        } catch (ClassCastException ignored) {
+                        }
                     }
                     for (Element arg : callInst.getListOfOperands()) {
                         try {
                             list.add((Operand) arg);
-                        }catch(ClassCastException ignored){}
+                        } catch (ClassCastException ignored) {
+                        }
                     }
                 }
                 return list;
             }
-            case NOPER -> {
+            case NOPER: {
                 SingleOpInstruction singInst = (SingleOpInstruction) instruction;
                 try {
                     list.add((Operand) singInst.getSingleOperand());
-                }catch(ClassCastException ignored){}
+                } catch (ClassCastException ignored) {
+                }
             }
-            case ASSIGN -> {
+            break;
+            case ASSIGN: {
                 AssignInstruction assignInst = (AssignInstruction) instruction;
                 return getUses(assignInst.getRhs());
             }
-            case BRANCH -> {
+            case BRANCH: {
                 CondBranchInstruction branchInst = (CondBranchInstruction) instruction;
                 for (Element arg : branchInst.getOperands()) {
                     try {
                         list.add((Operand) arg);
-                    }catch(ClassCastException ignored){}
+                    } catch (ClassCastException ignored) {
+                    }
                 }
                 return list;
             }
-            case RETURN -> {
+            case RETURN: {
                 ReturnInstruction retInst = (ReturnInstruction) instruction;
                 if (retInst.hasReturnValue()) {
                     try {
                         list.add((Operand) retInst.getOperand());
-                    }catch(ClassCastException ignored){}
+                    } catch (ClassCastException ignored) {
+                    }
                     return list;
                 }
                 return list;
             }
 
-            case GETFIELD -> {
+            case GETFIELD: {
                 GetFieldInstruction putInst = (GetFieldInstruction) instruction;
                 try {
                     list.add((Operand) putInst.getFirstOperand());
                     list.add((Operand) putInst.getSecondOperand());
-                }catch(ClassCastException ignored){}
+                } catch (ClassCastException ignored) {
+                }
                 return list;
             }
 
-            case PUTFIELD -> {
+            case PUTFIELD: {
                 PutFieldInstruction putInst = (PutFieldInstruction) instruction;
                 try {
                     list.add((Operand) putInst.getThirdOperand());
-                }catch(ClassCastException ignored){}
+                } catch (ClassCastException ignored) {
+                }
                 return list;
             }
 
-            case UNARYOPER -> {
+            case UNARYOPER: {
                 UnaryOpInstruction unaryInst = (UnaryOpInstruction) instruction;
                 try {
                     list.add((Operand) unaryInst.getOperand());
-                }catch(ClassCastException ignored){}
+                } catch (ClassCastException ignored) {
+                }
                 return list;
             }
-            case BINARYOPER -> {
+            case BINARYOPER: {
                 BinaryOpInstruction biInst = (BinaryOpInstruction) instruction;
                 if (biInst.getOperands() == null) return list;
                 for (Element arg : biInst.getOperands()) {
                     try {
                         list.add((Operand) arg);
-                    }catch(ClassCastException ignored){}
+                    } catch (ClassCastException ignored) {
+                    }
                 }
                 return list;
             }
-            default -> {
+            default: {
             }
         }
         return list;
-    }
-
-    private int indexInstructionByLabel(Method method, String label) {
-        for (int i = 0; i < method.getInstructions().size(); i++){
-            var labelsOfInstructions = method.getLabels(method.getInstr(i));
-            if (labelsOfInstructions.size() > 0 && labelsOfInstructions.contains(label)) {
-                return i+1;
-            }
-        }
-        return -1;
     }
 
 }
