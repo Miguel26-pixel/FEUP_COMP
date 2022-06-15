@@ -16,26 +16,15 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import org.specs.comp.ollir.parser.OllirParser;
 import pt.up.fe.comp.backend.JmmBackend;
-import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
-import pt.up.fe.comp.jmm.ollir.OllirUtils;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsStrings;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class BackendTest {
-
-    // @Test
-    // public void testHelloWorld() {
-    // var result = TestUtils.backend(SpecsIo.getResource("fixtures/public/HelloWorld.jmm"));
-    // TestUtils.noErrors(result.getReports());
-    // var output = result.run();
-    // assertEquals("Hello, World!", output.trim());
-    // }
+public class JasminTest {
 
     @Test
     public void testHelloWorld() {

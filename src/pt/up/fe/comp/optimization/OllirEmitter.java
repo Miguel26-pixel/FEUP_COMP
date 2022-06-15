@@ -148,6 +148,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         ollirCode.append(").").append(getOllirType(returnType)).append(" {");
         indentationLevel++;
         boolean returned = false;
+        int currentTemporaryVariableCounter = temporaryVariableCounter;
         for (var child : node.getChildren()) {
             if (child.getKind().equals("Return")) {
                 visit(child);
@@ -156,6 +157,7 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
                 visit(child);
             }
         }
+        temporaryVariableCounter = currentTemporaryVariableCounter;
         if (!returned) {
             startNewLine();
             ollirCode.append("ret.").append(getOllirType(returnType)).append(";");
@@ -308,16 +310,16 @@ public class OllirEmitter extends AJmmVisitor<SubstituteVariable, Boolean> {
         // Hold indexation in variable
         startNewLine();
         SubstituteVariable positionTemporaryVariable = createTemporaryVariable(node);
-        positionTemporaryVariable.setVariableType(elementType);
+        positionTemporaryVariable.setVariableType(new Type("int", false));
         ollirCode.append(createTemporaryAssign(positionTemporaryVariable, positionChild.getSubstituteWithType()));
         var closestMethod = getClosestMethod(node);
         boolean isClassField = symbolTable.getFields().stream().anyMatch(s -> s.getName().equals(variableName) && closestMethod.isPresent())
                 && symbolTable.getLocalVariables(getMethodName(closestMethod.get())).stream().noneMatch(s -> s.getName().equals(variableName));
         if (isClassField) {
             SubstituteVariable referenceHolder = createTemporaryVariable(node);
-            referenceHolder.setVariableType(elementType);
+            referenceHolder.setVariableType(symbol.getType());
             startNewLine();
-            ollirCode.append(createTemporaryAssign(referenceHolder, getField("this", variableName, getOllirType(elementType))));
+            ollirCode.append(createTemporaryAssign(referenceHolder, getField("this", variableName, getOllirType(symbol.getType()))));
             substituteVariable.setVariableName(referenceHolder.getVariableName() + "[" + positionTemporaryVariable.getSubstituteWithType() + "]");
         } else {
             substituteVariable.setVariableName(variableName + "[" + positionTemporaryVariable.getSubstituteWithType() + "]");

@@ -14,9 +14,9 @@
 #### Global self-evaluation of the project: 19
 
 ## Summary
-Our compiler takes `jmm` code, a subset of the `Java` language, and outputs `ollir`, a in-house intermediate code representation, and `jasmin`, a `JVM` stack-based language which can be run directly by the `JRE`.
+Our compiler takes `jmm` code, a subset of the `Java` language, and outputs `ollir`, an in-house intermediate code representation, and `jasmin`, a `JVM` stack-based language which can be run directly by the `JRE`.
 
-The frontend parses the `jmm` code to an abstract syntax tree, properly annotated for the later phases to depend on, and alerts for syntax errors, with respective line and column information to guide the end user.
+The frontend parses the `jmm` code to an abstract syntax tree, properly annotated for the later phases to depend on, and alerts for syntax errors, with respective line and column information to guide the end user, and `ollir` and `jasmin` reserved names properly escaped to avoid confusion in the upcoming stages.
 
 The backend is thoroughly implemented using the visitor pattern on top of the AST nodes.
 First, a symbol table, containing types, names and declarations, is generated for the code.
@@ -106,6 +106,11 @@ While visiting any kind of expression, a temporary variable is created to hold i
 
 > There is no need to translate `a = b` to `temp = b; a = temp;`. A simple registry allocation optimization in the `visitIdentifier` method changes the value of the temporary variable to the actual identifier name and does not inject any code. The `ollir` thus becomes simply `a = b`.
 
+Since the methods' local variables' liveliness cannot interfere, the variable temporary counter, used for its name, is reset for each method.
+The name is also escaped if it exists in the symbol table, to prevent name clashes.
+
+> The second compiled method can reuse the `t0` name for its first temporary variable, or `t0_`, if that method's local variables include a `t0`.
+
 An interesting challenge is the deduction of external `invoke` method call types (the internal ones are easier, since they are described in the symbol table). Since we have no access to the imported classes, we must trust the type matches at this level: the assigned variable type is passed to the right hand side expression visitor through the `assignType` field of the `SubstituteVariable` class.
 
 > A `jmm` code like `Imported obj; obj.bar(...)` becomes `invoke(...).V`, while `Imported obj; int a; a = obj.bar(...)` becomes `a.i32 :=.i32 invoke(...).i32`.
@@ -164,7 +169,22 @@ In terms of the code architecture, we are confident that our pipeline is simple 
 
 > While supporting other operators such as `>`, `!=`, or `==` would be a breeze, an addition like assignments in declarations would not be so difficult, too.
  
-While we implemented the required register allocation and constant propagation optimizations, we would like to point out the bigger feature set of the latter, given that it removes declarations and assignments of constant propagated variables, as explained above.
+While we implemented the required register allocation and constant propagation optimizations, we would like to point out the bigger feature set of the latter, given that it removes some dead code, as explained above.
+
+As a whole, we were able to run in the JVM all `jmm` code samples, including complex ones such as *TicTacToe* or *Life*.
+It was interesting to see that *Life.jmm* contained a field named *field*, which initially raised confusion at the Jasmin level, and proved the need for our AST disambiguation traversal.
+Also, the `WhileAndIf` sample provided contained a public class named `WhileAndIF`, which is not acceptable for the JVM, a small detail we also put effort to look into.
 
 ## Possible improvements
 Beside the already mentioned large size of some important classes, and the lack of a bigger optimization pipeline, we feel that our work could be much improved if we added more features to the base `jmm` language, such as method overloading, string literals or class constructor customizations.
+
+## Compile and Running
+
+To compile and install the program, run ``gradle installDist``. This will compile your classes and create a launcher script in the folder ``./build/install/comp2022-9b/bin``. For convenience, there are two script files, one for Windows (``comp2022-9b.bat``) and another for Linux (``comp2022-9b``), in the root folder, that call tihs launcher script.
+
+After compilation, a series of tests will be automatically executed. The build will stop if any test fails. Whenever you want to ignore the tests and build the program anyway, you can call Gradle with the flag ``-x test``.
+
+## Test
+
+To test the program, run ``gradle test``. This will execute the build, and run the JUnit tests in the ``test`` folder. If you want to see output printed during the tests, use the flag ``-i`` (i.e., ``gradle test -i``).
+You can also see a test report by opening ``./build/reports/tests/test/index.html``.

@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -45,7 +46,7 @@ public class JasminResult implements ReportsProvider {
     }
 
     public JasminResult(String className, String jasminCode, List<Report> reports) {
-        this(className, jasminCode, reports, Collections.emptyMap());
+        this(className, jasminCode, reports, new HashMap<>());
     }
 
     public JasminResult(OllirResult ollirResult, String jasminCode, List<Report> reports) {
@@ -54,15 +55,15 @@ public class JasminResult implements ReportsProvider {
     }
 
     public JasminResult(String jasminCode, Map<String, String> config) {
-        this("DummyClass", jasminCode, Collections.emptyList(), config);
+        this("DummyClass", jasminCode, new ArrayList<>(), config);
     }
 
     public JasminResult(String jasminCode) {
-        this(jasminCode, Collections.emptyMap());
+        this(jasminCode, new HashMap<>());
     }
 
     public static JasminResult newError(String className, Report errorReport) {
-        return new JasminResult(className, null, Arrays.asList(errorReport));
+        return new JasminResult(className, null, new ArrayList<>(Arrays.asList(errorReport)));
     }
 
     public String getClassName() {

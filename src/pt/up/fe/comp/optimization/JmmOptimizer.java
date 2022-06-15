@@ -10,10 +10,9 @@ import java.util.Collections;
 
 public class JmmOptimizer implements JmmOptimization {
 
-    final StringBuilder ollirCode = new StringBuilder();
-
     @Override
     public OllirResult toOllir(JmmSemanticsResult semanticsResult) {
+        final StringBuilder ollirCode = new StringBuilder();
         OllirEmitter ollirEmitter = new OllirEmitter(ollirCode, (JmmSymbolTable) semanticsResult.getSymbolTable(), 4);
         ollirEmitter.visit(semanticsResult.getRootNode());
         return new OllirResult(semanticsResult, ollirCode.toString(), Collections.emptyList());
@@ -33,7 +32,12 @@ public class JmmOptimizer implements JmmOptimization {
 
     @Override
     public JmmSemanticsResult optimize(JmmSemanticsResult semanticsResult) {
+        if (semanticsResult.getConfig().containsKey("optimize")
+                && semanticsResult.getConfig().get("optimize").equals("true")) {
+            ConstantPropagationVisitor constantPropagationVisitor =
+                    new ConstantPropagationVisitor((JmmSymbolTable) semanticsResult.getSymbolTable());
+            constantPropagationVisitor.visit(semanticsResult.getRootNode());
+        }
         return semanticsResult;
     }
-
 }

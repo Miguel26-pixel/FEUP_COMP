@@ -1,7 +1,8 @@
 package pt.up.fe.comp.jmm.parser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,13 +36,14 @@ public class JmmParserResult implements ReportsProvider {
     // }
 
     public static JmmParserResult newError(Report errorReport) {
-        return new JmmParserResult(null, Arrays.asList(errorReport), Collections.emptyMap());
+        return new JmmParserResult(null, new ArrayList<>(Arrays.asList(errorReport)), new HashMap<>());
     }
 
     public JmmNode getRootNode() {
         return this.rootNode;
     }
 
+    @Override
     public List<Report> getReports() {
         return this.reports;
     }

@@ -19,7 +19,7 @@ public class JmmSymbolTable extends ReportCollectorTable implements SymbolTable 
 
     public JmmSymbolTable(JmmParserResult parserResult) {
         importsTable = new ImportsTable(parserResult);
-        ClassDeclarationVisitor classDeclarationVisitor = new ClassDeclarationVisitor();
+        ClassDeclarationVisitor classDeclarationVisitor = new ClassDeclarationVisitor(parserResult.getConfig().get("inputFile"));
         classDeclarationVisitor.visit(parserResult.getRootNode(), classSignature);
         methodsTable = new MethodsTable(parserResult);
         this.reports.addAll(importsTable.getReports());
