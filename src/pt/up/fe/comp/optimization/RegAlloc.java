@@ -10,12 +10,12 @@ import java.util.List;
 public class RegAlloc {
 
     private ClassUnit classUnit;
-    private LivelinessAnalysis liveAnalyzer;
+    private LivenessAnalysis liveAnalyzer;
     private List<Report> reportsList;
 
     public RegAlloc(ClassUnit cUnit, List<Report> reports) {
         classUnit = cUnit;
-        liveAnalyzer = new LivelinessAnalysis();
+        liveAnalyzer = new LivenessAnalysis();
         reportsList = reports;
     }
 

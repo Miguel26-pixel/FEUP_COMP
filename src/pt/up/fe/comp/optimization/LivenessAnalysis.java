@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class LivelinessAnalysis {
+public class LivenessAnalysis {
 
     HashMap<Node, ArrayList<Operand>> def;
     HashMap<Node, ArrayList<Operand>> use;

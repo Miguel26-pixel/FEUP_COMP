@@ -29,7 +29,7 @@ import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.optimization.InterferenceGraph;
-import pt.up.fe.comp.optimization.LivelinessAnalysis;
+import pt.up.fe.comp.optimization.LivenessAnalysis;
 import pt.up.fe.comp.optimization.RegAlloc;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsStrings;
@@ -356,12 +356,12 @@ public class Cpf5_Optimizations {
 
 
     @Test
-    public void livelinessAnalysisTest(){
+    public void livenessAnalysisTest(){
 
         var result = getOllirResult2("basic/BasicMethodsClass.jmm");
         var method = CpUtils.getMethod(result, "func3");
 
-        LivelinessAnalysis liveAnal = new LivelinessAnalysis();
+        LivenessAnalysis liveAnal = new LivenessAnalysis();
         ArrayList<HashMap<Node, ArrayList<Operand>>> opNodes = liveAnal.analyze(method);
 
         Assert.assertNotNull(opNodes);
@@ -376,7 +376,7 @@ public class Cpf5_Optimizations {
         List<Report> reports = result.getReports();
         ClassUnit classUnit = result.getOllirClass();
 
-        LivelinessAnalysis liveAnal = new LivelinessAnalysis();
+        LivenessAnalysis liveAnal = new LivenessAnalysis();
         ArrayList<HashMap<Node, ArrayList<Operand>>> opNodes = liveAnal.analyze(method);
         RegAlloc optimizer = new RegAlloc(classUnit, result.getReports());
 
