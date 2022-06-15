@@ -13,28 +13,19 @@
 
 package pt.up.fe.comp.cpf;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-import org.specs.comp.ollir.ClassUnit;
-import org.specs.comp.ollir.Node;
-import org.specs.comp.ollir.Operand;
 import pt.up.fe.comp.CpUtils;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
-import pt.up.fe.comp.jmm.report.Report;
-import pt.up.fe.comp.optimization.InterferenceGraph;
-import pt.up.fe.comp.optimization.LivenessAnalysis;
-import pt.up.fe.comp.optimization.RegAlloc;
 import pt.up.fe.specs.util.SpecsIo;
 import pt.up.fe.specs.util.SpecsStrings;
-
-import static org.junit.Assert.fail;
 
 public class Cpf5_Optimizations {
 
@@ -42,27 +33,10 @@ public class Cpf5_Optimizations {
         return TestUtils.optimize(SpecsIo.getResource("fixtures/public/cpf/5_optimizations/" + filename));
     }
 
-    static OllirResult getOllirResult2(String filename) {
-        return TestUtils.optimize(SpecsIo.getResource("fixtures/public/cpf/3_ollir/" + filename));
-    }
-
     static JasminResult getJasminResult(String filename) {
         String resource = SpecsIo.getResource("fixtures/public/cpf/5_optimizations/" + filename);
         return TestUtils.backend(resource);
     }
-
-
-    private static boolean USE_OLLIR_EXPERIMENTAL = false;
-    static JasminResult getJasminResult2(String filename) {
-        if (USE_OLLIR_EXPERIMENTAL) {
-            filename = SpecsIo.removeExtension(filename) + ".ollir";
-            return TestUtils.backend(new OllirResult(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/" + filename),
-                    Collections.emptyMap()));
-        }
-
-        return TestUtils.backend(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/" + filename));
-    }
-
 
     static JasminResult getJasminResultOpt(String filename) {
         Map<String, String> config = new HashMap<>();
@@ -74,12 +48,6 @@ public class Cpf5_Optimizations {
         Map<String, String> config = new HashMap<>();
         config.put("registerAllocation", String.valueOf(numReg));
         return TestUtils.backend(SpecsIo.getResource("fixtures/public/cpf/5_optimizations/" + filename), config);
-    }
-
-    static JasminResult getJasminResultReg2(String filename, int numReg) {
-        Map<String, String> config = new HashMap<>();
-        config.put("registerAllocation", String.valueOf(numReg));
-        return TestUtils.backend(SpecsIo.getResource("fixtures/public/cpf/4_jasmin/" + filename), config);
     }
 
     /**
@@ -225,9 +193,7 @@ public class Cpf5_Optimizations {
         int expectedNumReg = 3;
 
         JasminResult original = getJasminResult(filename);
-        System.out.println(original.getJasminCode());
         JasminResult optimized = getJasminResultReg(filename, expectedNumReg);
-        System.out.println(optimized.getJasminCode());
 
         CpUtils.assertNotEquals("Expected code to change with -r flag\n\nOriginal code:\n" + original.getJasminCode(),
                 original.getJasminCode(), optimized.getJasminCode(),
@@ -268,7 +234,6 @@ public class Cpf5_Optimizations {
                 optimized);
 
         String method = CpUtils.getJasminMethod(optimized, "soManyRegisters");
-        System.out.println("\\.limit\\s+locals\\s+3");
         CpUtils.matches(method, "\\.limit\\s+locals\\s+3");
     }
 
@@ -352,61 +317,5 @@ public class Cpf5_Optimizations {
         CpUtils.assertEquals("Expected exactly " + expectedIf + " if instruction", expectedIf, ifOccurOpt, optimized);
         CpUtils.assertEquals("Expected exactly " + expectedGoto + " goto instructions", expectedGoto, gotoOccurOpt,
                 optimized);
-    }
-
-
-    @Test
-    public void livenessAnalysisTest(){
-
-        var result = getOllirResult2("basic/BasicMethodsClass.jmm");
-        var method = CpUtils.getMethod(result, "func3");
-
-        LivenessAnalysis liveAnal = new LivenessAnalysis();
-        ArrayList<HashMap<Node, ArrayList<Operand>>> opNodes = liveAnal.analyze(method);
-
-        Assert.assertNotNull(opNodes);
-
-    }
-
-    @Test
-    public void graphColoringTest () {
-
-        var result = getOllirResult2("basic/BasicMethodsClass.jmm");
-        var method = CpUtils.getMethod(result, "func3");
-        List<Report> reports = result.getReports();
-        ClassUnit classUnit = result.getOllirClass();
-
-        LivenessAnalysis liveAnal = new LivenessAnalysis();
-        ArrayList<HashMap<Node, ArrayList<Operand>>> opNodes = liveAnal.analyze(method);
-        RegAlloc optimizer = new RegAlloc(classUnit, result.getReports());
-
-        Assert.assertNotNull(opNodes);
-
-        InterferenceGraph varGraph = new InterferenceGraph(opNodes, method, reports);
-
-        Assert.assertNotNull(varGraph);
-        Assert.assertNotNull(optimizer);
-
-        try {
-            optimizer.allocateRegs(4);
-        }catch (Exception e){
-            String msg = "ALlocateRegister failed";
-            fail(msg);
-        }
-
-
-    }
-
-
-    private static final String JASMIN_METHOD_REGEX_PREFIX = "\\.method\\s+((public|private)\\s+)?(\\w+)\\(\\)";
-    @Test
-    public void jasminRegAllocationTest() {
-        JasminResult jasminResult = getJasminResult2("basic/BasicMethodsClass.jmm");
-        CpUtils.matches(jasminResult, JASMIN_METHOD_REGEX_PREFIX + "'?LBasicMethods;'?");
-
-        JasminResult jasminResultOptimized = getJasminResultReg2("basic/BasicMethodsClass.jmm", 4);
-
-        Assert.assertNotEquals(jasminResult,jasminResultOptimized);
-
     }
 }
