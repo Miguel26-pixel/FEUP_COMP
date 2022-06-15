@@ -1,5 +1,6 @@
 package pt.up.fe.comp.optimization;
 
+import org.specs.comp.ollir.ClassUnit;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.ollir.JmmOptimization;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
@@ -19,6 +20,13 @@ public class JmmOptimizer implements JmmOptimization {
 
     @Override
     public OllirResult optimize(OllirResult ollirResult) {
+        if (ollirResult.getConfig().containsKey("registerAllocation")
+                && (Integer.parseInt(ollirResult.getConfig().get("registerAllocation")) >= 0)) {
+            int n = Integer.parseInt(ollirResult.getConfig().get("registerAllocation"));
+            ClassUnit classUnit = ollirResult.getOllirClass();
+            RegAlloc optimizer = new RegAlloc(classUnit, ollirResult.getReports());
+            optimizer.allocateRegs(n);
+        }
         return ollirResult;
     }
 
